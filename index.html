@@ -3459,17 +3459,28 @@
 
     const CONFIG = {
 
+      /*
+        IMPORTANT:
+        Keep these as placeholders in a public GitHub file.
+        For production, use a server-side proxy/serverless function
+        so your API keys are not exposed to visitors.
+      */
       GNEWS_API_KEY:
         "YOUR_GNEWS_KEY_HERE",
 
       TWELVE_DATA_API_KEY:
         "YOUR_TWELVE_DATA_KEY_HERE",
 
+      /* News refresh: every 15 minutes */
       NEWS_REFRESH:
         15 * 60 * 1000,
 
+      /* Market refresh: every 5 minutes */
       MARKET_REFRESH:
-        60 * 1000
+        5 * 60 * 1000,
+
+      API_TIMEOUT:
+        15000
 
     };
 
@@ -3481,7 +3492,10 @@
     let marketChart = null;
 
     let selectedSymbol =
-      "NIFTY:NSE";
+      "NIFTY";
+
+    let selectedExchange =
+      "NSE";
 
     let selectedPeriod =
       "1day";
@@ -3500,103 +3514,37 @@
 
     const MARKET_GROUPS = {
 
+      /*
+        Twelve Data accepts the ticker in `symbol` and, where useful,
+        the exchange separately. This avoids the old NIFTY:NSE-style
+        identifiers that caused symbol lookup problems.
+      */
       india: [
-
-        {
-          symbol: "NIFTY:NSE",
-          name: "NIFTY 50"
-        },
-
-        {
-          symbol: "SENSEX:BSE",
-          name: "SENSEX"
-        },
-
-        {
-          symbol: "BANKNIFTY:NSE",
-          name: "BANK NIFTY"
-        },
-
-        {
-          symbol: "RELIANCE:NSE",
-          name: "Reliance Industries"
-        }
-
+        { symbol: "NIFTY", exchange: "NSE", name: "NIFTY 50" },
+        { symbol: "SENSEX", exchange: "BSE", name: "SENSEX" },
+        { symbol: "BANKNIFTY", exchange: "NSE", name: "BANK NIFTY" },
+        { symbol: "RELIANCE", exchange: "NSE", name: "Reliance Industries" }
       ],
-
 
       global: [
-
-        {
-          symbol: "SPX",
-          name: "S&P 500"
-        },
-
-        {
-          symbol: "IXIC",
-          name: "NASDAQ"
-        },
-
-        {
-          symbol: "DJI",
-          name: "Dow Jones"
-        },
-
-        {
-          symbol: "FTSE",
-          name: "FTSE 100"
-        }
-
+        { symbol: "SPX", name: "S&P 500" },
+        { symbol: "IXIC", name: "NASDAQ Composite" },
+        { symbol: "DJI", name: "Dow Jones" },
+        { symbol: "FTSE", name: "FTSE 100" }
       ],
-
 
       technology: [
-
-        {
-          symbol: "AAPL",
-          name: "Apple"
-        },
-
-        {
-          symbol: "MSFT",
-          name: "Microsoft"
-        },
-
-        {
-          symbol: "NVDA",
-          name: "NVIDIA"
-        },
-
-        {
-          symbol: "TSLA",
-          name: "Tesla"
-        }
-
+        { symbol: "AAPL", exchange: "NASDAQ", name: "Apple" },
+        { symbol: "MSFT", exchange: "NASDAQ", name: "Microsoft" },
+        { symbol: "NVDA", exchange: "NASDAQ", name: "NVIDIA" },
+        { symbol: "TSLA", exchange: "NASDAQ", name: "Tesla" }
       ],
 
-
       crypto: [
-
-        {
-          symbol: "BTC/USD",
-          name: "Bitcoin"
-        },
-
-        {
-          symbol: "ETH/USD",
-          name: "Ethereum"
-        },
-
-        {
-          symbol: "SOL/USD",
-          name: "Solana"
-        },
-
-        {
-          symbol: "XRP/USD",
-          name: "XRP"
-        }
-
+        { symbol: "BTC/USD", name: "Bitcoin" },
+        { symbol: "ETH/USD", name: "Ethereum" },
+        { symbol: "SOL/USD", name: "Solana" },
+        { symbol: "XRP/USD", name: "XRP" }
       ]
 
     };
@@ -3606,13 +3554,38 @@
        API HELPERS
     ====================================================== */
 
+    function isRealApiKey(value) {
+
+      if (!value) return false;
+
+      const key =
+        String(value).trim();
+
+      if (!key) return false;
+
+      const placeholders = [
+        "YOUR_GNEWS_KEY_HERE",
+        "YOUR_TWELVE_DATA_KEY_HERE",
+        "PASTE_YOUR",
+        "YOUR_API_KEY",
+        "REPLACE_ME",
+        "CHANGE_ME"
+      ];
+
+      return !placeholders.some(
+        placeholder =>
+          key.toUpperCase().includes(
+            placeholder.toUpperCase()
+          )
+      );
+
+    }
+
+
     function hasGNewsKey() {
 
-      return (
-        CONFIG.GNEWS_API_KEY &&
-        !CONFIG.GNEWS_API_KEY.includes(
-          "PASTE_YOUR"
-        )
+      return isRealApiKey(
+        CONFIG.GNEWS_API_KEY
       );
 
     }
@@ -3620,11 +3593,8 @@
 
     function hasMarketKey() {
 
-      return (
-        CONFIG.TWELVE_DATA_API_KEY &&
-        !CONFIG.TWELVE_DATA_API_KEY.includes(
-          "PASTE_YOUR"
-        )
+      return isRealApiKey(
+        CONFIG.TWELVE_DATA_API_KEY
       );
 
     }
@@ -3632,42 +3602,63 @@
 
     async function apiFetch(url) {
 
-      const response =
-        await fetch(
-          url,
-          {
-            cache: "no-store"
-          }
+      const controller =
+        new AbortController();
+
+      const timeout =
+        setTimeout(
+          () =>
+            controller.abort(),
+          CONFIG.API_TIMEOUT
         );
 
+      try {
 
-      if (!response.ok) {
+        const response =
+          await fetch(
+            url,
+            {
+              cache: "no-store",
+              signal:
+                controller.signal
+            }
+          );
 
-        throw new Error(
-          `HTTP ${response.status}`
-        );
+        const data =
+          await response
+            .json()
+            .catch(
+              () => ({})
+            );
+
+        if (!response.ok) {
+
+          throw new Error(
+            data.message ||
+            `HTTP ${response.status}`
+          );
+
+        }
+
+        if (
+          data.status === "error" ||
+          data.code
+        ) {
+
+          throw new Error(
+            data.message ||
+            "API request failed"
+          );
+
+        }
+
+        return data;
+
+      } finally {
+
+        clearTimeout(timeout);
 
       }
-
-
-      const data =
-        await response.json();
-
-
-      if (
-        data.status === "error" ||
-        data.code
-      ) {
-
-        throw new Error(
-          data.message ||
-          "API request failed"
-        );
-
-      }
-
-
-      return data;
 
     }
 
@@ -3896,7 +3887,7 @@
       */
 
       date.setHours(
-        date.getHours() - 36
+        date.getHours() - 48
       );
 
 
@@ -4360,7 +4351,8 @@
     ====================================================== */
 
     async function marketQuote(
-      symbol
+      symbol,
+      exchange = ""
     ) {
 
       if (!hasMarketKey()) {
@@ -4371,18 +4363,22 @@
 
       }
 
+      const paramsObject = {
+        symbol:
+          symbol,
+        apikey:
+          CONFIG.TWELVE_DATA_API_KEY
+      };
+
+      if (exchange) {
+        paramsObject.exchange =
+          exchange;
+      }
 
       const params =
-        new URLSearchParams({
-
-          symbol:
-            symbol,
-
-          apikey:
-            CONFIG.TWELVE_DATA_API_KEY
-
-        });
-
+        new URLSearchParams(
+          paramsObject
+        );
 
       return apiFetch(
         "https://api.twelvedata.com/quote?"
@@ -4398,7 +4394,8 @@
 
     async function marketHistory(
       symbol,
-      period
+      period,
+      exchange = ""
     ) {
 
       if (!hasMarketKey()) {
@@ -4470,25 +4467,34 @@
       }
 
 
+      const paramsObject = {
+
+        symbol:
+          symbol,
+
+        interval:
+          interval,
+
+        outputsize:
+          outputsize,
+
+        order:
+          "asc",
+
+        apikey:
+          CONFIG.TWELVE_DATA_API_KEY
+
+      };
+
+      if (exchange) {
+        paramsObject.exchange =
+          exchange;
+      }
+
       const params =
-        new URLSearchParams({
-
-          symbol:
-            symbol,
-
-          interval:
-            interval,
-
-          outputsize:
-            outputsize,
-
-          order:
-            "asc",
-
-          apikey:
-            CONFIG.TWELVE_DATA_API_KEY
-
-        });
+        new URLSearchParams(
+          paramsObject
+        );
 
 
       return apiFetch(
@@ -4590,7 +4596,8 @@
           () =>
             selectMarket(
               item.symbol,
-              item.name
+              item.name,
+              item.exchange || ""
             );
 
 
@@ -4615,7 +4622,8 @@
 
           const quote =
             await marketQuote(
-              item.symbol
+              item.symbol,
+              item.exchange || ""
             );
 
 
@@ -4692,11 +4700,15 @@
 
     async function selectMarket(
       symbol,
-      name
+      name,
+      exchange = ""
     ) {
 
       selectedSymbol =
         symbol;
+
+      selectedExchange =
+        exchange || "";
 
 
       document
@@ -4739,7 +4751,8 @@
 
         const quote =
           await marketQuote(
-            selectedSymbol
+            selectedSymbol,
+            selectedExchange
           );
 
 
@@ -4751,7 +4764,8 @@
         const history =
           await marketHistory(
             selectedSymbol,
-            selectedPeriod
+            selectedPeriod,
+            selectedExchange
           );
 
 
@@ -5216,7 +5230,8 @@
           const history =
             await marketHistory(
               selectedSymbol,
-              selectedPeriod
+              selectedPeriod,
+              selectedExchange
             );
 
 
@@ -5278,7 +5293,8 @@
 
         selectMarket(
           first.symbol,
-          first.name
+          first.name,
+          first.exchange || ""
         );
 
       }
@@ -5403,7 +5419,8 @@
                   onclick="
                     selectMarket(
                       '${escapeHTML(item.symbol)}',
-                      '${escapeHTML(item.instrument_name)}'
+                      '${escapeHTML(item.instrument_name)}',
+                      '${escapeHTML(item.exchange || "")}'
                     )
                   "
                 >
@@ -5716,8 +5733,9 @@
         loadWatchlist();
 
         selectMarket(
-          "NIFTY:NSE",
-          "NIFTY 50"
+          "NIFTY",
+          "NIFTY 50",
+          "NSE"
         );
 
       }
