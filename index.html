@@ -11,6 +11,18 @@
 <meta name="description"
 content="WORLDLYN brings global trends, markets, business, economy, technology and insights together in one place.">
 
+<!-- TradingView Market Widget -->
+<script
+type="module"
+src="https://widgets.tradingview-widget.com/w/en/tv-ticker-tape.js">
+</script>
+
+<script
+type="module"
+src="https://widgets.tradingview-widget.com/w/en/tv-market-overview.js">
+</script>
+
+
 <style>
 
 * {
@@ -41,7 +53,9 @@ body {
 }
 
 
-/* HEADER */
+/* =========================
+   HEADER
+========================= */
 
 header {
     background: var(--navy);
@@ -76,7 +90,9 @@ header {
 }
 
 
-/* NAVIGATION */
+/* =========================
+   NAVIGATION
+========================= */
 
 nav {
     background: var(--navy2);
@@ -113,7 +129,9 @@ nav a.active {
 }
 
 
-/* MAIN */
+/* =========================
+   MAIN
+========================= */
 
 .container {
     max-width: 1250px;
@@ -122,7 +140,25 @@ nav a.active {
 }
 
 
-/* BREAKING */
+/* =========================
+   TICKER
+========================= */
+
+.market-ticker {
+    background: white;
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+}
+
+.ticker-inner {
+    max-width: 1250px;
+    margin: auto;
+}
+
+
+/* =========================
+   BREAKING BAR
+========================= */
 
 .breaking {
     display: flex;
@@ -146,7 +182,9 @@ nav a.active {
 }
 
 
-/* HERO */
+/* =========================
+   HERO
+========================= */
 
 .hero-grid {
     display: grid;
@@ -154,15 +192,21 @@ nav a.active {
     gap: 22px;
 }
 
+.hero-link {
+    text-decoration: none;
+    color: inherit;
+}
+
 .hero {
     min-height: 390px;
     border-radius: 14px;
     overflow: hidden;
     position: relative;
+
     background:
         linear-gradient(
             to top,
-            rgba(0,0,0,0.88),
+            rgba(0,0,0,0.90),
             rgba(0,0,0,0.08)
         ),
         linear-gradient(
@@ -170,11 +214,18 @@ nav a.active {
             #173b6c,
             #081827
         );
+
     color: white;
     padding: 30px;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
+
+    transition: .2s;
+}
+
+.hero:hover {
+    transform: translateY(-2px);
 }
 
 .hero-label {
@@ -205,7 +256,9 @@ nav a.active {
 }
 
 
-/* SIDE STORIES */
+/* =========================
+   SIDE STORIES
+========================= */
 
 .side-stories {
     display: flex;
@@ -255,7 +308,9 @@ nav a.active {
 }
 
 
-/* SECTION */
+/* =========================
+   SECTION
+========================= */
 
 .section-header {
     display: flex;
@@ -278,45 +333,34 @@ nav a.active {
 }
 
 
-/* MARKET DASHBOARD */
+/* =========================
+   LIVE MARKET SECTION
+========================= */
 
-.market-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 14px;
-}
-
-.market-card {
+.market-wrapper {
     background: white;
     border: 1px solid var(--border);
-    border-radius: 11px;
-    padding: 18px;
+    border-radius: 14px;
+    padding: 10px;
+    overflow: hidden;
 }
 
-.market-name {
-    font-size: 12px;
-    color: var(--muted);
-    font-weight: 700;
+.market-widget {
+    width: 100%;
+    min-height: 430px;
 }
 
-.market-value {
-    font-size: 22px;
-    font-weight: 800;
-    margin-top: 8px;
-}
-
-.market-status {
-    font-size: 12px;
-    color: var(--muted);
-    margin-top: 5px;
-}
-
-.market-up {
-    color: var(--green);
+.market-note {
+    font-size: 11px;
+    color: #94a3b8;
+    margin-top: 10px;
+    padding: 0 8px 8px;
 }
 
 
-/* NEWS GRID */
+/* =========================
+   NEWS GRID
+========================= */
 
 .news-grid {
     display: grid;
@@ -345,15 +389,18 @@ nav a.active {
 
 .news-image {
     height: 150px;
+
     background:
         linear-gradient(
             135deg,
             #dbeafe,
             #94a3b8
         );
+
     display: flex;
     align-items: center;
     justify-content: center;
+
     color: #1e3a8a;
     font-weight: 800;
     font-size: 13px;
@@ -375,7 +422,9 @@ nav a.active {
 }
 
 
-/* TWO COLUMN */
+/* =========================
+   TWO COLUMN
+========================= */
 
 .two-column {
     display: grid;
@@ -415,7 +464,9 @@ nav a.active {
 }
 
 
-/* INSIGHT */
+/* =========================
+   INSIGHT
+========================= */
 
 .insight {
     margin-top: 42px;
@@ -444,7 +495,9 @@ nav a.active {
 }
 
 
-/* FOOTER */
+/* =========================
+   FOOTER
+========================= */
 
 footer {
     background: var(--navy);
@@ -499,7 +552,9 @@ footer {
 }
 
 
-/* MOBILE */
+/* =========================
+   MOBILE
+========================= */
 
 @media (max-width: 850px) {
 
@@ -521,10 +576,6 @@ footer {
 
     .hero h1 {
         font-size: 30px;
-    }
-
-    .market-grid {
-        grid-template-columns: repeat(2, 1fr);
     }
 
     .news-grid {
@@ -559,14 +610,6 @@ footer {
         font-size: 26px;
     }
 
-    .market-grid {
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .market-value {
-        font-size: 18px;
-    }
-
     .section-title {
         font-size: 21px;
     }
@@ -574,6 +617,7 @@ footer {
     .footer-container {
         grid-template-columns: 1fr;
     }
+
 }
 
 </style>
@@ -584,7 +628,9 @@ footer {
 <body>
 
 
-<!-- HEADER -->
+<!-- =========================
+     HEADER
+========================= -->
 
 <header>
 
@@ -612,7 +658,9 @@ GLOBAL • MARKETS • BUSINESS • TECHNOLOGY
 
 
 
-<!-- NAVIGATION -->
+<!-- =========================
+     NAVIGATION
+========================= -->
 
 <nav>
 
@@ -652,27 +700,50 @@ INSIGHTS
 
 
 
-<main class="container">
+<!-- =========================
+     MARKET TICKER
+========================= -->
 
+<div class="market-ticker">
 
-<!-- BREAKING -->
+<div class="ticker-inner">
 
-<div class="breaking">
+<tv-ticker-tape
+symbols="NSE:NIFTY,BSE:SENSEX,SP:SPX,NASDAQ:NDX"
+item-size="compact">
+</tv-ticker-tape>
 
-<span class="live-dot"></span>
-
-WORLDLYN DAILY — Understanding what is moving the world
+</div>
 
 </div>
 
 
 
-<!-- HERO -->
+<main class="container">
+
+
+<!-- =========================
+     DAILY BAR
+========================= -->
+
+<div class="breaking">
+
+<span class="live-dot"></span>
+
+WORLDLYN DAILY — Know What Moves the World
+
+</div>
+
+
+
+<!-- =========================
+     HERO
+========================= -->
 
 <section class="hero-grid">
 
 
-<a href="article.html" style="text-decoration:none;color:inherit;">
+<a href="article.html" class="hero-link">
 
 <div class="hero">
 
@@ -685,8 +756,9 @@ The trends shaping global markets, business and the world
 </h1>
 
 <p>
-WORLDLYN brings together the stories, trends and developments
-that matter — and explains why they matter.
+WORLDLYN brings together global developments,
+markets, business, technology and economic trends —
+explained simply and clearly.
 </p>
 
 <div class="hero-meta">
@@ -751,7 +823,9 @@ The technologies creating new opportunities and challenges.
 
 
 
-<!-- MARKET WATCH -->
+<!-- =========================
+     MARKET WATCH
+========================= -->
 
 <section id="markets">
 
@@ -762,86 +836,40 @@ Market Watch
 </h2>
 
 <span class="view-all">
-LIVE DATA — COMING SOON
+LIVE MARKET DATA
 </span>
 
 </div>
 
 
+<div class="market-wrapper">
 
-<div class="market-grid">
+<div class="market-widget">
 
-
-<div class="market-card">
-
-<div class="market-name">
-NIFTY 50
-</div>
-
-<div class="market-value">
-—
-</div>
-
-<div class="market-status">
-India
-</div>
-
-</div>
-
-
-
-<div class="market-card">
-
-<div class="market-name">
-SENSEX
-</div>
-
-<div class="market-value">
-—
-</div>
-
-<div class="market-status">
-India
-</div>
+<tv-market-overview
+symbol-sectors='[
+{
+"sectionName":"Global Indices",
+"symbols":[
+"NSE:NIFTY",
+"BSE:SENSEX",
+"SP:SPX",
+"NASDAQ:NDX"
+]
+}
+]'
+show-chart="true">
+</tv-market-overview>
 
 </div>
 
+<div class="market-note">
 
-
-<div class="market-card">
-
-<div class="market-name">
-S&P 500
-</div>
-
-<div class="market-value">
-—
-</div>
-
-<div class="market-status">
-United States
-</div>
+Market data is provided through TradingView. Availability,
+timeliness and whether data is real-time or delayed may vary
+by exchange and instrument.
 
 </div>
-
-
-
-<div class="market-card">
-
-<div class="market-name">
-NASDAQ
-</div>
-
-<div class="market-value">
-—
-</div>
-
-<div class="market-status">
-United States
-</div>
-
-</div>
-
 
 </div>
 
@@ -849,7 +877,9 @@ United States
 
 
 
-<!-- TOP STORIES -->
+<!-- =========================
+     TOP STORIES
+========================= -->
 
 <section id="global">
 
@@ -870,6 +900,8 @@ LATEST
 <div class="news-grid">
 
 
+<!-- GLOBAL -->
+
 <article class="news-card">
 
 <a href="article.html">
@@ -889,7 +921,8 @@ What is moving the global economy?
 </h3>
 
 <p>
-Major developments around the world and what they could mean for businesses and markets.
+Major developments around the world and what they could
+mean for businesses and markets.
 </p>
 
 </div>
@@ -899,6 +932,8 @@ Major developments around the world and what they could mean for businesses and 
 </article>
 
 
+
+<!-- MARKETS -->
 
 <article class="news-card">
 
@@ -919,7 +954,8 @@ What investors are watching today
 </h3>
 
 <p>
-The economic signals, company developments and market themes investors are following.
+The economic signals, company developments and market
+themes investors are following.
 </p>
 
 </div>
@@ -929,6 +965,8 @@ The economic signals, company developments and market themes investors are follo
 </article>
 
 
+
+<!-- BUSINESS -->
 
 <article class="news-card">
 
@@ -949,7 +987,8 @@ Business trends shaping tomorrow
 </h3>
 
 <p>
-Important developments across companies, industries and the global economy.
+Important developments across companies, industries
+and the global economy.
 </p>
 
 </div>
@@ -965,7 +1004,9 @@ Important developments across companies, industries and the global economy.
 
 
 
-<!-- BUSINESS -->
+<!-- =========================
+     BUSINESS & ECONOMY
+========================= -->
 
 <section id="business">
 
@@ -1002,7 +1043,8 @@ The companies and industries attracting attention
 </h3>
 
 <p>
-Follow corporate developments and industry trends that could shape markets.
+Follow corporate developments and industry trends
+that could shape markets.
 </p>
 
 </a>
@@ -1024,7 +1066,8 @@ Economic signals investors should understand
 </h3>
 
 <p>
-Inflation, interest rates, employment and economic growth explained simply.
+Inflation, interest rates, employment and economic
+growth explained simply.
 </p>
 
 </a>
@@ -1046,7 +1089,8 @@ Why market sentiment can change so quickly
 </h3>
 
 <p>
-Understanding the factors behind movements in financial markets.
+Understanding the factors behind movements
+in financial markets.
 </p>
 
 </a>
@@ -1069,7 +1113,8 @@ What happened today?
 </h3>
 
 <p style="margin-top:10px;color:#64748b;font-size:14px;">
-A short and simple summary of the most important developments.
+A short and simple summary of the most important
+developments.
 </p>
 
 <br>
@@ -1091,7 +1136,9 @@ The bigger picture behind today's biggest stories.
 
 
 
-<!-- TECHNOLOGY -->
+<!-- =========================
+     TECHNOLOGY
+========================= -->
 
 <section id="technology">
 
@@ -1131,7 +1178,8 @@ The AI developments businesses need to watch
 </h3>
 
 <p>
-The technologies changing productivity, investment and competition.
+The technologies changing productivity,
+investment and competition.
 </p>
 
 </div>
@@ -1161,7 +1209,8 @@ Technology trends changing the global economy
 </h3>
 
 <p>
-Understanding the innovations influencing industries and consumers.
+Understanding the innovations influencing
+industries and consumers.
 </p>
 
 </div>
@@ -1191,7 +1240,8 @@ The next wave of digital business
 </h3>
 
 <p>
-How technology is creating new business models and opportunities.
+How technology is creating new business
+models and opportunities.
 </p>
 
 </div>
@@ -1207,7 +1257,9 @@ How technology is creating new business models and opportunities.
 
 
 
-<!-- INSIGHT -->
+<!-- =========================
+     INSIGHT
+========================= -->
 
 <section id="insights">
 
@@ -1222,9 +1274,9 @@ Don't just follow the headline. Understand the story.
 </h2>
 
 <p>
-Our goal is simple: explain what happened, why it happened,
-and why it matters. WORLDLYN turns complicated global,
-business and market developments into clear insights.
+The goal of WORLDLYN is simple: explain what happened,
+why it happened and why it matters — giving readers
+context instead of simply another headline.
 </p>
 
 </div>
@@ -1236,7 +1288,9 @@ business and market developments into clear insights.
 
 
 
-<!-- FOOTER -->
+<!-- =========================
+     FOOTER
+========================= -->
 
 <footer>
 
