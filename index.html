@@ -2,21 +2,29 @@
 <html lang="en">
 
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <title>WORLDLYN — Know What Moves the World</title>
 
   <meta
     name="description"
-    content="WORLDLYN brings global news, stock markets, business, economy, technology, AI and insights together in one intelligent platform."
+    content="WORLDLYN brings global news, markets, business, economy, technology, AI and insights together in one place."
   >
 
-  <meta name="theme-color" content="#071a33">
+  <meta
+    name="theme-color"
+    content="#071a33"
+  >
 
   <!-- =====================================================
-       TRADINGVIEW WIDGETS
-       ===================================================== -->
+       TRADINGVIEW WEB COMPONENTS
+  ====================================================== -->
 
   <script
     type="module"
@@ -25,52 +33,29 @@
 
   <script
     type="module"
-    src="https://widgets.tradingview-widget.com/w/en/tv-market-overview.js">
+    src="https://widgets.tradingview-widget.com/w/en/tv-company-profile.js">
   </script>
 
+
+  <!-- =====================================================
+       FAVICON
+  ====================================================== -->
+
+  <link
+    rel="icon"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23071a33'/%3E%3Ctext x='50' y='68' text-anchor='middle' font-family='Arial' font-size='55' font-weight='800' fill='white'%3EW%3C/text%3E%3C/svg%3E"
+  >
+
+
+  <!-- =====================================================
+       MAIN STYLE
+  ====================================================== -->
 
   <style>
 
     /* =====================================================
-       WORLDLYN DESIGN SYSTEM
-       ===================================================== */
-
-    :root {
-      --navy: #06182f;
-      --navy-2: #0a2850;
-      --navy-3: #123f78;
-
-      --blue: #2563eb;
-      --blue-light: #eaf2ff;
-
-      --gold: #d8a43a;
-
-      --green: #16a34a;
-      --red: #dc2626;
-
-      --white: #ffffff;
-      --background: #f4f7fb;
-
-      --text: #172033;
-      --muted: #66758a;
-
-      --border: #dfe6ef;
-
-      --shadow:
-        0 12px 35px rgba(7, 26, 51, 0.08);
-
-      --shadow-lg:
-        0 25px 70px rgba(7, 26, 51, 0.15);
-
-      --radius: 18px;
-
-      --max-width: 1240px;
-    }
-
-
-    /* =====================================================
        RESET
-       ===================================================== */
+    ====================================================== */
 
     * {
       margin: 0;
@@ -81,28 +66,26 @@
 
     html {
       scroll-behavior: smooth;
-      scroll-padding-top: 145px;
     }
 
 
     body {
       font-family:
         Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
         Arial,
         Helvetica,
         sans-serif;
 
-      background: var(--background);
+      background: #f5f8fc;
 
-      color: var(--text);
+      color: #172033;
 
       line-height: 1.6;
-    }
 
-
-    a {
-      color: inherit;
-      text-decoration: none;
+      overflow-x: hidden;
     }
 
 
@@ -112,41 +95,104 @@
     }
 
 
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+
+    button,
+    input {
+      font: inherit;
+    }
+
+
     button {
-      font-family: inherit;
+      cursor: pointer;
+    }
+
+
+    :root {
+
+      --navy: #071a33;
+
+      --navy-2: #0b2a52;
+
+      --blue: #2563eb;
+
+      --blue-2: #3b82f6;
+
+      --light-blue: #eaf2ff;
+
+      --green: #16a34a;
+
+      --red: #dc2626;
+
+      --text: #172033;
+
+      --muted: #64748b;
+
+      --light: #f5f8fc;
+
+      --white: #ffffff;
+
+      --border: #dbe3ef;
+
+      --shadow:
+        0 15px 40px rgba(7, 26, 51, 0.08);
+
+      --radius: 18px;
     }
 
 
     /* =====================================================
-       HEADER
-       ===================================================== */
+       TOP HEADER
+    ====================================================== */
 
-    .brand-header {
+    .top-header {
+
       background:
         linear-gradient(
           120deg,
-          #041226,
-          #092650 55%,
-          #0e3d73
+          #06162d,
+          #092957,
+          #1555a0
         );
 
       color: white;
 
-      position: sticky;
+      padding: 20px 6%;
 
-      top: 0;
+      position: relative;
 
-      z-index: 1000;
-
-      border-bottom:
-        1px solid rgba(255,255,255,0.08);
+      overflow: hidden;
     }
 
 
-    .brand-inner {
-      width: min(var(--max-width), 92%);
+    .top-header::after {
 
-      min-height: 84px;
+      content: "";
+
+      position: absolute;
+
+      width: 420px;
+
+      height: 420px;
+
+      border-radius: 50%;
+
+      right: -180px;
+
+      top: -260px;
+
+      background:
+        rgba(255,255,255,0.07);
+    }
+
+
+    .header-inner {
+
+      width: min(1280px, 92%);
 
       margin: auto;
 
@@ -157,114 +203,30 @@
       justify-content: space-between;
 
       gap: 30px;
+
+      position: relative;
+
+      z-index: 2;
     }
 
 
     .brand {
+
       display: flex;
 
       align-items: center;
 
-      gap: 13px;
+      gap: 14px;
     }
 
 
-    .brand-logo {
-      width: 42px;
+    .brand-mark {
 
-      height: 42px;
+      width: 48px;
 
-      display: grid;
+      height: 48px;
 
-      place-items: center;
-
-      border-radius: 11px;
-
-      background:
-        linear-gradient(
-          135deg,
-          #2f6df6,
-          #164aa8
-        );
-
-      font-size: 18px;
-
-      font-weight: 900;
-
-      box-shadow:
-        0 8px 22px rgba(47,109,246,0.3);
-    }
-
-
-    .brand-name {
-      font-size: 28px;
-
-      line-height: 1;
-
-      font-weight: 950;
-
-      letter-spacing: 2.5px;
-    }
-
-
-    .brand-tagline {
-      margin-top: 5px;
-
-      color: #b9cce5;
-
-      font-size: 11px;
-
-      letter-spacing: .7px;
-    }
-
-
-    .brand-info {
-      color: #d6e4f6;
-
-      font-size: 10px;
-
-      font-weight: 800;
-
-      letter-spacing: 1px;
-
-      text-align: right;
-    }
-
-
-    .brand-info span {
-      color: #82adff;
-    }
-
-
-    /* =====================================================
-       NAVIGATION
-       ===================================================== */
-
-    .main-nav {
-      position: sticky;
-
-      top: 84px;
-
-      z-index: 999;
-
-      background: rgba(255,255,255,.97);
-
-      backdrop-filter: blur(12px);
-
-      border-bottom:
-        1px solid var(--border);
-
-      box-shadow:
-        0 3px 12px rgba(7,26,51,.04);
-    }
-
-
-    .nav-inner {
-      width: min(var(--max-width), 92%);
-
-      min-height: 54px;
-
-      margin: auto;
+      border-radius: 13px;
 
       display: flex;
 
@@ -272,7 +234,94 @@
 
       justify-content: center;
 
-      gap: 30px;
+      background:
+        linear-gradient(
+          135deg,
+          #2563eb,
+          #60a5fa
+        );
+
+      font-size: 24px;
+
+      font-weight: 900;
+
+      box-shadow:
+        0 8px 20px
+        rgba(0,0,0,0.20);
+    }
+
+
+    .brand-name {
+
+      font-size: 28px;
+
+      font-weight: 900;
+
+      letter-spacing: 1.5px;
+    }
+
+
+    .brand-tagline {
+
+      font-size: 12px;
+
+      color: #c6d5ea;
+
+      margin-top: 1px;
+    }
+
+
+    .header-right {
+
+      color: #d8e5f5;
+
+      font-size: 12px;
+
+      font-weight: 800;
+
+      letter-spacing: 1.2px;
+
+      text-align: right;
+    }
+
+
+    /* =====================================================
+       NAVIGATION
+    ====================================================== */
+
+    .main-nav {
+
+      position: sticky;
+
+      top: 0;
+
+      z-index: 1000;
+
+      background:
+        rgba(255,255,255,0.97);
+
+      backdrop-filter: blur(12px);
+
+      border-bottom:
+        1px solid var(--border);
+
+      box-shadow:
+        0 4px 20px
+        rgba(7,26,51,0.05);
+    }
+
+
+    .nav-inner {
+
+      width: min(1280px, 94%);
+
+      margin: auto;
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 5px;
 
       overflow-x: auto;
 
@@ -286,60 +335,41 @@
 
 
     .nav-link {
-      position: relative;
-
-      padding: 17px 0;
 
       white-space: nowrap;
 
-      color: #344054;
+      padding: 16px 13px;
 
       font-size: 11px;
 
-      font-weight: 850;
+      font-weight: 900;
 
-      letter-spacing: .7px;
+      letter-spacing: 1px;
 
-      transition: color .2s ease;
-    }
+      color: #334155;
 
+      border-bottom: 3px solid transparent;
 
-    .nav-link::after {
-      content: "";
-
-      position: absolute;
-
-      left: 0;
-
-      bottom: 7px;
-
-      width: 0;
-
-      height: 2px;
-
-      background: var(--blue);
-
-      transition: width .2s ease;
+      transition: 0.2s ease;
     }
 
 
     .nav-link:hover,
     .nav-link.active {
+
       color: var(--blue);
-    }
 
-
-    .nav-link:hover::after,
-    .nav-link.active::after {
-      width: 100%;
+      border-bottom-color:
+        var(--blue);
     }
 
 
     /* =====================================================
        TICKER
-       ===================================================== */
+    ====================================================== */
 
-    .ticker {
+    .ticker-area {
+
       background: white;
 
       border-bottom:
@@ -349,270 +379,322 @@
     }
 
 
-    .ticker-inner {
-      width: min(1500px, 100%);
-
-      min-height: 44px;
-
-      margin: auto;
-    }
-
-
-    tv-ticker-tape {
-      display: block;
+    .ticker-wrapper {
 
       width: 100%;
+
+      min-height: 46px;
     }
 
 
     /* =====================================================
-       MAIN
-       ===================================================== */
+       PAGE CONTAINER
+    ====================================================== */
 
-    main {
-      width: min(var(--max-width), 92%);
+    .container {
 
-      margin: 28px auto 80px;
+      width: min(1280px, 92%);
+
+      margin: 0 auto;
     }
 
 
     /* =====================================================
-       DAILY STATUS
-       ===================================================== */
+       LIVE BAR
+    ====================================================== */
 
-    .daily-status {
+    .daily-bar {
+
       display: flex;
 
       align-items: center;
 
       gap: 9px;
 
-      margin-bottom: 18px;
+      margin: 25px 0 18px;
 
       color: var(--muted);
 
-      font-size: 10px;
+      font-size: 12px;
 
-      font-weight: 850;
-
-      letter-spacing: .9px;
-
-      text-transform: uppercase;
+      font-weight: 700;
     }
 
 
     .live-dot {
+
       width: 8px;
 
       height: 8px;
 
       border-radius: 50%;
 
-      background: var(--red);
+      background: var(--green);
 
       box-shadow:
-        0 0 0 5px rgba(220,38,38,.10);
+        0 0 0 5px
+        rgba(22,163,74,0.10);
     }
 
 
     /* =====================================================
        HERO
-       ===================================================== */
-
-    .hero-layout {
-      display: grid;
-
-      grid-template-columns:
-        minmax(0, 1.7fr)
-        minmax(300px, .8fr);
-
-      gap: 22px;
-    }
-
+    ====================================================== */
 
     .hero {
-      min-height: 455px;
 
-      padding: 55px;
+      min-height: 480px;
+
+      border-radius: 24px;
+
+      overflow: hidden;
+
+      position: relative;
 
       display: flex;
 
       align-items: flex-end;
 
-      position: relative;
-
-      overflow: hidden;
-
-      border-radius: 24px;
-
-      color: white;
+      padding: 55px;
 
       background:
 
-        radial-gradient(
-          circle at 88% 12%,
-          rgba(79,140,255,.35),
-          transparent 30%
-        ),
-
-        radial-gradient(
-          circle at 5% 100%,
-          rgba(216,164,58,.10),
-          transparent 25%
-        ),
-
         linear-gradient(
           135deg,
-          #041226,
-          #0a2c59 58%,
-          #10457e
+          rgba(4,18,40,0.96),
+          rgba(10,45,91,0.90)
+        ),
+
+        radial-gradient(
+          circle at 85% 15%,
+          #2563eb,
+          transparent 35%
         );
 
-      box-shadow: var(--shadow-lg);
+      color: white;
+
+      box-shadow: var(--shadow);
     }
 
 
-    .hero::after {
+    .hero::before {
+
       content: "";
 
       position: absolute;
 
-      width: 480px;
+      width: 450px;
 
-      height: 480px;
-
-      right: -250px;
-
-      top: -250px;
+      height: 450px;
 
       border-radius: 50%;
 
-      border:
-        1px solid rgba(255,255,255,.10);
+      right: -170px;
 
-      box-shadow:
-        0 0 0 55px rgba(255,255,255,.025),
-        0 0 0 110px rgba(255,255,255,.018);
+      top: -170px;
+
+      background:
+        rgba(255,255,255,0.07);
+    }
+
+
+    .hero-grid-lines {
+
+      position: absolute;
+
+      inset: 0;
+
+      opacity: 0.12;
+
+      background-image:
+        linear-gradient(
+          rgba(255,255,255,0.25) 1px,
+          transparent 1px
+        ),
+        linear-gradient(
+          90deg,
+          rgba(255,255,255,0.25) 1px,
+          transparent 1px
+        );
+
+      background-size: 45px 45px;
     }
 
 
     .hero-content {
+
       position: relative;
 
       z-index: 2;
 
-      max-width: 760px;
+      max-width: 780px;
     }
 
 
-    .eyebrow {
-      display: inline-flex;
+    .hero-kicker {
 
-      align-items: center;
+      color: #8bbcff;
 
-      gap: 7px;
+      font-size: 11px;
 
-      color: #9dc3ff;
+      font-weight: 900;
 
-      font-size: 10px;
+      letter-spacing: 2px;
 
-      font-weight: 950;
-
-      letter-spacing: 1.7px;
-
-      text-transform: uppercase;
-
-      margin-bottom: 15px;
-    }
-
-
-    .eyebrow::before {
-      content: "";
-
-      width: 22px;
-
-      height: 2px;
-
-      background: var(--gold);
+      margin-bottom: 14px;
     }
 
 
     .hero h1 {
+
       font-size:
-        clamp(38px, 5.2vw, 64px);
+        clamp(36px, 5vw, 66px);
 
       line-height: 1.02;
 
-      letter-spacing: -1.8px;
-
-      font-weight: 950;
+      letter-spacing: -2px;
 
       margin-bottom: 20px;
     }
 
 
     .hero-description {
-      max-width: 680px;
 
-      color: #d7e5f6;
+      color: #d5e3f5;
 
-      font-size: 15px;
+      font-size: 16px;
 
-      line-height: 1.75;
+      max-width: 690px;
+
+      margin-bottom: 25px;
     }
 
 
     .hero-meta {
+
       display: flex;
 
       flex-wrap: wrap;
 
-      gap: 12px;
+      gap: 9px;
+    }
 
-      margin-top: 25px;
 
-      color: #a8c5e8;
+    .hero-pill {
+
+      padding: 7px 11px;
+
+      border-radius: 100px;
+
+      background:
+        rgba(255,255,255,0.09);
+
+      border:
+        1px solid
+        rgba(255,255,255,0.12);
 
       font-size: 10px;
 
-      font-weight: 850;
+      font-weight: 800;
 
-      letter-spacing: .8px;
-
-      text-transform: uppercase;
-    }
-
-
-    .hero-meta span {
-      padding-right: 12px;
-
-      border-right:
-        1px solid rgba(255,255,255,.18);
-    }
-
-
-    .hero-meta span:last-child {
-      border-right: none;
+      letter-spacing: .7px;
     }
 
 
     /* =====================================================
-       FEATURE CARDS
-       ===================================================== */
+       SECTION HEADERS
+    ====================================================== */
 
-    .feature-column {
-      display: flex;
+    .section {
 
-      flex-direction: column;
+      margin-top: 70px;
 
-      gap: 22px;
+      scroll-margin-top: 80px;
     }
 
 
-    .feature-card {
-      flex: 1;
+    .section-heading {
 
-      padding: 27px;
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: flex-end;
+
+      gap: 20px;
+
+      margin-bottom: 25px;
+    }
+
+
+    .section-kicker {
+
+      display: block;
+
+      color: var(--blue);
+
+      font-size: 10px;
+
+      font-weight: 900;
+
+      letter-spacing: 2px;
+
+      margin-bottom: 6px;
+    }
+
+
+    .section-heading h2 {
+
+      color: var(--navy);
+
+      font-size: 32px;
+
+      line-height: 1.1;
+    }
+
+
+    .section-description {
+
+      color: var(--muted);
+
+      font-size: 14px;
+
+      max-width: 650px;
+
+      margin-top: 7px;
+    }
+
+
+    .section-link {
+
+      color: var(--blue);
+
+      font-size: 10px;
+
+      font-weight: 900;
+
+      letter-spacing: 1px;
+
+      white-space: nowrap;
+    }
+
+
+    /* =====================================================
+       NEWS CARDS
+    ====================================================== */
+
+    .news-grid {
+
+      display: grid;
+
+      grid-template-columns:
+        repeat(3, 1fr);
+
+      gap: 20px;
+    }
+
+
+    .news-card {
 
       background: white;
 
@@ -621,44 +703,117 @@
 
       border-radius: var(--radius);
 
+      overflow: hidden;
+
       box-shadow:
-        0 5px 18px rgba(7,26,51,.06);
+        0 8px 25px
+        rgba(7,26,51,0.05);
 
       transition:
         transform .25s ease,
-        box-shadow .25s ease,
-        border-color .25s ease;
+        box-shadow .25s ease;
     }
 
 
-    .feature-card:hover {
-      transform: translateY(-5px);
+    .news-card:hover {
 
-      border-color: #bfd2ef;
+      transform:
+        translateY(-6px);
 
-      box-shadow: var(--shadow);
+      box-shadow:
+        0 18px 40px
+        rgba(7,26,51,0.12);
     }
 
 
-    .feature-number {
-      color: #dbe5f3;
+    .news-image {
 
-      font-size: 38px;
+      height: 205px;
 
-      line-height: 1;
+      position: relative;
 
-      font-weight: 950;
+      overflow: hidden;
 
-      margin-bottom: 18px;
+      background:
+        linear-gradient(
+          135deg,
+          #0b2a52,
+          #2563eb
+        );
     }
 
 
-    .category {
+    .news-image img {
+
+      width: 100%;
+
+      height: 100%;
+
+      object-fit: cover;
+    }
+
+
+    .news-image-overlay {
+
+      position: absolute;
+
+      inset: 0;
+
+      display: flex;
+
+      align-items: flex-end;
+
+      padding: 17px;
+
+      background:
+        linear-gradient(
+          transparent 35%,
+          rgba(0,0,0,.60)
+        );
+    }
+
+
+    .news-image-label {
+
+      color: white;
+
+      font-size: 10px;
+
+      font-weight: 900;
+
+      letter-spacing: 1.5px;
+    }
+
+
+    .news-placeholder {
+
+      width: 100%;
+
+      height: 100%;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      font-size: 58px;
+    }
+
+
+    .news-content {
+
+      padding: 21px;
+    }
+
+
+    .news-category {
+
       color: var(--blue);
 
       font-size: 10px;
 
-      font-weight: 950;
+      font-weight: 900;
 
       letter-spacing: 1.3px;
 
@@ -668,10 +823,11 @@
     }
 
 
-    .feature-card h2 {
+    .news-card h3 {
+
       color: var(--navy);
 
-      font-size: 20px;
+      font-size: 19px;
 
       line-height: 1.3;
 
@@ -679,94 +835,71 @@
     }
 
 
-    .feature-card p {
+    .news-card p {
+
       color: var(--muted);
 
       font-size: 13px;
 
-      line-height: 1.65;
+      line-height: 1.6;
     }
 
 
-    /* =====================================================
-       SECTIONS
-       ===================================================== */
+    .news-footer {
 
-    section {
-      margin-top: 58px;
-    }
-
-
-    .section-header {
       display: flex;
-
-      align-items: flex-end;
 
       justify-content: space-between;
 
-      gap: 20px;
+      gap: 10px;
 
-      margin-bottom: 22px;
-    }
+      margin-top: 16px;
 
+      padding-top: 13px;
 
-    .section-kicker {
-      display: block;
+      border-top:
+        1px solid var(--border);
 
-      color: var(--blue);
-
-      font-size: 10px;
-
-      font-weight: 950;
-
-      letter-spacing: 1.5px;
-
-      text-transform: uppercase;
-
-      margin-bottom: 4px;
-    }
-
-
-    .section-title {
-      color: var(--navy);
-
-      font-size: 29px;
-
-      line-height: 1.15;
-
-      letter-spacing: -.7px;
-
-      font-weight: 950;
-    }
-
-
-    .section-description {
-      color: var(--muted);
-
-      font-size: 13px;
-
-      margin-top: 5px;
-    }
-
-
-    .section-link {
-      color: var(--blue);
+      color: #94a3b8;
 
       font-size: 10px;
-
-      font-weight: 950;
-
-      letter-spacing: 1px;
-
-      white-space: nowrap;
     }
 
 
     /* =====================================================
-       MARKET SECTION
-       ===================================================== */
+       NEWS STATUS
+    ====================================================== */
 
-    .market-panel {
+    .news-status {
+
+      padding: 15px;
+
+      background: #eef5ff;
+
+      border:
+        1px solid #d7e6ff;
+
+      border-radius: 12px;
+
+      color: #31527b;
+
+      font-size: 12px;
+
+      margin-bottom: 20px;
+    }
+
+
+    .news-status strong {
+      color: var(--navy);
+    }
+
+
+    /* =====================================================
+       MARKET SEARCH
+    ====================================================== */
+
+    .market-search {
+
       background: white;
 
       border:
@@ -774,482 +907,93 @@
 
       border-radius: 20px;
 
-      overflow: hidden;
+      padding: 18px;
 
       box-shadow: var(--shadow);
-    }
-
-
-    .market-panel-header {
-      padding: 19px 22px;
 
       display: flex;
 
       align-items: center;
 
-      justify-content: space-between;
+      gap: 14px;
 
-      gap: 15px;
-
-      border-bottom:
-        1px solid var(--border);
+      margin-bottom: 18px;
     }
 
 
-    .market-panel-header strong {
-      color: var(--navy);
+    .search-icon {
 
-      font-size: 15px;
-    }
+      width: 48px;
 
+      height: 48px;
 
-    .market-live {
-      display: inline-flex;
+      flex: 0 0 48px;
+
+      border-radius: 13px;
+
+      background: var(--light-blue);
+
+      color: var(--blue);
+
+      display: flex;
 
       align-items: center;
 
-      gap: 7px;
+      justify-content: center;
 
-      color: var(--green);
+      font-size: 25px;
+
+      font-weight: 900;
+    }
+
+
+    .search-input-wrapper {
+
+      flex: 1;
+    }
+
+
+    .search-input-wrapper label {
+
+      display: block;
 
       font-size: 10px;
 
       font-weight: 900;
 
-      letter-spacing: .8px;
+      letter-spacing: 1px;
 
-      text-transform: uppercase;
+      color: var(--navy);
+
+      margin-bottom: 4px;
     }
 
 
-    .market-live::before {
-      content: "";
-
-      width: 7px;
-
-      height: 7px;
-
-      border-radius: 50%;
-
-      background: var(--green);
-
-      box-shadow:
-        0 0 0 4px rgba(22,163,74,.10);
-    }
-
-
-    .market-widget {
-      min-height: 470px;
-
-      padding: 5px;
-
-      overflow: hidden;
-    }
-
-
-    tv-market-overview {
-      display: block;
+    .market-search input {
 
       width: 100%;
 
-      min-height: 460px;
+      border: none;
+
+      outline: none;
+
+      font-size: 16px;
+
+      color: var(--text);
+
+      background: transparent;
     }
 
 
-    .market-disclaimer {
-      padding: 14px 22px;
+    .market-search input::placeholder {
 
-      border-top:
-        1px solid var(--border);
-
-      color: var(--muted);
-
-      font-size: 10px;
-
-      line-height: 1.6;
+      color: #94a3b8;
     }
 
 
-    /* =====================================================
-       MARKET SNAPSHOT
-       ===================================================== */
+    .search-hint {
 
-    .snapshot-grid {
-      display: grid;
-
-      grid-template-columns:
-        repeat(4, 1fr);
-
-      gap: 15px;
-    }
-
-
-    .snapshot-card {
-      background: white;
-
-      border:
-        1px solid var(--border);
-
-      border-radius: 15px;
-
-      padding: 20px;
-
-      box-shadow:
-        0 5px 18px rgba(7,26,51,.05);
-
-      transition:
-        transform .2s ease,
-        box-shadow .2s ease;
-    }
-
-
-    .snapshot-card:hover {
-      transform: translateY(-3px);
-
-      box-shadow: var(--shadow);
-    }
-
-
-    .snapshot-top {
-      display: flex;
-
-      justify-content: space-between;
-
-      align-items: flex-start;
-
-      gap: 10px;
-    }
-
-
-    .snapshot-region {
-      color: var(--muted);
-
-      font-size: 9px;
-
-      font-weight: 900;
-
-      letter-spacing: 1px;
-    }
-
-
-    .snapshot-card h3 {
-      color: var(--navy);
-
-      font-size: 18px;
-
-      margin-top: 2px;
-    }
-
-
-    .snapshot-badge {
-      padding: 4px 7px;
-
-      border-radius: 6px;
-
-      color: var(--blue);
-
-      background: var(--blue-light);
-
-      font-size: 8px;
-
-      font-weight: 950;
-    }
-
-
-    .snapshot-value {
-      margin-top: 20px;
-
-      color: var(--navy);
-
-      font-size: 21px;
-
-      font-weight: 950;
-    }
-
-
-    .snapshot-status {
-      color: var(--green);
-
-      font-size: 10px;
-
-      font-weight: 900;
-
-      text-transform: uppercase;
-    }
-
-
-    .snapshot-card p {
-      color: var(--muted);
-
-      font-size: 12px;
-
-      line-height: 1.55;
-
-      margin-top: 10px;
-    }
-
-
-    /* =====================================================
-       NEWS
-       ===================================================== */
-
-    .news-layout {
-      display: grid;
-
-      grid-template-columns:
-        minmax(0, 1.55fr)
-        minmax(290px, .8fr);
-
-      gap: 22px;
-    }
-
-
-    .news-grid {
-      display: grid;
-
-      grid-template-columns:
-        repeat(2, 1fr);
-
-      gap: 18px;
-    }
-
-
-    .news-card {
-      overflow: hidden;
-
-      background: white;
-
-      border:
-        1px solid var(--border);
-
-      border-radius: 16px;
-
-      box-shadow:
-        0 5px 18px rgba(7,26,51,.05);
-
-      transition:
-        transform .25s ease,
-        box-shadow .25s ease,
-        border-color .25s ease;
-    }
-
-
-    .news-card:hover {
-      transform: translateY(-4px);
-
-      border-color: #bfd2ef;
-
-      box-shadow: var(--shadow);
-    }
-
-
-    .news-image {
-      height: 155px;
-
-      padding: 18px;
-
-      display: flex;
-
-      align-items: flex-end;
-
-      color: white;
-
-      background:
-        radial-gradient(
-          circle at 80% 20%,
-          rgba(79,140,255,.45),
-          transparent 28%
-        ),
-
-        linear-gradient(
-          135deg,
-          #06182f,
-          #174a89
-        );
-    }
-
-
-    .news-image.gold {
-      background:
-        linear-gradient(
-          135deg,
-          #071a33,
-          #80601e
-        );
-    }
-
-
-    .news-image.green {
-      background:
-        linear-gradient(
-          135deg,
-          #06271b,
-          #087344
-        );
-    }
-
-
-    .news-image.purple {
-      background:
-        linear-gradient(
-          135deg,
-          #171038,
-          #4d3a9a
-        );
-    }
-
-
-    .news-image-label {
-      font-size: 22px;
-
-      font-weight: 950;
-
-      letter-spacing: 1px;
-    }
-
-
-    .news-body {
-      padding: 21px;
-    }
-
-
-    .news-source {
-      display: flex;
-
-      align-items: center;
-
-      justify-content: space-between;
-
-      gap: 10px;
-
-      margin-bottom: 9px;
-    }
-
-
-    .source-name {
-      color: var(--muted);
-
-      font-size: 9px;
-
-      font-weight: 900;
-
-      letter-spacing: .7px;
-
-      text-transform: uppercase;
-    }
-
-
-    .news-date {
-      color: #98a5b6;
-
-      font-size: 9px;
-    }
-
-
-    .news-card h3 {
-      color: var(--navy);
-
-      font-size: 18px;
-
-      line-height: 1.32;
-    }
-
-
-    .news-card p {
-      color: var(--muted);
-
-      font-size: 12px;
-
-      line-height: 1.65;
-
-      margin-top: 9px;
-    }
-
-
-    .read-more {
-      display: inline-block;
-
-      margin-top: 13px;
-
-      color: var(--blue);
-
-      font-size: 10px;
-
-      font-weight: 900;
-
-      letter-spacing: .4px;
-    }
-
-
-    /* =====================================================
-       DAILY BRIEF
-       ===================================================== */
-
-    .daily-brief {
-      background:
-        linear-gradient(
-          145deg,
-          #071a33,
-          #0e3769
-        );
-
-      color: white;
-
-      border-radius: 18px;
-
-      padding: 27px;
-
-      box-shadow: var(--shadow);
-
-      position: sticky;
-
-      top: 155px;
-    }
-
-
-    .brief-label {
-      color: #8dbdff;
-
-      font-size: 10px;
-
-      font-weight: 950;
-
-      letter-spacing: 1.5px;
-
-      margin-bottom: 11px;
-    }
-
-
-    .daily-brief h2 {
-      font-size: 25px;
-
-      line-height: 1.2;
-
-      margin-bottom: 17px;
-    }
-
-
-    .brief-item {
-      padding: 14px 0;
-
-      border-top:
-        1px solid rgba(255,255,255,.12);
-    }
-
-
-    .brief-item strong {
-      display: block;
-
-      font-size: 12px;
-
-      line-height: 1.4;
-    }
-
-
-    .brief-item span {
-      display: block;
-
-      color: #adc3df;
+      color: #94a3b8;
 
       font-size: 10px;
 
@@ -1257,129 +1001,539 @@
     }
 
 
-    .brief-footer {
-      margin-top: 18px;
+    .search-button {
 
-      padding-top: 15px;
+      border: none;
 
-      border-top:
-        1px solid rgba(255,255,255,.12);
+      background: var(--navy);
 
-      color: #91acd0;
+      color: white;
+
+      padding: 13px 20px;
+
+      border-radius: 10px;
+
+      font-size: 12px;
+
+      font-weight: 900;
+
+      transition: .2s ease;
+    }
+
+
+    .search-button:hover {
+
+      background: var(--blue);
+
+      transform:
+        translateY(-2px);
+    }
+
+
+    /* =====================================================
+       QUICK MARKET BUTTONS
+    ====================================================== */
+
+    .quick-markets {
+
+      display: grid;
+
+      grid-template-columns:
+        repeat(4, 1fr);
+
+      gap: 12px;
+
+      margin-bottom: 22px;
+    }
+
+
+    .quick-market {
+
+      border:
+        1px solid var(--border);
+
+      background: white;
+
+      border-radius: 13px;
+
+      padding: 14px;
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 10px;
+
+      text-align: left;
+
+      transition: .2s ease;
+    }
+
+
+    .quick-market:hover {
+
+      border-color: var(--blue);
+
+      transform:
+        translateY(-2px);
+
+      box-shadow:
+        0 8px 22px
+        rgba(37,99,235,.10);
+    }
+
+
+    .quick-market-icon {
+
+      font-size: 22px;
+    }
+
+
+    .quick-market strong {
+
+      display: block;
+
+      color: var(--navy);
+
+      font-size: 12px;
+    }
+
+
+    .quick-market small {
+
+      display: block;
+
+      color: var(--muted);
 
       font-size: 10px;
     }
 
 
     /* =====================================================
-       BUSINESS
-       ===================================================== */
+       MARKET SELECTED PANEL
+    ====================================================== */
 
-    .business-grid {
-      display: grid;
+    .market-panel {
 
-      grid-template-columns:
-        1.2fr 1fr 1fr;
-
-      gap: 18px;
-    }
-
-
-    .business-card {
       background: white;
 
       border:
         1px solid var(--border);
 
-      border-radius: 16px;
+      border-radius: 22px;
 
-      padding: 25px;
+      overflow: hidden;
 
-      box-shadow:
-        0 5px 18px rgba(7,26,51,.05);
+      box-shadow: var(--shadow);
+
+      margin-bottom: 22px;
     }
 
 
-    .business-card.featured {
-      color: white;
+    .market-panel-header {
 
-      background:
-        linear-gradient(
-          145deg,
-          #071a33,
-          #0e3769
-        );
+      padding: 22px 25px;
 
-      border: none;
+      border-bottom:
+        1px solid var(--border);
+
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: center;
+
+      gap: 20px;
     }
 
 
-    .business-card.featured .category {
-      color: #8dbdff;
+    .market-live {
+
+      color: var(--green);
+
+      font-size: 9px;
+
+      font-weight: 900;
+
+      letter-spacing: 1.5px;
     }
 
 
-    .business-card.featured h3 {
-      color: white;
-    }
+    .market-panel-header h3 {
 
-
-    .business-card.featured p {
-      color: #c8d8ec;
-    }
-
-
-    .business-card h3 {
       color: var(--navy);
 
-      font-size: 20px;
+      font-size: 27px;
 
-      line-height: 1.3;
-
-      margin-bottom: 9px;
+      margin-top: 5px;
     }
 
 
-    .business-card p {
+    .market-symbol {
+
       color: var(--muted);
 
-      font-size: 13px;
+      font-size: 11px;
+    }
 
-      line-height: 1.65;
+
+    .tv-link {
+
+      color: var(--blue);
+
+      font-size: 11px;
+
+      font-weight: 800;
+
+      white-space: nowrap;
     }
 
 
     /* =====================================================
-       TECHNOLOGY
-       ===================================================== */
+       TRADINGVIEW CHART
+    ====================================================== */
 
-    .technology-grid {
+    .chart-box {
+
+      height: 610px;
+
+      width: 100%;
+    }
+
+
+    .tradingview-widget-container {
+
+      width: 100%;
+
+      height: 100%;
+    }
+
+
+    .tradingview-widget-container__widget {
+
+      width: 100%;
+
+      height:
+        calc(100% - 30px);
+    }
+
+
+    /* =====================================================
+       MARKET DATA GRID
+    ====================================================== */
+
+    .market-data-grid {
+
+      display: grid;
+
+      grid-template-columns:
+        repeat(2, 1fr);
+
+      gap: 20px;
+    }
+
+
+    .market-data-card {
+
+      background: white;
+
+      border:
+        1px solid var(--border);
+
+      border-radius: 18px;
+
+      padding: 20px;
+
+      min-height: 180px;
+
+      overflow: hidden;
+
+      box-shadow:
+        0 8px 25px
+        rgba(7,26,51,.04);
+    }
+
+
+    .market-data-card h3 {
+
+      color: var(--navy);
+
+      font-size: 17px;
+
+      margin-bottom: 12px;
+    }
+
+
+    .widget-height-symbol {
+
+      min-height: 125px;
+    }
+
+
+    .widget-height-fundamental {
+
+      min-height: 430px;
+    }
+
+
+    .widget-height-analysis {
+
+      min-height: 430px;
+    }
+
+
+    .widget-height-profile {
+
+      min-height: 350px;
+    }
+
+
+    .widget-height-news {
+
+      min-height: 430px;
+    }
+
+
+    /* =====================================================
+       MARKET INFORMATION
+    ====================================================== */
+
+    .market-info-grid {
+
       display: grid;
 
       grid-template-columns:
         repeat(3, 1fr);
 
-      gap: 18px;
+      gap: 15px;
+
+      margin-top: 22px;
     }
 
 
-    .technology-card {
-      min-height: 245px;
+    .market-info-card {
 
-      padding: 26px;
+      background: #f8fbff;
 
-      border-radius: 17px;
+      border:
+        1px solid var(--border);
+
+      border-radius: 15px;
+
+      padding: 19px;
+    }
+
+
+    .market-info-icon {
+
+      font-size: 25px;
+
+      margin-bottom: 9px;
+    }
+
+
+    .market-info-card h4 {
+
+      color: var(--navy);
+
+      font-size: 15px;
+
+      margin-bottom: 5px;
+    }
+
+
+    .market-info-card p {
+
+      color: var(--muted);
+
+      font-size: 12px;
+    }
+
+
+    .market-disclaimer {
+
+      margin-top: 18px;
+
+      padding: 17px;
+
+      border-radius: 12px;
+
+      background: #f1f5f9;
+
+      color: var(--muted);
+
+      font-size: 10px;
+    }
+
+
+    .market-disclaimer strong {
+
+      display: block;
+
+      color: var(--navy);
+
+      margin-bottom: 4px;
+    }
+
+
+    /* =====================================================
+       CATEGORY FEATURE
+    ====================================================== */
+
+    .category-grid {
+
+      display: grid;
+
+      grid-template-columns:
+        repeat(2, 1fr);
+
+      gap: 20px;
+    }
+
+
+    .category-panel {
+
+      border-radius: 20px;
+
+      padding: 30px;
+
+      min-height: 260px;
 
       color: white;
 
+      position: relative;
+
+      overflow: hidden;
+
+      display: flex;
+
+      flex-direction: column;
+
+      justify-content: flex-end;
+    }
+
+
+    .category-panel::after {
+
+      content: "";
+
+      position: absolute;
+
+      width: 240px;
+
+      height: 240px;
+
+      border-radius: 50%;
+
+      right: -80px;
+
+      top: -90px;
+
+      background:
+        rgba(255,255,255,.10);
+    }
+
+
+    .category-global {
+
       background:
         linear-gradient(
-          145deg,
-          #101c3d,
-          #254d8f
+          135deg,
+          #0b2a52,
+          #2563eb
+        );
+    }
+
+
+    .category-business {
+
+      background:
+        linear-gradient(
+          135deg,
+          #123524,
+          #16a34a
+        );
+    }
+
+
+    .category-economy {
+
+      background:
+        linear-gradient(
+          135deg,
+          #3c1b5c,
+          #7c3aed
+        );
+    }
+
+
+    .category-tech {
+
+      background:
+        linear-gradient(
+          135deg,
+          #172033,
+          #0f766e
+        );
+    }
+
+
+    .category-panel > * {
+
+      position: relative;
+
+      z-index: 2;
+    }
+
+
+    .category-panel span {
+
+      font-size: 10px;
+
+      font-weight: 900;
+
+      letter-spacing: 1.7px;
+
+      opacity: .8;
+    }
+
+
+    .category-panel h3 {
+
+      font-size: 29px;
+
+      margin: 6px 0;
+    }
+
+
+    .category-panel p {
+
+      max-width: 540px;
+
+      color: #dbeafe;
+
+      font-size: 13px;
+    }
+
+
+    /* =====================================================
+       INSIGHT
+    ====================================================== */
+
+    .insight {
+
+      background:
+        linear-gradient(
+          120deg,
+          #071a33,
+          #0b2a52
         );
 
-      box-shadow: var(--shadow);
+      color: white;
+
+      border-radius: 22px;
+
+      padding: 55px;
 
       position: relative;
 
@@ -1387,220 +1541,81 @@
     }
 
 
-    .technology-card:nth-child(2) {
-      background:
-        linear-gradient(
-          145deg,
-          #11223a,
-          #126e63
-        );
+    .insight::after {
+
+      content: "W";
+
+      position: absolute;
+
+      right: 30px;
+
+      bottom: -75px;
+
+      font-size: 260px;
+
+      font-weight: 900;
+
+      color:
+        rgba(255,255,255,.035);
     }
 
 
-    .technology-card:nth-child(3) {
-      background:
-        linear-gradient(
-          145deg,
-          #24153f,
-          #5942a3
-        );
-    }
+    .insight-label {
 
-
-    .technology-number {
-      color: rgba(255,255,255,.28);
-
-      font-size: 36px;
-
-      font-weight: 950;
-
-      margin-bottom: 30px;
-    }
-
-
-    .technology-card h3 {
-      font-size: 21px;
-
-      line-height: 1.25;
-
-      margin-bottom: 8px;
-    }
-
-
-    .technology-card p {
-      color: #d3e0f1;
-
-      font-size: 12px;
-
-      line-height: 1.65;
-    }
-
-
-    /* =====================================================
-       ABOUT
-       ===================================================== */
-
-    .about-section {
-      display: grid;
-
-      grid-template-columns:
-        .75fr 1.25fr;
-
-      gap: 24px;
-    }
-
-
-    .founder-card {
-      padding: 35px;
-
-      color: white;
-
-      border-radius: 20px;
-
-      background:
-        linear-gradient(
-          145deg,
-          #06182f,
-          #123f78
-        );
-
-      box-shadow: var(--shadow-lg);
-
-      text-align: center;
-    }
-
-
-    .founder-avatar {
-      width: 100px;
-
-      height: 100px;
-
-      margin: 0 auto 18px;
-
-      display: grid;
-
-      place-items: center;
-
-      border-radius: 50%;
-
-      background:
-        linear-gradient(
-          135deg,
-          #2f6df6,
-          #164aa8
-        );
-
-      border:
-        4px solid rgba(255,255,255,.15);
-
-      font-size: 36px;
-
-      font-weight: 950;
-    }
-
-
-    .founder-card h3 {
-      font-size: 24px;
-
-      margin-bottom: 4px;
-    }
-
-
-    .founder-role {
-      color: #8dbdff;
+      color: #7db3ff;
 
       font-size: 10px;
 
       font-weight: 900;
 
-      letter-spacing: 1px;
-
-      text-transform: uppercase;
-    }
-
-
-    .founder-card p {
-      margin-top: 17px;
-
-      color: #c8d8ec;
-
-      font-size: 12px;
-
-      line-height: 1.7;
-    }
-
-
-    .about-content {
-      padding: 35px;
-
-      background: white;
-
-      border:
-        1px solid var(--border);
-
-      border-radius: 20px;
-
-      box-shadow:
-        0 5px 18px rgba(7,26,51,.05);
-    }
-
-
-    .about-content h3 {
-      color: var(--navy);
-
-      font-size: 27px;
-
-      line-height: 1.2;
-
-      margin-bottom: 13px;
-    }
-
-
-    .about-content p {
-      color: var(--muted);
-
-      font-size: 14px;
-
-      line-height: 1.8;
+      letter-spacing: 2px;
 
       margin-bottom: 12px;
     }
 
 
-    .vision-box {
-      margin-top: 22px;
+    .insight h2 {
 
-      padding: 18px;
+      max-width: 780px;
 
-      border-left:
-        3px solid var(--blue);
+      font-size:
+        clamp(30px,4vw,48px);
 
-      background: var(--blue-light);
+      line-height: 1.1;
 
-      color: var(--navy);
+      margin-bottom: 15px;
+    }
 
-      font-weight: 800;
+
+    .insight p {
+
+      max-width: 750px;
+
+      color: #c9d9ec;
 
       font-size: 14px;
     }
 
 
     /* =====================================================
-       CONTACT
-       ===================================================== */
+       ABOUT
+    ====================================================== */
 
-    .contact-grid {
+    .about-grid {
+
       display: grid;
 
       grid-template-columns:
-        1fr 1fr;
+        1fr 1.5fr;
 
-      gap: 22px;
+      gap: 25px;
+
+      align-items: stretch;
     }
 
 
-    .contact-card,
-    .contact-form {
+    .about-card {
+
       background: white;
 
       border:
@@ -1611,215 +1626,260 @@
       padding: 30px;
 
       box-shadow:
-        0 5px 18px rgba(7,26,51,.05);
+        0 8px 25px
+        rgba(7,26,51,.05);
     }
 
 
-    .contact-card h3,
-    .contact-form h3 {
-      color: var(--navy);
+    .creator-card {
 
-      font-size: 23px;
+      background:
+        linear-gradient(
+          145deg,
+          #071a33,
+          #123f76
+        );
 
-      margin-bottom: 9px;
+      color: white;
     }
 
 
-    .contact-card > p {
-      color: var(--muted);
+    .creator-avatar {
 
-      font-size: 13px;
+      width: 80px;
 
-      line-height: 1.7;
+      height: 80px;
+
+      border-radius: 22px;
+
+      background:
+        linear-gradient(
+          135deg,
+          #2563eb,
+          #60a5fa
+        );
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      font-size: 35px;
+
+      font-weight: 900;
 
       margin-bottom: 22px;
     }
 
 
-    .contact-item {
-      padding: 15px 0;
+    .creator-card h3 {
 
-      border-top:
-        1px solid var(--border);
-    }
-
-
-    .contact-item strong {
-      display: block;
-
-      color: var(--navy);
-
-      font-size: 11px;
-
-      text-transform: uppercase;
-
-      letter-spacing: .8px;
-    }
-
-
-    .contact-item span {
-      display: block;
-
-      color: var(--muted);
-
-      font-size: 13px;
-
-      margin-top: 3px;
-    }
-
-
-    .form-group {
-      margin-bottom: 15px;
-    }
-
-
-    .form-group label {
-      display: block;
+      font-size: 25px;
 
       margin-bottom: 6px;
-
-      color: var(--navy);
-
-      font-size: 11px;
-
-      font-weight: 800;
     }
 
 
-    .form-group input,
-    .form-group textarea,
-    .form-group select {
-      width: 100%;
+    .creator-role {
 
-      padding: 12px 13px;
-
-      border:
-        1px solid var(--border);
-
-      border-radius: 9px;
-
-      background: #fbfcfe;
-
-      color: var(--text);
-
-      font-family: inherit;
-
-      font-size: 13px;
-
-      outline: none;
-    }
-
-
-    .form-group input:focus,
-    .form-group textarea:focus,
-    .form-group select:focus {
-      border-color: var(--blue);
-
-      box-shadow:
-        0 0 0 3px rgba(37,99,235,.08);
-    }
-
-
-    .form-group textarea {
-      min-height: 120px;
-
-      resize: vertical;
-    }
-
-
-    .submit-button {
-      width: 100%;
-
-      padding: 12px;
-
-      border: none;
-
-      border-radius: 9px;
-
-      background: var(--blue);
-
-      color: white;
+      color: #9fc3f0;
 
       font-size: 12px;
 
-      font-weight: 900;
+      font-weight: 700;
 
-      cursor: pointer;
-
-      transition:
-        background .2s ease,
-        transform .2s ease;
+      margin-bottom: 20px;
     }
 
 
-    .submit-button:hover {
-      background: #1d4ed8;
+    .creator-card p {
 
-      transform: translateY(-1px);
+      color: #d0deee;
+
+      font-size: 13px;
     }
 
 
-    /* =====================================================
-       INSIGHT
-       ===================================================== */
+    .about-card h3 {
 
-    .insight {
-      padding: 48px;
+      color: var(--navy);
 
-      border-radius: 22px;
-
-      color: white;
-
-      background:
-        radial-gradient(
-          circle at 90% 10%,
-          rgba(79,140,255,.25),
-          transparent 28%
-        ),
-
-        linear-gradient(
-          135deg,
-          #06182f,
-          #0e3769
-        );
-
-      box-shadow: var(--shadow-lg);
-    }
-
-
-    .insight-label {
-      color: #8dbdff;
-
-      font-size: 10px;
-
-      font-weight: 950;
-
-      letter-spacing: 1.6px;
+      font-size: 25px;
 
       margin-bottom: 12px;
     }
 
 
-    .insight h2 {
-      max-width: 800px;
+    .about-card p {
 
-      font-size:
-        clamp(29px, 4vw, 45px);
+      color: var(--muted);
 
-      line-height: 1.12;
+      font-size: 14px;
 
-      letter-spacing: -1px;
-
-      margin-bottom: 15px;
+      margin-bottom: 14px;
     }
 
 
-    .insight p {
-      max-width: 760px;
+    .about-points {
 
-      color: #cbdcf0;
+      display: grid;
 
-      font-size: 14px;
+      grid-template-columns:
+        repeat(2,1fr);
+
+      gap: 10px;
+
+      margin-top: 18px;
+    }
+
+
+    .about-point {
+
+      padding: 13px;
+
+      border:
+        1px solid var(--border);
+
+      border-radius: 12px;
+
+      background: #f8fbff;
+
+      color: var(--navy);
+
+      font-size: 12px;
+
+      font-weight: 800;
+    }
+
+
+    /* =====================================================
+       CONTACT
+    ====================================================== */
+
+    .contact-box {
+
+      background: white;
+
+      border:
+        1px solid var(--border);
+
+      border-radius: 20px;
+
+      padding: 30px;
+
+      box-shadow: var(--shadow);
+
+      display: grid;
+
+      grid-template-columns:
+        1fr 1fr;
+
+      gap: 30px;
+    }
+
+
+    .contact-box h3 {
+
+      color: var(--navy);
+
+      font-size: 26px;
+
+      margin-bottom: 8px;
+    }
+
+
+    .contact-box p {
+
+      color: var(--muted);
+
+      font-size: 13px;
+    }
+
+
+    .contact-list {
+
+      margin-top: 20px;
+
+      display: grid;
+
+      gap: 10px;
+    }
+
+
+    .contact-item {
+
+      display: flex;
+
+      gap: 12px;
+
+      align-items: flex-start;
+
+      padding: 13px;
+
+      background: #f8fbff;
+
+      border-radius: 12px;
+
+      border:
+        1px solid var(--border);
+    }
+
+
+    .contact-icon {
+
+      font-size: 20px;
+    }
+
+
+    .contact-item strong {
+
+      display: block;
+
+      color: var(--navy);
+
+      font-size: 12px;
+    }
+
+
+    .contact-item span {
+
+      color: var(--muted);
+
+      font-size: 11px;
+    }
+
+
+    .contact-message {
+
+      background:
+        linear-gradient(
+          135deg,
+          #eaf2ff,
+          #f8fbff
+        );
+
+      border-radius: 16px;
+
+      padding: 25px;
+    }
+
+
+    .contact-message h4 {
+
+      color: var(--navy);
+
+      font-size: 18px;
+
+      margin-bottom: 8px;
+    }
+
+
+    .contact-message p {
+
+      color: #52657d;
+
+      font-size: 12px;
 
       line-height: 1.7;
     }
@@ -1827,166 +1887,208 @@
 
     /* =====================================================
        FOOTER
-       ===================================================== */
+    ====================================================== */
 
     footer {
-      margin-top: 75px;
 
-      background: #041226;
+      margin-top: 80px;
+
+      background: #06162d;
 
       color: white;
+
+      padding: 45px 0 20px;
     }
 
 
-    .footer-inner {
-      width: min(var(--max-width), 92%);
+    .footer-grid {
+
+      width: min(1280px,92%);
 
       margin: auto;
-
-      padding: 50px 0 35px;
 
       display: grid;
 
       grid-template-columns:
-        2fr 1fr 1fr;
+        1.5fr 1fr 1fr;
 
-      gap: 60px;
+      gap: 40px;
     }
 
 
     .footer-logo {
+
       font-size: 25px;
 
-      font-weight: 950;
+      font-weight: 900;
 
-      letter-spacing: 1.8px;
+      letter-spacing: 1px;
 
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
 
     .footer-description {
-      max-width: 430px;
 
-      color: #9db2ce;
+      color: #9fb3cc;
 
       font-size: 12px;
 
-      line-height: 1.7;
-    }
-
-
-    .footer-column {
-      display: flex;
-
-      flex-direction: column;
-
-      gap: 9px;
+      max-width: 390px;
     }
 
 
     .footer-column h4 {
-      font-size: 10px;
 
-      letter-spacing: 1.3px;
+      font-size: 12px;
 
-      text-transform: uppercase;
+      letter-spacing: 1px;
 
-      margin-bottom: 6px;
+      margin-bottom: 13px;
     }
 
 
     .footer-column a {
-      color: #9db2ce;
 
-      font-size: 12px;
+      display: block;
 
-      transition: color .2s ease;
+      color: #9fb3cc;
+
+      font-size: 11px;
+
+      margin-bottom: 8px;
+
+      transition: .2s ease;
     }
 
 
     .footer-column a:hover {
+
       color: white;
     }
 
 
     .copyright {
-      width: min(var(--max-width), 92%);
 
-      margin: auto;
+      width: min(1280px,92%);
 
-      padding: 20px 0 25px;
+      margin: 35px auto 0;
+
+      padding-top: 18px;
 
       border-top:
-        1px solid rgba(255,255,255,.08);
+        1px solid
+        rgba(255,255,255,.10);
 
-      color: #7289a7;
+      color: #7186a1;
 
       font-size: 10px;
     }
 
 
     /* =====================================================
-       RESPONSIVE
-       ===================================================== */
+       LOADING
+    ====================================================== */
 
-    @media (max-width: 1050px) {
+    .loading {
 
-      .hero-layout {
-        grid-template-columns: 1fr;
-      }
+      min-height: 180px;
 
+      display: flex;
 
-      .feature-column {
-        display: grid;
+      align-items: center;
 
-        grid-template-columns: 1fr 1fr;
-      }
+      justify-content: center;
 
+      color: var(--muted);
 
-      .news-layout {
-        grid-template-columns: 1fr;
-      }
+      font-size: 12px;
+    }
 
 
-      .daily-brief {
-        position: static;
-      }
+    .spinner {
+
+      width: 20px;
+
+      height: 20px;
+
+      border: 3px solid #dbeafe;
+
+      border-top-color:
+        var(--blue);
+
+      border-radius: 50%;
+
+      animation:
+        spin .8s linear infinite;
+
+      margin-right: 9px;
+    }
 
 
-      .snapshot-grid {
-        grid-template-columns:
-          repeat(2, 1fr);
-      }
+    @keyframes spin {
 
-
-      .business-grid {
-        grid-template-columns:
-          1fr 1fr;
-      }
-
-
-      .business-card.featured {
-        grid-column: 1 / -1;
-      }
-
-
-      .about-section {
-        grid-template-columns: 1fr;
+      to {
+        transform: rotate(360deg);
       }
 
     }
 
 
-    @media (max-width: 760px) {
+    /* =====================================================
+       MOBILE
+    ====================================================== */
 
-      .brand-inner {
-        min-height: 72px;
+    @media (max-width: 950px) {
+
+      .header-right {
+        display: none;
       }
 
 
-      .brand-info {
-        display: none;
+      .news-grid {
+        grid-template-columns:
+          repeat(2,1fr);
+      }
+
+
+      .quick-markets {
+        grid-template-columns:
+          repeat(2,1fr);
+      }
+
+
+      .market-data-grid {
+        grid-template-columns:
+          1fr;
+      }
+
+
+      .market-info-grid {
+        grid-template-columns:
+          repeat(2,1fr);
+      }
+
+
+      .about-grid,
+      .contact-box {
+        grid-template-columns:
+          1fr;
+      }
+
+
+      .footer-grid {
+        grid-template-columns:
+          1fr 1fr;
+      }
+
+    }
+
+
+    @media (max-width: 650px) {
+
+      .top-header {
+        padding: 16px 4%;
       }
 
 
@@ -1995,92 +2097,106 @@
       }
 
 
-      .brand-logo {
-        width: 36px;
-
-        height: 36px;
+      .brand-mark {
+        width: 42px;
+        height: 42px;
       }
 
 
-      .main-nav {
-        top: 72px;
+      .nav-link {
+        padding: 13px 9px;
+        font-size: 9px;
       }
 
 
-      .nav-inner {
-        justify-content: flex-start;
-
-        gap: 24px;
-      }
-
-
-      main {
+      .container {
         width: 94%;
-
-        margin-top: 21px;
       }
 
 
       .hero {
-        min-height: 410px;
+        min-height: 430px;
 
-        padding: 34px 27px;
+        padding: 30px 25px;
 
         border-radius: 18px;
       }
 
 
       .hero h1 {
-        font-size: 37px;
+        font-size: 38px;
 
         letter-spacing: -1px;
       }
 
 
-      .feature-column {
-        grid-template-columns: 1fr;
-      }
-
-
-      .section-header {
+      .section-heading {
         display: block;
       }
 
 
       .section-link {
-        display: inline-block;
+        display: block;
 
-        margin-top: 7px;
+        margin-top: 10px;
       }
 
 
       .news-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns:
+          1fr;
       }
 
 
-      .snapshot-grid {
-        grid-template-columns: 1fr;
+      .quick-markets {
+        grid-template-columns:
+          1fr;
       }
 
 
-      .business-grid {
-        grid-template-columns: 1fr;
+      .market-search {
+        flex-direction: column;
+
+        align-items: stretch;
       }
 
 
-      .business-card.featured {
-        grid-column: auto;
+      .search-icon {
+        display: none;
       }
 
 
-      .technology-grid {
-        grid-template-columns: 1fr;
+      .search-button {
+        width: 100%;
       }
 
 
-      .contact-grid {
-        grid-template-columns: 1fr;
+      .market-panel-header {
+        display: block;
+      }
+
+
+      .tv-link {
+        display: block;
+
+        margin-top: 10px;
+      }
+
+
+      .chart-box {
+        height: 500px;
+      }
+
+
+      .market-info-grid {
+        grid-template-columns:
+          1fr;
+      }
+
+
+      .category-grid {
+        grid-template-columns:
+          1fr;
       }
 
 
@@ -2089,34 +2205,15 @@
       }
 
 
-      .footer-inner {
-        grid-template-columns: 1fr;
-
-        gap: 30px;
-      }
-
-    }
-
-
-    @media (max-width: 430px) {
-
-      .hero h1 {
-        font-size: 32px;
+      .about-points {
+        grid-template-columns:
+          1fr;
       }
 
 
-      .hero-description {
-        font-size: 13px;
-      }
-
-
-      .section-title {
-        font-size: 25px;
-      }
-
-
-      .hero-meta {
-        display: none;
+      .footer-grid {
+        grid-template-columns:
+          1fr;
       }
 
     }
@@ -2131,15 +2228,18 @@
 
   <!-- =====================================================
        HEADER
-       ===================================================== -->
+  ====================================================== -->
 
-  <header class="brand-header">
+  <header class="top-header">
 
-    <div class="brand-inner">
+    <div class="header-inner">
 
-      <a href="#home" class="brand">
+      <a
+        href="#home"
+        class="brand"
+      >
 
-        <div class="brand-logo">
+        <div class="brand-mark">
           W
         </div>
 
@@ -2158,11 +2258,12 @@
       </a>
 
 
-      <div class="brand-info">
-        GLOBAL <span>•</span>
-        MARKETS <span>•</span>
-        BUSINESS <span>•</span>
-        TECHNOLOGY
+      <div class="header-right">
+
+        GLOBAL • MARKETS • BUSINESS • ECONOMY<br>
+
+        TECHNOLOGY • AI • CRYPTO • INSIGHTS
+
       </div>
 
     </div>
@@ -2172,49 +2273,79 @@
 
   <!-- =====================================================
        NAVIGATION
-       ===================================================== -->
+  ====================================================== -->
 
   <nav class="main-nav">
 
     <div class="nav-inner">
 
-      <a href="#home" class="nav-link active">
+      <a
+        class="nav-link active"
+        href="#home"
+      >
         HOME
       </a>
 
-      <a href="#global" class="nav-link">
+      <a
+        class="nav-link"
+        href="#global"
+      >
         GLOBAL
       </a>
 
-      <a href="#markets" class="nav-link">
+      <a
+        class="nav-link"
+        href="#stock-market"
+      >
         STOCK MARKET
       </a>
 
-      <a href="#business" class="nav-link">
+      <a
+        class="nav-link"
+        href="#business"
+      >
         BUSINESS
       </a>
 
-      <a href="#economy" class="nav-link">
+      <a
+        class="nav-link"
+        href="#economy"
+      >
         ECONOMY
       </a>
 
-      <a href="#technology" class="nav-link">
+      <a
+        class="nav-link"
+        href="#technology"
+      >
         TECHNOLOGY
       </a>
 
-      <a href="#ai" class="nav-link">
+      <a
+        class="nav-link"
+        href="#ai"
+      >
         AI
       </a>
 
-      <a href="#crypto" class="nav-link">
+      <a
+        class="nav-link"
+        href="#crypto"
+      >
         CRYPTO
       </a>
 
-      <a href="#about" class="nav-link">
+      <a
+        class="nav-link"
+        href="#about"
+      >
         ABOUT
       </a>
 
-      <a href="#contact" class="nav-link">
+      <a
+        class="nav-link"
+        href="#contact"
+      >
         CONTACT
       </a>
 
@@ -2225,14 +2356,23 @@
 
   <!-- =====================================================
        MARKET TICKER
-       ===================================================== -->
+  ====================================================== -->
 
-  <div class="ticker">
+  <div class="ticker-area">
 
-    <div class="ticker-inner">
+    <div class="ticker-wrapper">
 
       <tv-ticker-tape
-        symbols="FOREXCOM:SPXUSD,FOREXCOM:NSXUSD,FOREXCOM:DJI,NSE:NIFTY,INDEXBOM:SENSEX,FX:USDINR,BITSTAMP:BTCUSD"
+        symbols="
+          NSE:NIFTY,
+          BSE:SENSEX,
+          NASDAQ:IXIC,
+          SP:SPX,
+          NASDAQ:AAPL,
+          NASDAQ:NVDA,
+          BITSTAMP:BTCUSD,
+          BITSTAMP:ETHUSD
+        "
         item-size="compact">
       </tv-ticker-tape>
 
@@ -2241,133 +2381,148 @@
   </div>
 
 
-  <main id="home">
+  <!-- =====================================================
+       MAIN
+  ====================================================== -->
+
+  <main
+    id="home"
+    class="container"
+  >
 
 
-    <!-- =====================================================
-         DAILY STATUS
-         ===================================================== -->
+    <!-- DAILY STATUS -->
 
-    <div class="daily-status">
+    <div class="daily-bar">
 
       <span class="live-dot"></span>
 
       WORLDLYN DAILY
 
-      <span>•</span>
-
-      LIVE MARKET &amp; NEWS INTELLIGENCE
+      <span>
+        • Automatically updated news & market information
+      </span>
 
     </div>
 
 
-    <!-- =====================================================
+    <!-- ===================================================
          HERO
-         ===================================================== -->
+    ==================================================== -->
 
-    <section class="hero-layout" style="margin-top:0;">
+    <section class="hero">
 
+      <div class="hero-grid-lines"></div>
 
-      <a href="#global">
+      <div class="hero-content">
 
-        <div class="hero">
-
-          <div class="hero-content">
-
-            <div class="eyebrow">
-              WORLDLYN FEATURE
-            </div>
-
-            <h1>
-              Know what moves the world before it moves you.
-            </h1>
-
-            <p class="hero-description">
-              WORLDLYN brings together global news, stock markets,
-              business, economics, technology and AI — with context
-              that helps you understand what really matters.
-            </p>
-
-            <div class="hero-meta">
-
-              <span>Global</span>
-
-              <span>Markets</span>
-
-              <span>Business</span>
-
-              <span>Technology</span>
-
-              <span>AI</span>
-
-            </div>
-
-          </div>
-
+        <div class="hero-kicker">
+          WORLDLYN FEATURE
         </div>
 
-      </a>
+        <h1>
+          Understand what moves
+          markets, business and the world.
+        </h1>
 
+        <p class="hero-description">
+          WORLDLYN brings together global developments,
+          stock markets, business, economic trends,
+          technology, AI and crypto — explained simply
+          so you can understand what is happening and why
+          it matters.
+        </p>
 
-      <div class="feature-column">
+        <div class="hero-meta">
 
+          <span class="hero-pill">
+            GLOBAL
+          </span>
 
-        <a href="#markets" class="feature-card">
+          <span class="hero-pill">
+            MARKETS
+          </span>
 
-          <div class="feature-number">
-            01
-          </div>
+          <span class="hero-pill">
+            BUSINESS
+          </span>
 
-          <div class="category">
-            MARKET INTELLIGENCE
-          </div>
+          <span class="hero-pill">
+            TECHNOLOGY
+          </span>
 
-          <h2>
-            Follow the markets that matter.
-          </h2>
+          <span class="hero-pill">
+            INSIGHTS
+          </span>
 
-          <p>
-            Track major indices, currencies, commodities and
-            market-moving developments in one place.
-          </p>
-
-        </a>
-
-
-        <a href="#ai" class="feature-card">
-
-          <div class="feature-number">
-            02
-          </div>
-
-          <div class="category">
-            AI &amp; TECHNOLOGY
-          </div>
-
-          <h2>
-            Technology is becoming an economic story.
-          </h2>
-
-          <p>
-            Discover the developments in AI and technology that
-            could influence companies, markets and everyday life.
-          </p>
-
-        </a>
-
+        </div>
 
       </div>
 
     </section>
 
 
-    <!-- =====================================================
+    <!-- ===================================================
+         GLOBAL NEWS
+    ==================================================== -->
+
+    <section
+      id="global"
+      class="section"
+    >
+
+      <div class="section-heading">
+
+        <div>
+
+          <span class="section-kicker">
+            GLOBAL
+          </span>
+
+          <h2>
+            What is happening around the world?
+          </h2>
+
+          <p class="section-description">
+            Major international developments,
+            geopolitics, economies and events shaping
+            the global environment.
+          </p>
+
+        </div>
+
+        <span class="section-link">
+          AUTO UPDATED
+        </span>
+
+      </div>
+
+
+      <div
+        id="globalNews"
+        class="news-grid"
+      >
+
+        <div class="loading">
+          <span class="spinner"></span>
+          Loading latest global news...
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================
          STOCK MARKET
-         ===================================================== -->
+    ==================================================== -->
 
-    <section id="markets">
+    <section
+      id="stock-market"
+      class="section"
+    >
 
-      <div class="section-header">
+      <div class="section-heading">
 
         <div>
 
@@ -2375,572 +2530,735 @@
             STOCK MARKET
           </span>
 
-          <h2 class="section-title">
+          <h2>
             Markets, at a glance.
           </h2>
 
           <p class="section-description">
-            Live market information and the forces moving investors.
+            Search stocks, indices, crypto, currencies
+            and other financial instruments and explore
+            charts, market information, fundamentals,
+            technical analysis and related news.
           </p>
 
         </div>
 
         <span class="section-link">
-          LIVE DATA
+          LIVE MARKET VIEW
         </span>
 
       </div>
 
+
+      <!-- SEARCH -->
+
+      <form
+        class="market-search"
+        id="marketSearchForm"
+      >
+
+        <div class="search-icon">
+          ⌕
+        </div>
+
+        <div class="search-input-wrapper">
+
+          <label for="marketSearch">
+            SEARCH THE MARKET
+          </label>
+
+          <input
+            id="marketSearch"
+            type="search"
+            list="marketSuggestions"
+            placeholder="Search Reliance, TCS, NIFTY, Apple, NVIDIA, Bitcoin..."
+            autocomplete="off"
+          >
+
+          <datalist id="marketSuggestions">
+
+            <option value="NIFTY 50">
+            <option value="SENSEX">
+            <option value="Reliance">
+            <option value="TCS">
+            <option value="Infosys">
+            <option value="HDFC Bank">
+            <option value="ICICI Bank">
+            <option value="Apple">
+            <option value="Microsoft">
+            <option value="NVIDIA">
+            <option value="Tesla">
+            <option value="Amazon">
+            <option value="NASDAQ">
+            <option value="S&P 500">
+            <option value="Bitcoin">
+            <option value="Ethereum">
+            <option value="USD INR">
+
+          </datalist>
+
+          <div class="search-hint">
+            Select a suggested instrument or enter a TradingView symbol such as NSE:RELIANCE.
+          </div>
+
+        </div>
+
+        <button
+          class="search-button"
+          type="submit"
+        >
+          Search
+        </button>
+
+      </form>
+
+
+      <!-- QUICK MARKET BUTTONS -->
+
+      <div class="quick-markets">
+
+        <button
+          class="quick-market"
+          data-symbol="NSE:NIFTY"
+          data-name="NIFTY 50"
+        >
+
+          <span class="quick-market-icon">
+            🇮🇳
+          </span>
+
+          <div>
+
+            <strong>
+              NIFTY 50
+            </strong>
+
+            <small>
+              India • NSE
+            </small>
+
+          </div>
+
+        </button>
+
+
+        <button
+          class="quick-market"
+          data-symbol="BSE:SENSEX"
+          data-name="SENSEX"
+        >
+
+          <span class="quick-market-icon">
+            🇮🇳
+          </span>
+
+          <div>
+
+            <strong>
+              SENSEX
+            </strong>
+
+            <small>
+              India • BSE
+            </small>
+
+          </div>
+
+        </button>
+
+
+        <button
+          class="quick-market"
+          data-symbol="NASDAQ:IXIC"
+          data-name="NASDAQ"
+        >
+
+          <span class="quick-market-icon">
+            🇺🇸
+          </span>
+
+          <div>
+
+            <strong>
+              NASDAQ
+            </strong>
+
+            <small>
+              United States
+            </small>
+
+          </div>
+
+        </button>
+
+
+        <button
+          class="quick-market"
+          data-symbol="SP:SPX"
+          data-name="S&P 500"
+        >
+
+          <span class="quick-market-icon">
+            🇺🇸
+          </span>
+
+          <div>
+
+            <strong>
+              S&P 500
+            </strong>
+
+            <small>
+              United States
+            </small>
+
+          </div>
+
+        </button>
+
+
+        <button
+          class="quick-market"
+          data-symbol="NSE:RELIANCE"
+          data-name="Reliance Industries"
+        >
+
+          <span class="quick-market-icon">
+            🏢
+          </span>
+
+          <div>
+
+            <strong>
+              RELIANCE
+            </strong>
+
+            <small>
+              NSE • India
+            </small>
+
+          </div>
+
+        </button>
+
+
+        <button
+          class="quick-market"
+          data-symbol="NASDAQ:AAPL"
+          data-name="Apple"
+        >
+
+          <span class="quick-market-icon">
+            🍎
+          </span>
+
+          <div>
+
+            <strong>
+              APPLE
+            </strong>
+
+            <small>
+              NASDAQ
+            </small>
+
+          </div>
+
+        </button>
+
+
+        <button
+          class="quick-market"
+          data-symbol="NASDAQ:NVDA"
+          data-name="NVIDIA"
+        >
+
+          <span class="quick-market-icon">
+            ⚡
+          </span>
+
+          <div>
+
+            <strong>
+              NVIDIA
+            </strong>
+
+            <small>
+              NASDAQ
+            </small>
+
+          </div>
+
+        </button>
+
+
+        <button
+          class="quick-market"
+          data-symbol="BITSTAMP:BTCUSD"
+          data-name="Bitcoin"
+        >
+
+          <span class="quick-market-icon">
+            ₿
+          </span>
+
+          <div>
+
+            <strong>
+              BITCOIN
+            </strong>
+
+            <small>
+              Crypto
+            </small>
+
+          </div>
+
+        </button>
+
+      </div>
+
+
+      <!-- SELECTED MARKET -->
 
       <div class="market-panel">
 
         <div class="market-panel-header">
 
-          <strong>
-            Global Market Monitor
-          </strong>
+          <div>
 
-          <span class="market-live">
-            Market data
-          </span>
+            <div class="market-live">
+              ● MARKET DATA
+            </div>
 
-        </div>
+            <h3 id="selectedMarketName">
+              NIFTY 50
+            </h3>
 
+            <div
+              id="selectedMarketSymbol"
+              class="market-symbol"
+            >
+              NSE:NIFTY
+            </div>
 
-        <div class="market-widget">
+          </div>
 
-          <tv-market-overview
-            symbol-sectors='[
-              {
-                "sectionName":"Global Indices",
-                "symbols":[
-                  "FOREXCOM:SPXUSD",
-                  "FOREXCOM:NSXUSD",
-                  "FOREXCOM:DJI",
-                  "FOREXCOM:UKXGBP"
-                ]
-              },
-              {
-                "sectionName":"India",
-                "symbols":[
-                  "NSE:NIFTY",
-                  "INDEXBOM:SENSEX"
-                ]
-              },
-              {
-                "sectionName":"Technology",
-                "symbols":[
-                  "NASDAQ:AAPL",
-                  "NASDAQ:MSFT",
-                  "NASDAQ:NVDA",
-                  "NASDAQ:TSLA"
-                ]
-              },
-              {
-                "sectionName":"Crypto",
-                "symbols":[
-                  "BITSTAMP:BTCUSD",
-                  "BITSTAMP:ETHUSD"
-                ]
-              }
-            ]'
-            show-chart="true">
-          </tv-market-overview>
+          <a
+            id="tvSymbolLink"
+            class="tv-link"
+            href="https://www.tradingview.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            View on TradingView ↗
+          </a>
 
         </div>
 
 
-        <div class="market-disclaimer">
-          Market data is provided through TradingView.
-          Availability, timeliness and whether data is real-time
-          or delayed may vary by exchange and instrument.
+        <!-- ADVANCED CHART -->
+
+        <div class="chart-box">
+
+          <div
+            class="tradingview-widget-container"
+          >
+
+            <div
+              class="tradingview-widget-container__widget"
+            ></div>
+
+            <div
+              class="tradingview-widget-copyright"
+            >
+
+              <a
+                href="https://www.tradingview.com/"
+                target="_blank"
+                rel="noopener nofollow"
+              >
+                Track markets on TradingView
+              </a>
+
+            </div>
+
+            <script
+              type="text/javascript"
+              src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js"
+              async
+            >
+            {
+              "autosize": true,
+              "symbol": "NSE:NIFTY",
+              "interval": "D",
+              "timezone": "Asia/Kolkata",
+              "theme": "light",
+              "style": "1",
+              "locale": "en",
+              "allow_symbol_change": true,
+              "withdateranges": true,
+              "hide_side_toolbar": false,
+              "hide_top_toolbar": false,
+              "hide_legend": false,
+              "hide_volume": false,
+              "details": true,
+              "hotlist": true,
+              "calendar": true,
+              "save_image": false,
+              "support_host": "https://www.tradingview.com"
+            }
+            </script>
+
+          </div>
+
         </div>
+
+      </div>
+
+
+      <!-- MARKET DATA WIDGETS -->
+
+      <div class="market-data-grid">
+
+
+        <!-- SYMBOL INFO -->
+
+        <div class="market-data-card widget-height-symbol">
+
+          <h3>
+            📌 Key Market Information
+          </h3>
+
+          <div
+            class="tradingview-widget-container"
+          >
+
+            <div
+              class="tradingview-widget-container__widget"
+            ></div>
+
+            <script
+              type="text/javascript"
+              src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-info.js"
+              async
+            >
+            {
+              "symbol": "NSE:NIFTY",
+              "width": "100%",
+              "locale": "en",
+              "colorTheme": "light",
+              "isTransparent": true
+            }
+            </script>
+
+          </div>
+
+        </div>
+
+
+        <!-- COMPANY PROFILE -->
+
+        <div class="market-data-card widget-height-profile">
+
+          <h3>
+            🏢 Company / Instrument Profile
+          </h3>
+
+          <tv-company-profile
+            symbol="NSE:NIFTY"
+          >
+          </tv-company-profile>
+
+        </div>
+
+
+        <!-- FUNDAMENTALS -->
+
+        <div class="market-data-card widget-height-fundamental">
+
+          <h3>
+            📊 Fundamental Data
+          </h3>
+
+          <div
+            class="tradingview-widget-container"
+          >
+
+            <div
+              class="tradingview-widget-container__widget"
+            ></div>
+
+            <script
+              type="text/javascript"
+              src="https://s3.tradingview.com/external-embedding/embed-widget-financials.js"
+              async
+            >
+            {
+              "colorTheme": "light",
+              "isTransparent": true,
+              "displayMode": "adaptive",
+              "width": "100%",
+              "height": "100%",
+              "symbol": "NSE:NIFTY",
+              "locale": "en"
+            }
+            </script>
+
+          </div>
+
+        </div>
+
+
+        <!-- TECHNICAL ANALYSIS -->
+
+        <div class="market-data-card widget-height-analysis">
+
+          <h3>
+            📉 Technical Analysis
+          </h3>
+
+          <div
+            class="tradingview-widget-container"
+          >
+
+            <div
+              class="tradingview-widget-container__widget"
+            ></div>
+
+            <script
+              type="text/javascript"
+              src="https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js"
+              async
+            >
+            {
+              "interval": "1D",
+              "width": "100%",
+              "isTransparent": true,
+              "height": "100%",
+              "symbol": "NSE:NIFTY",
+              "showIntervalTabs": true,
+              "displayMode": "single",
+              "locale": "en",
+              "colorTheme": "light"
+            }
+            </script>
+
+          </div>
+
+        </div>
+
+
+        <!-- SYMBOL NEWS -->
+
+        <div class="market-data-card widget-height-news">
+
+          <h3>
+            📰 Market News
+          </h3>
+
+          <div
+            class="tradingview-widget-container"
+          >
+
+            <div
+              class="tradingview-widget-container__widget"
+            ></div>
+
+            <script
+              type="text/javascript"
+              src="https://s3.tradingview.com/external-embedding/embed-widget-timeline.js"
+              async
+            >
+            {
+              "feedMode": "symbol",
+              "symbol": "NSE:NIFTY",
+              "displayMode": "regular",
+              "colorTheme": "light",
+              "isTransparent": true,
+              "locale": "en",
+              "width": "100%",
+              "height": "100%"
+            }
+            </script>
+
+          </div>
+
+        </div>
+
+
+        <!-- MARKET DATA AVAILABLE -->
+
+        <div class="market-data-card">
+
+          <h3>
+            🔎 What can you check?
+          </h3>
+
+          <p
+            style="
+              color:#64748b;
+              font-size:13px;
+              line-height:1.8;
+            "
+          >
+
+            Depending on the instrument, WORLDLYN can
+            display price information, daily movement,
+            historical charts, volume, market
+            capitalization, valuation metrics, financial
+            information, company profile, technical
+            analysis, related news and more.
+
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <!-- MARKET INFORMATION CARDS -->
+
+      <div class="market-info-grid">
+
+        <div class="market-info-card">
+
+          <div class="market-info-icon">
+            📈
+          </div>
+
+          <h4>
+            Price & Performance
+          </h4>
+
+          <p>
+            Price, percentage change, previous close,
+            opening price, daily range and historical
+            performance where available.
+          </p>
+
+        </div>
+
+
+        <div class="market-info-card">
+
+          <div class="market-info-icon">
+            💰
+          </div>
+
+          <h4>
+            Company Fundamentals
+          </h4>
+
+          <p>
+            Market capitalization, P/E, EPS, revenue,
+            net income, dividends and other available
+            financial metrics.
+          </p>
+
+        </div>
+
+
+        <div class="market-info-card">
+
+          <div class="market-info-icon">
+            📊
+          </div>
+
+          <h4>
+            Technical Analysis
+          </h4>
+
+          <p>
+            Moving averages, oscillators, technical
+            ratings and other analysis tools.
+          </p>
+
+        </div>
+
+
+        <div class="market-info-card">
+
+          <div class="market-info-icon">
+            📰
+          </div>
+
+          <h4>
+            Related News
+          </h4>
+
+          <p>
+            Market and company-related stories associated
+            with the selected instrument.
+          </p>
+
+        </div>
+
+
+        <div class="market-info-card">
+
+          <div class="market-info-icon">
+            🏢
+          </div>
+
+          <h4>
+            Company Profile
+          </h4>
+
+          <p>
+            Sector, industry and business information
+            for supported companies.
+          </p>
+
+        </div>
+
+
+        <div class="market-info-card">
+
+          <div class="market-info-icon">
+            📅
+          </div>
+
+          <h4>
+            Historical Data
+          </h4>
+
+          <p>
+            Explore different time periods using the
+            interactive chart.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="market-disclaimer">
+
+        <strong>
+          Market data disclaimer
+        </strong>
+
+        Market information is provided through third-party
+        market-data services. Availability, accuracy,
+        timing and whether data is real-time, delayed or
+        end-of-day may vary by exchange and instrument.
 
       </div>
 
     </section>
 
 
-    <!-- =====================================================
-         MARKET SNAPSHOT
-         ===================================================== -->
-
-    <section>
-
-      <div class="section-header">
-
-        <div>
-
-          <span class="section-kicker">
-            MARKET PULSE
-          </span>
-
-          <h2 class="section-title">
-            Markets worth watching.
-          </h2>
-
-        </div>
-
-      </div>
-
-
-      <div class="snapshot-grid">
-
-
-        <article class="snapshot-card">
-
-          <div class="snapshot-top">
-
-            <div>
-
-              <div class="snapshot-region">
-                INDIA
-              </div>
-
-              <h3>
-                NIFTY 50
-              </h3>
-
-            </div>
-
-            <span class="snapshot-badge">
-              NSE
-            </span>
-
-          </div>
-
-          <div class="snapshot-value">
-            LIVE
-          </div>
-
-          <div class="snapshot-status">
-            Market Watch
-          </div>
-
-          <p>
-            India's leading equity benchmark and a key indicator
-            of domestic investor sentiment.
-          </p>
-
-        </article>
-
-
-        <article class="snapshot-card">
-
-          <div class="snapshot-top">
-
-            <div>
-
-              <div class="snapshot-region">
-                INDIA
-              </div>
-
-              <h3>
-                SENSEX
-              </h3>
-
-            </div>
-
-            <span class="snapshot-badge">
-              BSE
-            </span>
-
-          </div>
-
-          <div class="snapshot-value">
-            LIVE
-          </div>
-
-          <div class="snapshot-status">
-            Market Watch
-          </div>
-
-          <p>
-            One of India's most closely followed stock-market
-            benchmarks.
-          </p>
-
-        </article>
-
-
-        <article class="snapshot-card">
-
-          <div class="snapshot-top">
-
-            <div>
-
-              <div class="snapshot-region">
-                UNITED STATES
-              </div>
-
-              <h3>
-                S&amp;P 500
-              </h3>
-
-            </div>
-
-            <span class="snapshot-badge">
-              US
-            </span>
-
-          </div>
-
-          <div class="snapshot-value">
-            LIVE
-          </div>
-
-          <div class="snapshot-status">
-            Global Benchmark
-          </div>
-
-          <p>
-            One of the world's most important large-cap equity
-            benchmarks.
-          </p>
-
-        </article>
-
-
-        <article class="snapshot-card">
-
-          <div class="snapshot-top">
-
-            <div>
-
-              <div class="snapshot-region">
-                UNITED STATES
-              </div>
-
-              <h3>
-                NASDAQ
-              </h3>
-
-            </div>
-
-            <span class="snapshot-badge">
-              TECH
-            </span>
-
-          </div>
-
-          <div class="snapshot-value">
-            LIVE
-          </div>
-
-          <div class="snapshot-status">
-            Technology Focus
-          </div>
-
-          <p>
-            A technology-heavy market closely watched for
-            growth and innovation trends.
-          </p>
-
-        </article>
-
-
-      </div>
-
-    </section>
-
-
-    <!-- =====================================================
-         GLOBAL NEWS
-         ===================================================== -->
-
-    <section id="global">
-
-      <div class="section-header">
-
-        <div>
-
-          <span class="section-kicker">
-            GLOBAL NEWS
-          </span>
-
-          <h2 class="section-title">
-            What is moving the world?
-          </h2>
-
-          <p class="section-description">
-            This area is ready to be connected to the automatic
-            news feed.
-          </p>
-
-        </div>
-
-        <span class="section-link">
-          LATEST
-        </span>
-
-      </div>
-
-
-      <div class="news-layout">
-
-
-        <div class="news-grid">
-
-
-          <article class="news-card">
-
-            <a href="#">
-
-              <div class="news-image">
-
-                <span class="news-image-label">
-                  GLOBAL
-                </span>
-
-              </div>
-
-              <div class="news-body">
-
-                <div class="news-source">
-
-                  <span class="source-name">
-                    WORLDLYN NEWS
-                  </span>
-
-                  <span class="news-date">
-                    LIVE FEED
-                  </span>
-
-                </div>
-
-                <h3>
-                  Latest global developments will appear here automatically.
-                </h3>
-
-                <p>
-                  The live news system will automatically bring
-                  relevant international stories into this section.
-                </p>
-
-                <span class="read-more">
-                  READ STORY →
-                </span>
-
-              </div>
-
-            </a>
-
-          </article>
-
-
-          <article class="news-card">
-
-            <a href="#markets">
-
-              <div class="news-image gold">
-
-                <span class="news-image-label">
-                  MARKETS
-                </span>
-
-              </div>
-
-              <div class="news-body">
-
-                <div class="news-source">
-
-                  <span class="source-name">
-                    MARKET PULSE
-                  </span>
-
-                  <span class="news-date">
-                    LIVE
-                  </span>
-
-                </div>
-
-                <h3>
-                  Important stock-market developments will be highlighted here.
-                </h3>
-
-                <p>
-                  Market-moving events, index movements, corporate
-                  developments and economic signals.
-                </p>
-
-                <span class="read-more">
-                  MARKET WATCH →
-                </span>
-
-              </div>
-
-            </a>
-
-          </article>
-
-
-          <article class="news-card">
-
-            <a href="#business">
-
-              <div class="news-image green">
-
-                <span class="news-image-label">
-                  BUSINESS
-                </span>
-
-              </div>
-
-              <div class="news-body">
-
-                <div class="news-source">
-
-                  <span class="source-name">
-                    BUSINESS
-                  </span>
-
-                  <span class="news-date">
-                    LIVE FEED
-                  </span>
-
-                </div>
-
-                <h3>
-                  Company and industry news will update automatically.
-                </h3>
-
-                <p>
-                  Follow important corporate developments, industries,
-                  earnings and business trends.
-                </p>
-
-                <span class="read-more">
-                  BUSINESS NEWS →
-                </span>
-
-              </div>
-
-            </a>
-
-          </article>
-
-
-          <article class="news-card">
-
-            <a href="#ai">
-
-              <div class="news-image purple">
-
-                <span class="news-image-label">
-                  AI
-                </span>
-
-              </div>
-
-              <div class="news-body">
-
-                <div class="news-source">
-
-                  <span class="source-name">
-                    AI WATCH
-                  </span>
-
-                  <span class="news-date">
-                    LIVE FEED
-                  </span>
-
-                </div>
-
-                <h3>
-                  New AI developments and technology stories will appear here.
-                </h3>
-
-                <p>
-                  Discover AI models, companies, investment, regulation
-                  and the wider economic impact of artificial intelligence.
-                </p>
-
-                <span class="read-more">
-                  AI NEWS →
-                </span>
-
-              </div>
-
-            </a>
-
-          </article>
-
-
-        </div>
-
-
-        <!-- DAILY BRIEF -->
-
-        <aside class="daily-brief">
-
-          <div class="brief-label">
-            WORLDLYN DAILY BRIEF
-          </div>
-
-          <h2>
-            Three things to know.
-          </h2>
-
-
-          <div class="brief-item">
-
-            <strong>
-              Market-moving stories will be automatically selected.
-            </strong>
-
-            <span>
-              STOCK MARKET
-            </span>
-
-          </div>
-
-
-          <div class="brief-item">
-
-            <strong>
-              Important global developments will be summarized.
-            </strong>
-
-            <span>
-              GLOBAL
-            </span>
-
-          </div>
-
-
-          <div class="brief-item">
-
-            <strong>
-              AI and technology developments will be tracked.
-            </strong>
-
-            <span>
-              TECHNOLOGY
-            </span>
-
-          </div>
-
-
-          <div class="brief-footer">
-            Automatic news integration will populate this section
-            once the live news API is connected.
-          </div>
-
-        </aside>
-
-
-      </div>
-
-    </section>
-
-
-    <!-- =====================================================
+    <!-- ===================================================
          BUSINESS
-         ===================================================== -->
+    ==================================================== -->
 
-    <section id="business">
+    <section
+      id="business"
+      class="section"
+    >
 
-      <div class="section-header">
+      <div class="section-heading">
 
         <div>
 
@@ -2948,89 +3266,99 @@
             BUSINESS
           </span>
 
-          <h2 class="section-title">
-            The bigger business picture.
+          <h2>
+            Companies, industries and competition.
           </h2>
 
           <p class="section-description">
-            Companies, industries, investment and corporate developments.
+            Corporate developments, business strategy,
+            industry trends and major company news.
           </p>
 
         </div>
 
+        <span class="section-link">
+          AUTO UPDATED
+        </span>
+
       </div>
 
 
-      <div class="business-grid">
+      <div
+        id="businessNews"
+        class="news-grid"
+      >
 
-
-        <article class="business-card featured">
-
-          <div class="category">
-            WHY IT MATTERS
-          </div>
-
-          <h3>
-            Business decisions are increasingly shaped by technology,
-            markets and changing economic conditions.
-          </h3>
-
-          <p>
-            WORLDLYN will connect corporate developments with the
-            larger economic and market forces behind them.
-          </p>
-
-        </article>
-
-
-        <article class="business-card">
-
-          <div class="category">
-            COMPANIES
-          </div>
-
-          <h3>
-            Corporate developments
-          </h3>
-
-          <p>
-            Follow company results, major announcements, mergers,
-            acquisitions and strategic decisions.
-          </p>
-
-        </article>
-
-
-        <article class="business-card" id="economy">
-
-          <div class="category">
-            ECONOMY
-          </div>
-
-          <h3>
-            Economic signals
-          </h3>
-
-          <p>
-            Inflation, interest rates, GDP, employment, central banks
-            and other forces influencing markets.
-          </p>
-
-        </article>
-
+        <div class="loading">
+          <span class="spinner"></span>
+          Loading business news...
+        </div>
 
       </div>
 
     </section>
 
 
-    <!-- =====================================================
+    <!-- ===================================================
+         ECONOMY
+    ==================================================== -->
+
+    <section
+      id="economy"
+      class="section"
+    >
+
+      <div class="section-heading">
+
+        <div>
+
+          <span class="section-kicker">
+            ECONOMY
+          </span>
+
+          <h2>
+            The numbers behind the headlines.
+          </h2>
+
+          <p class="section-description">
+            Inflation, interest rates, employment,
+            GDP, central banks and economic signals.
+          </p>
+
+        </div>
+
+        <span class="section-link">
+          AUTO UPDATED
+        </span>
+
+      </div>
+
+
+      <div
+        id="economyNews"
+        class="news-grid"
+      >
+
+        <div class="loading">
+          <span class="spinner"></span>
+          Loading economic news...
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================
          TECHNOLOGY
-         ===================================================== -->
+    ==================================================== -->
 
-    <section id="technology">
+    <section
+      id="technology"
+      class="section"
+    >
 
-      <div class="section-header">
+      <div class="section-heading">
 
         <div>
 
@@ -3038,88 +3366,49 @@
             TECHNOLOGY
           </span>
 
-          <h2 class="section-title">
-            The technology economy.
+          <h2>
+            Technology changing the economy.
           </h2>
 
           <p class="section-description">
-            Technology, innovation, cybersecurity, chips and digital business.
+            Innovation, software, semiconductors,
+            digital businesses and emerging technology.
           </p>
 
         </div>
 
+        <span class="section-link">
+          AUTO UPDATED
+        </span>
+
       </div>
 
 
-      <div class="technology-grid">
+      <div
+        id="technologyNews"
+        class="news-grid"
+      >
 
-
-        <article class="technology-card">
-
-          <div class="technology-number">
-            01
-          </div>
-
-          <h3>
-            Big Tech
-          </h3>
-
-          <p>
-            Follow major technology companies, products, platforms
-            and developments shaping the digital economy.
-          </p>
-
-        </article>
-
-
-        <article class="technology-card">
-
-          <div class="technology-number">
-            02
-          </div>
-
-          <h3>
-            Semiconductors
-          </h3>
-
-          <p>
-            Track the chip industry, AI infrastructure, supply chains
-            and companies powering the next technology cycle.
-          </p>
-
-        </article>
-
-
-        <article class="technology-card">
-
-          <div class="technology-number">
-            03
-          </div>
-
-          <h3>
-            Cybersecurity
-          </h3>
-
-          <p>
-            Important developments in digital security, data protection
-            and the rapidly changing cyber landscape.
-          </p>
-
-        </article>
-
+        <div class="loading">
+          <span class="spinner"></span>
+          Loading technology news...
+        </div>
 
       </div>
 
     </section>
 
 
-    <!-- =====================================================
+    <!-- ===================================================
          AI
-         ===================================================== -->
+    ==================================================== -->
 
-    <section id="ai">
+    <section
+      id="ai"
+      class="section"
+    >
 
-      <div class="section-header">
+      <div class="section-heading">
 
         <div>
 
@@ -3127,92 +3416,50 @@
             ARTIFICIAL INTELLIGENCE
           </span>
 
-          <h2 class="section-title">
-            AI is changing the economy.
+          <h2>
+            AI is changing business.
           </h2>
 
           <p class="section-description">
-            AI news, companies, investment, regulation and innovation.
+            AI models, companies, investment, automation,
+            regulation and the technologies shaping the
+            next generation of business.
           </p>
 
         </div>
 
         <span class="section-link">
-          AI WATCH
+          AUTO UPDATED
         </span>
 
       </div>
 
 
-      <div class="technology-grid">
+      <div
+        id="aiNews"
+        class="news-grid"
+      >
 
-
-        <article class="technology-card">
-
-          <div class="technology-number">
-            AI
-          </div>
-
-          <h3>
-            AI Models
-          </h3>
-
-          <p>
-            New models, capabilities and breakthroughs changing
-            how people and businesses use artificial intelligence.
-          </p>
-
-        </article>
-
-
-        <article class="technology-card">
-
-          <div class="technology-number">
-            $$
-          </div>
-
-          <h3>
-            AI Investment
-          </h3>
-
-          <p>
-            Track investment, infrastructure, chips and the companies
-            competing for leadership in the AI economy.
-          </p>
-
-        </article>
-
-
-        <article class="technology-card">
-
-          <div class="technology-number">
-            +1
-          </div>
-
-          <h3>
-            AI Impact
-          </h3>
-
-          <p>
-            Understand how AI affects productivity, jobs, businesses,
-            markets, regulation and the wider economy.
-          </p>
-
-        </article>
-
+        <div class="loading">
+          <span class="spinner"></span>
+          Loading AI news...
+        </div>
 
       </div>
 
     </section>
 
 
-    <!-- =====================================================
+    <!-- ===================================================
          CRYPTO
-         ===================================================== -->
+    ==================================================== -->
 
-    <section id="crypto">
+    <section
+      id="crypto"
+      class="section"
+    >
 
-      <div class="section-header">
+      <div class="section-heading">
 
         <div>
 
@@ -3220,89 +3467,152 @@
             CRYPTO
           </span>
 
-          <h2 class="section-title">
-            Digital assets.
+          <h2>
+            Digital assets and blockchain.
           </h2>
 
           <p class="section-description">
-            Follow crypto markets, regulation and institutional developments.
+            Bitcoin, Ethereum, digital assets, blockchain,
+            crypto markets and regulatory developments.
           </p>
 
         </div>
 
+        <span class="section-link">
+          AUTO UPDATED
+        </span>
+
       </div>
 
 
-      <div class="business-grid">
+      <div
+        id="cryptoNews"
+        class="news-grid"
+      >
 
-
-        <article class="business-card featured">
-
-          <div class="category">
-            CRYPTO MARKET
-          </div>
-
-          <h3>
-            Bitcoin and digital assets in focus.
-          </h3>
-
-          <p>
-            The live market ticker above provides current crypto pricing,
-            while the automatic news feed will surface important crypto
-            developments here.
-          </p>
-
-        </article>
-
-
-        <article class="business-card">
-
-          <div class="category">
-            BITCOIN
-          </div>
-
-          <h3>
-            Market movements
-          </h3>
-
-          <p>
-            Track major price movements, institutional activity and
-            factors influencing digital-asset markets.
-          </p>
-
-        </article>
-
-
-        <article class="business-card">
-
-          <div class="category">
-            REGULATION
-          </div>
-
-          <h3>
-            Policy &amp; adoption
-          </h3>
-
-          <p>
-            Follow important regulatory decisions and developments
-            influencing the future of digital assets.
-          </p>
-
-        </article>
-
+        <div class="loading">
+          <span class="spinner"></span>
+          Loading crypto news...
+        </div>
 
       </div>
 
     </section>
 
 
-    <!-- =====================================================
+    <!-- ===================================================
+         CATEGORY FEATURE
+    ==================================================== -->
+
+    <section class="section">
+
+      <div class="section-heading">
+
+        <div>
+
+          <span class="section-kicker">
+            WORLDLYN
+          </span>
+
+          <h2>
+            One place. Different perspectives.
+          </h2>
+
+        </div>
+
+      </div>
+
+
+      <div class="category-grid">
+
+        <a
+          href="#stock-market"
+          class="category-panel category-global"
+        >
+
+          <span>
+            MARKET INTELLIGENCE
+          </span>
+
+          <h3>
+            Follow the money.
+          </h3>
+
+          <p>
+            Understand what investors are watching
+            and how market movements connect with
+            the wider economy.
+          </p>
+
+        </a>
+
+
+        <a
+          href="#technology"
+          class="category-panel category-tech"
+        >
+
+          <span>
+            TECHNOLOGY & AI
+          </span>
+
+          <h3>
+            Understand what comes next.
+          </h3>
+
+          <p>
+            Discover the technologies and ideas
+            changing companies, industries and
+            everyday life.
+          </p>
+
+        </a>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         INSIGHT
+    ==================================================== -->
+
+    <section class="section">
+
+      <div class="insight">
+
+        <div class="insight-label">
+          WORLDLYN INSIGHT
+        </div>
+
+        <h2>
+          Don't just follow the headline.
+          Understand the story.
+        </h2>
+
+        <p>
+          WORLDLYN is built around a simple idea:
+          information is more useful when people understand
+          what happened, why it happened and why it matters.
+          The platform brings different parts of the global
+          economy together so readers can see the bigger picture.
+        </p>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================
          ABOUT
-         ===================================================== -->
+    ==================================================== -->
 
-    <section id="about">
+    <section
+      id="about"
+      class="section"
+    >
 
-      <div class="section-header">
+      <div class="section-heading">
 
         <div>
 
@@ -3310,8 +3620,8 @@
             ABOUT WORLDLYN
           </span>
 
-          <h2 class="section-title">
-            The person behind WORLDLYN.
+          <h2>
+            Built with curiosity. Designed for clarity.
           </h2>
 
         </div>
@@ -3319,12 +3629,12 @@
       </div>
 
 
-      <div class="about-section">
+      <div class="about-grid">
 
 
-        <div class="founder-card">
+        <div class="about-card creator-card">
 
-          <div class="founder-avatar">
+          <div class="creator-avatar">
             SW
           </div>
 
@@ -3332,82 +3642,100 @@
             Saurabh Waghmare
           </h3>
 
-          <div class="founder-role">
-            Founder &amp; Creator
+          <div class="creator-role">
+            Founder & Creator of WORLDLYN
           </div>
 
           <p>
-            WORLDLYN was created with the vision of bringing
-            global news, markets, business, technology and
-            economic developments together in one place.
+            WORLDLYN is an independent project created by
+            Saurabh Waghmare with the goal of bringing
+            markets, business, technology, economics and
+            global developments together in one accessible
+            platform.
           </p>
 
         </div>
 
 
-        <div class="about-content">
-
-          <div class="category">
-            THE WORLDLYN STORY
-          </div>
+        <div class="about-card">
 
           <h3>
-            Don't just follow the headline. Understand the story.
+            Why WORLDLYN?
           </h3>
 
           <p>
-            WORLDLYN is an independent digital platform created
-            to make important developments easier to discover,
-            understand and follow.
+            The modern world produces enormous amounts of
+            information every day. WORLDLYN is designed to
+            make that information easier to discover,
+            understand and connect.
           </p>
 
           <p>
-            The idea is simple: instead of forcing readers to
-            search across multiple websites for global news,
-            market movements, business developments and technology
-            stories, WORLDLYN brings them together in one clean
-            experience.
+            The platform combines automatically updated
+            news with interactive financial-market tools,
+            allowing readers to move from a headline to
+            the bigger picture.
           </p>
 
           <p>
-            The platform combines live market information,
-            automatically updated news and concise context so
-            readers can understand not only what happened,
-            but why it matters.
+            WORLDLYN is also a personal learning and
+            entrepreneurship project — bringing together
+            interests in business analytics, markets,
+            technology and global affairs.
           </p>
 
-          <div class="vision-box">
-            “Know What Moves the World.”
+
+          <div class="about-points">
+
+            <div class="about-point">
+              🌎 Global Perspective
+            </div>
+
+            <div class="about-point">
+              📊 Data & Analytics
+            </div>
+
+            <div class="about-point">
+              💼 Business
+            </div>
+
+            <div class="about-point">
+              💻 Technology
+            </div>
+
           </div>
 
         </div>
-
 
       </div>
 
     </section>
 
 
-    <!-- =====================================================
+    <!-- ===================================================
          CONTACT
-         ===================================================== -->
+    ==================================================== -->
 
-    <section id="contact">
+    <section
+      id="contact"
+      class="section"
+    >
 
-      <div class="section-header">
+      <div class="section-heading">
 
         <div>
 
           <span class="section-kicker">
-            CONTACT WORLDLYN
+            CONTACT
           </span>
 
-          <h2 class="section-title">
-            Let's connect.
+          <h2>
+            Have an idea, suggestion or opportunity?
           </h2>
 
           <p class="section-description">
-            Questions, feedback, corrections or business enquiries.
+            WORLDLYN is being built and improved continuously.
+            Feedback, collaborations and ideas are welcome.
           </p>
 
         </div>
@@ -3415,206 +3743,114 @@
       </div>
 
 
-      <div class="contact-grid">
+      <div class="contact-box">
 
 
-        <div class="contact-card">
+        <div>
 
           <h3>
-            Get in touch
+            Let's connect.
           </h3>
 
           <p>
-            Have a suggestion, found an issue, want to discuss
-            WORLDLYN or have a business enquiry? Send us a message.
+            For feedback about WORLDLYN, content ideas,
+            collaborations or business opportunities,
+            reach out to the creator.
           </p>
 
 
-          <div class="contact-item">
+          <div class="contact-list">
 
-            <strong>
-              Founder
-            </strong>
+            <div class="contact-item">
 
-            <span>
-              Saurabh Waghmare
-            </span>
+              <div class="contact-icon">
+                👤
+              </div>
+
+              <div>
+
+                <strong>
+                  Creator
+                </strong>
+
+                <span>
+                  Saurabh Waghmare
+                </span>
+
+              </div>
+
+            </div>
+
+
+            <div class="contact-item">
+
+              <div class="contact-icon">
+                🌐
+              </div>
+
+              <div>
+
+                <strong>
+                  Website
+                </strong>
+
+                <span>
+                  WORLDLYN — Know What Moves the World
+                </span>
+
+              </div>
+
+            </div>
+
+
+            <div class="contact-item">
+
+              <div class="contact-icon">
+                💡
+              </div>
+
+              <div>
+
+                <strong>
+                  Collaboration
+                </strong>
+
+                <span>
+                  News, analytics, business and technology ideas
+                </span>
+
+              </div>
+
+            </div>
 
           </div>
-
-
-          <div class="contact-item">
-
-            <strong>
-              Email
-            </strong>
-
-            <span>
-              Your WORLDLYN email
-            </span>
-
-          </div>
-
-
-          <div class="contact-item">
-
-            <strong>
-              Purpose
-            </strong>
-
-            <span>
-              Feedback • Corrections • Partnerships • Business enquiries
-            </span>
-
-          </div>
-
 
         </div>
 
 
-        <div class="contact-form">
+        <div class="contact-message">
 
-          <h3>
-            Send a message
-          </h3>
+          <h4>
+            WORLDLYN is growing.
+          </h4>
 
+          <p>
+            This website is an evolving project. New
+            categories, better market tools, more data
+            sources and additional features can be added
+            over time.
+          </p>
 
-          <!--
-            NOTE:
-            This form is visually ready.
-            To actually receive submissions, connect it to
-            Formspree, FormSubmit, Netlify Forms, or your backend.
-          -->
+          <br>
 
-          <form
-            action="#"
-            method="POST"
-            onsubmit="event.preventDefault(); alert('Thank you for contacting WORLDLYN. The contact form will be connected to the live email system in the next setup step.');"
-          >
-
-
-            <div class="form-group">
-
-              <label for="name">
-                Name
-              </label>
-
-              <input
-                type="text"
-                id="name"
-                name="name"
-                placeholder="Your name"
-                required
-              >
-
-            </div>
-
-
-            <div class="form-group">
-
-              <label for="email">
-                Email
-              </label>
-
-              <input
-                type="email"
-                id="email"
-                name="email"
-                placeholder="you@example.com"
-                required
-              >
-
-            </div>
-
-
-            <div class="form-group">
-
-              <label for="subject">
-                Subject
-              </label>
-
-              <select id="subject" name="subject">
-
-                <option>
-                  General enquiry
-                </option>
-
-                <option>
-                  Feedback
-                </option>
-
-                <option>
-                  News correction
-                </option>
-
-                <option>
-                  Business enquiry
-                </option>
-
-                <option>
-                  Partnership
-                </option>
-
-              </select>
-
-            </div>
-
-
-            <div class="form-group">
-
-              <label for="message">
-                Message
-              </label>
-
-              <textarea
-                id="message"
-                name="message"
-                placeholder="Write your message..."
-                required
-              ></textarea>
-
-            </div>
-
-
-            <button
-              type="submit"
-              class="submit-button"
-            >
-              SEND MESSAGE
-            </button>
-
-
-          </form>
+          <p>
+            If you publish this site publicly, add your
+            preferred email address or social profile here
+            once you decide which contact channel you want
+            WORLDLYN visitors to use.
+          </p>
 
         </div>
-
-
-      </div>
-
-    </section>
-
-
-    <!-- =====================================================
-         INSIGHT
-         ===================================================== -->
-
-    <section>
-
-      <div class="insight">
-
-        <div class="insight-label">
-          THE WORLDLYN DIFFERENCE
-        </div>
-
-        <h2>
-          Don't just follow the headline. Understand what it changes.
-        </h2>
-
-        <p>
-          Markets move quickly. Technology changes quickly.
-          The world changes quickly. WORLDLYN is built to help
-          readers understand the bigger picture behind the news.
-        </p>
 
       </div>
 
@@ -3626,11 +3862,11 @@
 
   <!-- =====================================================
        FOOTER
-       ===================================================== -->
+  ====================================================== -->
 
   <footer>
 
-    <div class="footer-inner">
+    <div class="footer-grid">
 
 
       <div>
@@ -3640,9 +3876,8 @@
         </div>
 
         <p class="footer-description">
-          Global news, stock markets, business, economy,
-          technology, AI and insights — brought together
-          in one intelligent platform.
+          Global news, markets, business, economy,
+          technology, AI and insights — explained clearly.
         </p>
 
       </div>
@@ -3651,14 +3886,14 @@
       <div class="footer-column">
 
         <h4>
-          Explore
+          EXPLORE
         </h4>
 
         <a href="#global">
           Global
         </a>
 
-        <a href="#markets">
+        <a href="#stock-market">
           Stock Market
         </a>
 
@@ -3674,14 +3909,6 @@
           Technology
         </a>
 
-        <a href="#ai">
-          AI
-        </a>
-
-        <a href="#crypto">
-          Crypto
-        </a>
-
       </div>
 
 
@@ -3691,6 +3918,14 @@
           WORLDLYN
         </h4>
 
+        <a href="#ai">
+          AI
+        </a>
+
+        <a href="#crypto">
+          Crypto
+        </a>
+
         <a href="#about">
           About
         </a>
@@ -3699,16 +3934,7 @@
           Contact
         </a>
 
-        <a href="#">
-          Privacy
-        </a>
-
-        <a href="#">
-          Disclaimer
-        </a>
-
       </div>
-
 
     </div>
 
@@ -3716,12 +3942,1194 @@
     <div class="copyright">
 
       © 2026 WORLDLYN. All rights reserved.
-      &nbsp;•&nbsp;
-      Created by Saurabh Waghmare.
+
+      <br><br>
+
+      Market data and charts are provided through
+      TradingView. News is retrieved from external RSS
+      sources and remains the property of its respective
+      publishers.
 
     </div>
 
   </footer>
+
+
+  <!-- =====================================================
+       JAVASCRIPT
+  ====================================================== -->
+
+  <script>
+
+    /* =====================================================
+       MARKET SYMBOL MAP
+    ====================================================== */
+
+    const marketMap = {
+
+      "nifty":
+        {
+          symbol: "NSE:NIFTY",
+          name: "NIFTY 50"
+        },
+
+      "nifty 50":
+        {
+          symbol: "NSE:NIFTY",
+          name: "NIFTY 50"
+        },
+
+      "sensex":
+        {
+          symbol: "BSE:SENSEX",
+          name: "SENSEX"
+        },
+
+      "reliance":
+        {
+          symbol: "NSE:RELIANCE",
+          name: "Reliance Industries"
+        },
+
+      "tcs":
+        {
+          symbol: "NSE:TCS",
+          name: "Tata Consultancy Services"
+        },
+
+      "infosys":
+        {
+          symbol: "NSE:INFY",
+          name: "Infosys"
+        },
+
+      "hdfc bank":
+        {
+          symbol: "NSE:HDFCBANK",
+          name: "HDFC Bank"
+        },
+
+      "icici bank":
+        {
+          symbol: "NSE:ICICIBANK",
+          name: "ICICI Bank"
+        },
+
+      "apple":
+        {
+          symbol: "NASDAQ:AAPL",
+          name: "Apple"
+        },
+
+      "microsoft":
+        {
+          symbol: "NASDAQ:MSFT",
+          name: "Microsoft"
+        },
+
+      "nvidia":
+        {
+          symbol: "NASDAQ:NVDA",
+          name: "NVIDIA"
+        },
+
+      "tesla":
+        {
+          symbol: "NASDAQ:TSLA",
+          name: "Tesla"
+        },
+
+      "amazon":
+        {
+          symbol: "NASDAQ:AMZN",
+          name: "Amazon"
+        },
+
+      "nasdaq":
+        {
+          symbol: "NASDAQ:IXIC",
+          name: "NASDAQ"
+        },
+
+      "s&p 500":
+        {
+          symbol: "SP:SPX",
+          name: "S&P 500"
+        },
+
+      "bitcoin":
+        {
+          symbol: "BITSTAMP:BTCUSD",
+          name: "Bitcoin"
+        },
+
+      "btc":
+        {
+          symbol: "BITSTAMP:BTCUSD",
+          name: "Bitcoin"
+        },
+
+      "ethereum":
+        {
+          symbol: "BITSTAMP:ETHUSD",
+          name: "Ethereum"
+        },
+
+      "eth":
+        {
+          symbol: "BITSTAMP:ETHUSD",
+          name: "Ethereum"
+        },
+
+      "usd inr":
+        {
+          symbol: "FX_IDC:USDINR",
+          name: "USD / INR"
+        }
+
+    };
+
+
+    /* =====================================================
+       GET CURRENT SYMBOL
+    ====================================================== */
+
+    function getCurrentSymbol() {
+
+      const params =
+        new URLSearchParams(
+          window.location.search
+        );
+
+      return (
+        params.get("tvwidgetsymbol")
+        || "NSE:NIFTY"
+      );
+
+    }
+
+
+    /* =====================================================
+       CREATE TRADINGVIEW URL
+    ====================================================== */
+
+    function tradingViewUrl(symbol) {
+
+      return (
+        "https://www.tradingview.com/symbols/"
+        +
+        symbol.replace(":", "-")
+        +
+        "/"
+      );
+
+    }
+
+
+    /* =====================================================
+       UPDATE MARKET HEADER
+    ====================================================== */
+
+    function updateMarketHeader() {
+
+      const symbol =
+        getCurrentSymbol();
+
+      let name =
+        symbol;
+
+
+      Object.keys(marketMap)
+        .forEach(function(key) {
+
+          if (
+            marketMap[key].symbol
+            === symbol
+          ) {
+
+            name =
+              marketMap[key].name;
+
+          }
+
+        });
+
+
+      const nameElement =
+        document.getElementById(
+          "selectedMarketName"
+        );
+
+
+      const symbolElement =
+        document.getElementById(
+          "selectedMarketSymbol"
+        );
+
+
+      const linkElement =
+        document.getElementById(
+          "tvSymbolLink"
+        );
+
+
+      if (nameElement) {
+
+        nameElement.textContent =
+          name;
+
+      }
+
+
+      if (symbolElement) {
+
+        symbolElement.textContent =
+          symbol;
+
+      }
+
+
+      if (linkElement) {
+
+        linkElement.href =
+          tradingViewUrl(symbol);
+
+      }
+
+    }
+
+
+    updateMarketHeader();
+
+
+    /* =====================================================
+       MARKET SEARCH
+    ====================================================== */
+
+    document
+      .getElementById(
+        "marketSearchForm"
+      )
+      .addEventListener(
+        "submit",
+        function(event) {
+
+          event.preventDefault();
+
+
+          const input =
+            document
+              .getElementById(
+                "marketSearch"
+              )
+              .value
+              .trim();
+
+
+          if (!input) {
+
+            return;
+
+          }
+
+
+          const normalized =
+            input
+              .toLowerCase();
+
+
+          let selected =
+            marketMap[normalized];
+
+
+          /*
+             Allow users to enter an exact
+             TradingView symbol.
+
+             Example:
+             NSE:RELIANCE
+             NASDAQ:AAPL
+             BSE:SENSEX
+          */
+
+          if (
+            !selected
+            &&
+            input.includes(":")
+          ) {
+
+            selected = {
+
+              symbol:
+                input.toUpperCase(),
+
+              name:
+                input.toUpperCase()
+
+            };
+
+          }
+
+
+          /*
+             Known instrument:
+             reload this WORLDLYN page with
+             TradingView's recommended
+             tvwidgetsymbol parameter.
+          */
+
+          if (selected) {
+
+            const url =
+              new URL(
+                window.location.href
+              );
+
+
+            url.searchParams.set(
+              "tvwidgetsymbol",
+              selected.symbol
+            );
+
+
+            window.location.href =
+              url.toString();
+
+
+            return;
+
+          }
+
+
+          /*
+             Unknown search:
+             send the user to TradingView's
+             search interface rather than
+             inventing a ticker.
+          */
+
+          const searchUrl =
+            "https://www.tradingview.com/search/?query="
+            +
+            encodeURIComponent(input);
+
+
+          window.open(
+            searchUrl,
+            "_blank",
+            "noopener,noreferrer"
+          );
+
+        }
+      );
+
+
+    /* =====================================================
+       QUICK MARKET BUTTONS
+    ====================================================== */
+
+    document
+      .querySelectorAll(
+        ".quick-market"
+      )
+      .forEach(function(button) {
+
+        button.addEventListener(
+          "click",
+          function() {
+
+            const symbol =
+              button.dataset.symbol;
+
+
+            const url =
+              new URL(
+                window.location.href
+              );
+
+
+            url.searchParams.set(
+              "tvwidgetsymbol",
+              symbol
+            );
+
+
+            window.location.href =
+              url.toString();
+
+          }
+        );
+
+      });
+
+
+    /* =====================================================
+       RSS NEWS CONFIGURATION
+    ====================================================== */
+
+    const newsFeeds = {
+
+      global: {
+
+        element:
+          "globalNews",
+
+        query:
+          "world global international news",
+
+        emoji:
+          "🌎",
+
+        color:
+          "global"
+
+      },
+
+
+      business: {
+
+        element:
+          "businessNews",
+
+        query:
+          "business companies corporate markets",
+
+        emoji:
+          "💼",
+
+        color:
+          "business"
+
+      },
+
+
+      economy: {
+
+        element:
+          "economyNews",
+
+        query:
+          "economy inflation interest rates GDP central banks",
+
+        emoji:
+          "📊",
+
+        color:
+          "economy"
+
+      },
+
+
+      technology: {
+
+        element:
+          "technologyNews",
+
+        query:
+          "technology semiconductor software innovation",
+
+        emoji:
+          "💻",
+
+        color:
+          "technology"
+
+      },
+
+
+      ai: {
+
+        element:
+          "aiNews",
+
+        query:
+          "artificial intelligence AI OpenAI technology",
+
+        emoji:
+          "🤖",
+
+        color:
+          "ai"
+
+      },
+
+
+      crypto: {
+
+        element:
+          "cryptoNews",
+
+        query:
+          "Bitcoin Ethereum cryptocurrency blockchain",
+
+        emoji:
+          "₿",
+
+        color:
+          "crypto"
+
+      }
+
+    };
+
+
+    /* =====================================================
+       BUILD GOOGLE NEWS RSS URL
+    ====================================================== */
+
+    function createGoogleNewsFeed(query) {
+
+      return (
+        "https://news.google.com/rss/search?q="
+        +
+        encodeURIComponent(query)
+        +
+        "&hl=en-IN&gl=IN&ceid=IN:en"
+      );
+
+    }
+
+
+    /* =====================================================
+       FETCH RSS
+    ====================================================== */
+
+    async function fetchNews(category) {
+
+      const config =
+        newsFeeds[category];
+
+
+      const container =
+        document.getElementById(
+          config.element
+        );
+
+
+      if (!container) {
+        return;
+      }
+
+
+      try {
+
+        const rssUrl =
+          createGoogleNewsFeed(
+            config.query
+          );
+
+
+        const apiUrl =
+          "https://api.rss2json.com/v1/api.json?rss_url="
+          +
+          encodeURIComponent(
+            rssUrl
+          );
+
+
+        const response =
+          await fetch(
+            apiUrl,
+            {
+              cache: "no-store"
+            }
+          );
+
+
+        if (!response.ok) {
+
+          throw new Error(
+            "News service unavailable"
+          );
+
+        }
+
+
+        const data =
+          await response.json();
+
+
+        if (
+          data.status !== "ok"
+          ||
+          !data.items
+          ||
+          !data.items.length
+        ) {
+
+          throw new Error(
+            "No articles available"
+          );
+
+        }
+
+
+        renderNews(
+          container,
+          data.items.slice(0,6),
+          config
+        );
+
+      }
+      catch (error) {
+
+        container.innerHTML = `
+
+          <div class="news-status">
+
+            <strong>
+              News is temporarily unavailable.
+            </strong>
+
+            The section will automatically
+            try again later.
+
+          </div>
+
+        `;
+
+      }
+
+    }
+
+
+    /* =====================================================
+       CLEAN DESCRIPTION
+    ====================================================== */
+
+    function cleanDescription(text) {
+
+      if (!text) {
+        return "";
+      }
+
+
+      const temp =
+        document.createElement(
+          "div"
+        );
+
+
+      temp.innerHTML =
+        text;
+
+
+      const clean =
+        temp.textContent
+          || temp.innerText
+          || "";
+
+
+      return clean
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0,170);
+
+    }
+
+
+    /* =====================================================
+       FORMAT DATE
+    ====================================================== */
+
+    function formatDate(dateString) {
+
+      if (!dateString) {
+        return "Latest";
+      }
+
+
+      const date =
+        new Date(dateString);
+
+
+      if (
+        Number.isNaN(
+          date.getTime()
+        )
+      ) {
+
+        return "Latest";
+
+      }
+
+
+      return date.toLocaleDateString(
+        "en-IN",
+        {
+          day: "numeric",
+          month: "short",
+          year: "numeric"
+        }
+      );
+
+    }
+
+
+    /* =====================================================
+       RENDER NEWS
+    ====================================================== */
+
+    function renderNews(
+      container,
+      articles,
+      config
+    ) {
+
+      container.innerHTML = "";
+
+
+      articles.forEach(
+        function(article) {
+
+          const card =
+            document.createElement(
+              "article"
+            );
+
+
+          card.className =
+            "news-card";
+
+
+          const link =
+            document.createElement(
+              "a"
+            );
+
+
+          link.href =
+            article.link
+            || "#";
+
+
+          link.target =
+            "_blank";
+
+
+          link.rel =
+            "noopener noreferrer";
+
+
+          const image =
+            document.createElement(
+              "div"
+            );
+
+
+          image.className =
+            "news-image";
+
+
+          const imageUrl =
+            article.thumbnail
+            ||
+            article.enclosure?.link
+            ||
+            "";
+
+
+          if (imageUrl) {
+
+            const img =
+              document.createElement(
+                "img"
+              );
+
+
+            img.src =
+              imageUrl;
+
+
+            img.alt =
+              article.title
+              || "WORLDLYN news";
+
+
+            img.loading =
+              "lazy";
+
+
+            img.onerror =
+              function() {
+
+                this.remove();
+
+
+                const placeholder =
+                  document.createElement(
+                    "div"
+                  );
+
+
+                placeholder.className =
+                  "news-placeholder";
+
+
+                placeholder.textContent =
+                  config.emoji;
+
+
+                image.prepend(
+                  placeholder
+                );
+
+              };
+
+
+            image.appendChild(
+              img
+            );
+
+          }
+          else {
+
+            const placeholder =
+              document.createElement(
+                "div"
+              );
+
+
+            placeholder.className =
+              "news-placeholder";
+
+
+            placeholder.textContent =
+              config.emoji;
+
+
+            image.appendChild(
+              placeholder
+            );
+
+          }
+
+
+          const overlay =
+            document.createElement(
+              "div"
+            );
+
+
+          overlay.className =
+            "news-image-overlay";
+
+
+          const imageLabel =
+            document.createElement(
+              "span"
+            );
+
+
+          imageLabel.className =
+            "news-image-label";
+
+
+          imageLabel.textContent =
+            "WORLDLYN • LATEST";
+
+
+          overlay.appendChild(
+            imageLabel
+          );
+
+
+          image.appendChild(
+            overlay
+          );
+
+
+          const content =
+            document.createElement(
+              "div"
+            );
+
+
+          content.className =
+            "news-content";
+
+
+          const category =
+            document.createElement(
+              "div"
+            );
+
+
+          category.className =
+            "news-category";
+
+
+          category.textContent =
+            categoryName(
+              config.color
+            );
+
+
+          const title =
+            document.createElement(
+              "h3"
+            );
+
+
+          title.textContent =
+            article.title
+            || "Latest development";
+
+
+          const description =
+            document.createElement(
+              "p"
+            );
+
+
+          description.textContent =
+            cleanDescription(
+              article.description
+            );
+
+
+          const footer =
+            document.createElement(
+              "div"
+            );
+
+
+          footer.className =
+            "news-footer";
+
+
+          const source =
+            document.createElement(
+              "span"
+            );
+
+
+          source.textContent =
+            "Google News RSS";
+
+
+          const date =
+            document.createElement(
+              "span"
+            );
+
+
+          date.textContent =
+            formatDate(
+              article.pubDate
+            );
+
+
+          footer.appendChild(
+            source
+          );
+
+
+          footer.appendChild(
+            date
+          );
+
+
+          content.appendChild(
+            category
+          );
+
+
+          content.appendChild(
+            title
+          );
+
+
+          if (
+            description.textContent
+          ) {
+
+            content.appendChild(
+              description
+            );
+
+          }
+
+
+          content.appendChild(
+            footer
+          );
+
+
+          link.appendChild(
+            image
+          );
+
+
+          link.appendChild(
+            content
+          );
+
+
+          card.appendChild(
+            link
+          );
+
+
+          container.appendChild(
+            card
+          );
+
+        }
+      );
+
+    }
+
+
+    /* =====================================================
+       CATEGORY NAME
+    ====================================================== */
+
+    function categoryName(category) {
+
+      const names = {
+
+        global:
+          "Global",
+
+        business:
+          "Business",
+
+        economy:
+          "Economy",
+
+        technology:
+          "Technology",
+
+        ai:
+          "Artificial Intelligence",
+
+        crypto:
+          "Crypto"
+
+      };
+
+
+      return (
+        names[category]
+        || "News"
+      );
+
+    }
+
+
+    /* =====================================================
+       LOAD ALL NEWS
+    ====================================================== */
+
+    function loadAllNews() {
+
+      Object.keys(
+        newsFeeds
+      )
+      .forEach(
+        function(category) {
+
+          fetchNews(
+            category
+          );
+
+        }
+      );
+
+    }
+
+
+    loadAllNews();
+
+
+    /* =====================================================
+       AUTOMATIC NEWS REFRESH
+       
+       Every 10 minutes.
+    ====================================================== */
+
+    setInterval(
+      loadAllNews,
+      10 * 60 * 1000
+    );
+
+
+    /* =====================================================
+       ACTIVE NAVIGATION
+    ====================================================== */
+
+    const navLinks =
+      document.querySelectorAll(
+        ".nav-link"
+      );
+
+
+    const sections =
+      document.querySelectorAll(
+        "main section[id]"
+      );
+
+
+    window.addEventListener(
+      "scroll",
+      function() {
+
+        let current =
+          "home";
+
+
+        sections.forEach(
+          function(section) {
+
+            const top =
+              section.offsetTop
+              - 130;
+
+
+            if (
+              window.scrollY
+              >= top
+            ) {
+
+              current =
+                section.id;
+
+            }
+
+          }
+        );
+
+
+        navLinks.forEach(
+          function(link) {
+
+            link.classList.remove(
+              "active"
+            );
+
+
+            if (
+              link.getAttribute(
+                "href"
+              )
+              === "#" + current
+            ) {
+
+              link.classList.add(
+                "active"
+              );
+
+            }
+
+          }
+        );
+
+      }
+    );
+
+
+  </script>
 
 
 </body>
