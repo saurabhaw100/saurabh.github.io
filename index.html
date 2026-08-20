@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>WORLDLYN | Know What Moves the World</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f5f7fa;
+            color: #111827;
+        }
+
+        header {
+            background: #0b1220;
+            color: white;
+            padding: 20px 6%;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 30px;
+            font-weight: 800;
+            letter-spacing: 2px;
+        }
+
+        .tagline {
+            font-size: 13px;
+            color: #b8c2d1;
+            margin-top: 4px;
+        }
+
+        nav {
+            background: #111827;
+            padding: 14px 6%;
+            display: flex;
+            gap: 25px;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        nav a:hover {
+            color: #60a5fa;
+        }
+
+        .container {
+            width: 88%;
+            max-width: 1200px;
+            margin: 30px auto;
+        }
+
+        .breaking {
+            background: #dc2626;
+            color: white;
+            padding: 10px 15px;
+            font-weight: bold;
+            border-radius: 5px;
+            margin-bottom: 25px;
+        }
+
+        .hero {
+            background: white;
+            border-radius: 12px;
+            padding: 35px;
+            margin-bottom: 30px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.07);
+        }
+
+        .hero-label {
+            color: #2563eb;
+            font-size: 13px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .hero h1 {
+            font-size: 38px;
+            line-height: 1.15;
+            margin-bottom: 15px;
+        }
+
+        .hero p {
+            color: #6b7280;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            margin: 35px 0 18px;
+            border-left: 5px solid #2563eb;
+            padding-left: 12px;
+        }
+
+        .markets {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .market-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .market-card h3 {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 10px;
+        }
+
+        .market-value {
+            font-size: 23px;
+            font-weight: bold;
+        }
+
+        .market-change {
+            color: #16a34a;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .articles {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .article {
+            background: white;
+            padding: 22px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .category {
+            color: #2563eb;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .article h3 {
+            font-size: 19px;
+            line-height: 1.35;
+            margin-bottom: 10px;
+        }
+
+        .article p {
+            color: #6b7280;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .insight {
+            background: #0b1220;
+            color: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 35px;
+        }
+
+        .insight h2 {
+            margin-bottom: 12px;
+        }
+
+        .insight p {
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        footer {
+            background: #0b1220;
+            color: white;
+            text-align: center;
+            padding: 35px 20px;
+            margin-top: 50px;
+        }
+
+        footer p {
+            color: #94a3b8;
+            margin-top: 8px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 800px) {
+
+            .hero h1 {
+                font-size: 28px;
+            }
+
+            .markets {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .articles {
+                grid-template-columns: 1fr;
+            }
+
+            .header-top {
+                display: block;
+            }
+
+            nav {
+                gap: 18px;
+            }
+        }
+
+        @media (max-width: 450px) {
+
+            .markets {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .container {
+                width: 92%;
+            }
+
+            .hero {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="header-top">
+        <div>
+            <div class="logo">WORLDLYN</div>
+            <div class="tagline">Know What Moves the World.</div>
+        </div>
+    </div>
+</header>
+
+<nav>
+    <a href="#">HOME</a>
+    <a href="#">GLOBAL</a>
+    <a href="#">MARKETS</a>
+    <a href="#">BUSINESS</a>
+    <a href="#">ECONOMY</a>
+    <a href="#">TECH & AI</a>
+    <a href="#">INSIGHTS</a>
+</nav>
+
+<main class="container">
+
+    <div class="breaking">
+        🔴 WORLDLYN DAILY — Latest global developments
+    </div>
+
+    <section class="hero">
+        <div class="hero-label">WORLDLYN FEATURE</div>
+
+        <h1>
+            Understanding the trends shaping markets and the world
+        </h1>
+
+        <p>
+            WORLDLYN brings together global developments, business,
+            markets, technology and economic trends — explained simply
+            and clearly.
+        </p>
+    </section>
+
+    <h2 class="section-title">Market Watch</h2>
+
+    <section class="markets">
+
+        <div class="market-card">
+            <h3>NIFTY 50</h3>
+            <div class="market-value">—</div>
+            <div class="market-change">Market data coming soon</div>
+        </div>
+
+        <div class="market-card">
+            <h3>SENSEX</h3>
+            <div class="market-value">—</div>
+            <div class="market-change">Market data coming soon</div>
+        </div>
+
+        <div class="market-card">
+            <h3>S&P 500</h3>
+            <div class="market-value">—</div>
+            <div class="market-change">Market data coming soon</div>
+        </div>
+
+        <div class="market-card">
+            <h3>NASDAQ</h3>
+            <div class="market-value">—</div>
+            <div class="market-change">Market data coming soon</div>
+        </div>
+
+    </section>
+
+    <h2 class="section-title">Global</h2>
+
+    <section class="articles">
+
+        <article class="article">
+            <div class="category">Global</div>
+            <h3>What is moving the global economy?</h3>
+            <p>
+                Follow major developments around the world and understand
+                why they matter.
+            </p>
+        </article>
+
+        <article class="article">
+            <div class="category">Markets</div>
+            <h3>What investors are watching today</h3>
+            <p>
+                Key market developments, company news and economic signals
+                in one place.
+            </p>
+        </article>
+
+        <article class="article">
+            <div class="category">Business</div>
+            <h3>The business trends shaping tomorrow</h3>
+            <p>
+                Discover important developments across companies,
+                industries and economies.
+            </p>
+        </article>
+
+    </section>
+
+    <h2 class="section-title">Technology & AI</h2>
+
+    <section class="articles">
+
+        <article class="article">
+            <div class="category">Technology</div>
+            <h3>Technology changing the way businesses operate</h3>
+            <p>
+                Follow the technologies influencing companies and markets.
+            </p>
+        </article>
+
+        <article class="article">
+            <div class="category">AI</div>
+            <h3>The latest developments in artificial intelligence</h3>
+            <p>
+                Understand the AI developments that could affect businesses
+                and the global economy.
+            </p>
+        </article>
+
+        <article class="article">
+            <div class="category">Insights</div>
+            <h3>Why today's biggest stories matter</h3>
+            <p>
+                WORLDLYN explains the story behind the headline.
+            </p>
+        </article>
+
+    </section>
+
+    <section class="insight">
+
+        <h2>WORLDLYN INSIGHT</h2>
+
+        <p>
+            Our goal is simple: don't just tell you what happened.
+            We explain what happened, why it happened, and why it matters.
+        </p>
+
+    </section>
+
+</main>
+
+<footer>
+
+    <strong>WORLDLYN</strong>
+
+    <p>Know What Moves the World.</p>
+
+    <p>© 2026 WORLDLYN. All rights reserved.</p>
+
+</footer>
+
+</body>
+</html>
