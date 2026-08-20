@@ -846,20 +846,42 @@ LIVE MARKET DATA
 
 <div class="market-widget">
 
-<tv-market-overview
-symbol-sectors='[
-{
-"sectionName":"Global Indices",
-"symbols":[
-"NSE:NIFTY",
-"BSE:SENSEX",
-"SP:SPX",
-"NASDAQ:NDX"
-]
-}
-]'
-show-chart="true">
-</tv-market-overview>
+<div class="market-widget">
+
+  <tv-market-overview
+    symbol-sectors='[
+      {
+        "sectionName":"Global Indices",
+        "symbols":[
+          "FOREXCOM:SPXUSD",
+          "FOREXCOM:NSXUSD",
+          "FOREXCOM:DJI",
+          "FOREXCOM:UKXGBP"
+        ]
+      },
+      {
+        "sectionName":"Technology",
+        "symbols":[
+          "NASDAQ:AAPL",
+          "NASDAQ:MSFT",
+          "NASDAQ:NVDA",
+          "NASDAQ:TSLA"
+        ]
+      },
+      {
+        "sectionName":"Crypto",
+        "symbols":[
+          "BITSTAMP:BTCUSD",
+          "BITSTAMP:ETHUSD"
+        ]
+      }
+    ]'
+    show-chart="true">
+  </tv-market-overview>
+
+</div>
+
+<div class="market-note">
 
 </div>
 
