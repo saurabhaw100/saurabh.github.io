@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -39,6 +40,7 @@ body {
     line-height: 1.5;
 }
 
+
 /* HEADER */
 
 header {
@@ -49,7 +51,7 @@ header {
 .header-container {
     max-width: 1250px;
     margin: auto;
-    padding: 25px 25px 22px;
+    padding: 25px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -72,6 +74,7 @@ header {
     color: #94a3b8;
     font-size: 13px;
 }
+
 
 /* NAVIGATION */
 
@@ -109,6 +112,7 @@ nav a.active {
     border-bottom: 3px solid var(--blue2);
 }
 
+
 /* MAIN */
 
 .container {
@@ -116,6 +120,7 @@ nav a.active {
     margin: auto;
     padding: 30px 25px 60px;
 }
+
 
 /* BREAKING */
 
@@ -139,6 +144,7 @@ nav a.active {
     border-radius: 50%;
     display: inline-block;
 }
+
 
 /* HERO */
 
@@ -198,6 +204,7 @@ nav a.active {
     font-size: 12px;
 }
 
+
 /* SIDE STORIES */
 
 .side-stories {
@@ -220,6 +227,13 @@ nav a.active {
     box-shadow: 0 8px 25px rgba(0,0,0,0.06);
 }
 
+.side-card a {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    height: 100%;
+}
+
 .category {
     font-size: 11px;
     font-weight: 800;
@@ -239,6 +253,7 @@ nav a.active {
     font-size: 13px;
     margin-top: 8px;
 }
+
 
 /* SECTION */
 
@@ -261,6 +276,7 @@ nav a.active {
     font-size: 13px;
     font-weight: 700;
 }
+
 
 /* MARKET DASHBOARD */
 
@@ -299,6 +315,7 @@ nav a.active {
     color: var(--green);
 }
 
+
 /* NEWS GRID */
 
 .news-grid {
@@ -318,6 +335,12 @@ nav a.active {
 .news-card:hover {
     transform: translateY(-3px);
     box-shadow: 0 10px 25px rgba(0,0,0,.07);
+}
+
+.news-card a {
+    text-decoration: none;
+    color: inherit;
+    display: block;
 }
 
 .news-image {
@@ -351,6 +374,7 @@ nav a.active {
     font-size: 13px;
 }
 
+
 /* TWO COLUMN */
 
 .two-column {
@@ -375,6 +399,11 @@ nav a.active {
     border-bottom: none;
 }
 
+.list-item a {
+    text-decoration: none;
+    color: inherit;
+}
+
 .list-item h3 {
     font-size: 16px;
     margin-bottom: 5px;
@@ -384,6 +413,7 @@ nav a.active {
     color: var(--muted);
     font-size: 13px;
 }
+
 
 /* INSIGHT */
 
@@ -412,6 +442,7 @@ nav a.active {
     color: #b7c4d5;
     max-width: 850px;
 }
+
 
 /* FOOTER */
 
@@ -467,6 +498,7 @@ footer {
     padding: 18px;
 }
 
+
 /* MOBILE */
 
 @media (max-width: 850px) {
@@ -508,6 +540,7 @@ footer {
     }
 }
 
+
 @media (max-width: 520px) {
 
     .logo {
@@ -544,10 +577,12 @@ footer {
 }
 
 </style>
+
 </head>
 
 
 <body>
+
 
 <!-- HEADER -->
 
@@ -556,8 +591,15 @@ footer {
 <div class="header-container">
 
 <div>
-<div class="logo">WORLDLYN</div>
-<div class="tagline">Know What Moves the World.</div>
+
+<div class="logo">
+WORLDLYN
+</div>
+
+<div class="tagline">
+Know What Moves the World.
+</div>
+
 </div>
 
 <div class="header-right">
@@ -569,23 +611,45 @@ GLOBAL • MARKETS • BUSINESS • TECHNOLOGY
 </header>
 
 
+
 <!-- NAVIGATION -->
 
 <nav>
 
 <div class="nav-container">
 
-<a href="#" class="active">HOME</a>
-<a href="#global">GLOBAL</a>
-<a href="#markets">MARKETS</a>
-<a href="#business">BUSINESS</a>
-<a href="#economy">ECONOMY</a>
-<a href="#technology">TECH & AI</a>
-<a href="#insights">INSIGHTS</a>
+<a href="index.html" class="active">
+HOME
+</a>
+
+<a href="#global">
+GLOBAL
+</a>
+
+<a href="#markets">
+MARKETS
+</a>
+
+<a href="#business">
+BUSINESS
+</a>
+
+<a href="#economy">
+ECONOMY
+</a>
+
+<a href="#technology">
+TECH & AI
+</a>
+
+<a href="#insights">
+INSIGHTS
+</a>
 
 </div>
 
 </nav>
+
 
 
 <main class="container">
@@ -602,13 +666,19 @@ WORLDLYN DAILY — Understanding what is moving the world
 </div>
 
 
+
 <!-- HERO -->
 
 <section class="hero-grid">
 
+
+<a href="article.html" style="text-decoration:none;color:inherit;">
+
 <div class="hero">
 
-<div class="hero-label">WORLDLYN FEATURE</div>
+<div class="hero-label">
+WORLDLYN FEATURE
+</div>
 
 <h1>
 The trends shaping global markets, business and the world
@@ -625,12 +695,20 @@ Global • Markets • Business • Insights
 
 </div>
 
+</a>
+
+
 
 <div class="side-stories">
 
+
 <div class="side-card">
 
-<div class="category">Markets</div>
+<a href="article.html">
+
+<div class="category">
+Markets
+</div>
 
 <h3>
 What investors are watching across global markets
@@ -640,12 +718,19 @@ What investors are watching across global markets
 Key developments shaping investor sentiment and market direction.
 </p>
 
+</a>
+
 </div>
+
 
 
 <div class="side-card">
 
-<div class="category">Technology</div>
+<a href="article.html">
+
+<div class="category">
+Technology
+</div>
 
 <h3>
 How AI is changing businesses and the global economy
@@ -655,12 +740,15 @@ How AI is changing businesses and the global economy
 The technologies creating new opportunities and challenges.
 </p>
 
+</a>
+
 </div>
 
 
 </div>
 
 </section>
+
 
 
 <!-- MARKET WATCH -->
@@ -669,61 +757,96 @@ The technologies creating new opportunities and challenges.
 
 <div class="section-header">
 
-<h2 class="section-title">Market Watch</h2>
+<h2 class="section-title">
+Market Watch
+</h2>
 
-<span class="view-all">LIVE DATA — COMING SOON</span>
+<span class="view-all">
+LIVE DATA — COMING SOON
+</span>
 
 </div>
+
 
 
 <div class="market-grid">
 
+
 <div class="market-card">
 
-<div class="market-name">NIFTY 50</div>
+<div class="market-name">
+NIFTY 50
+</div>
 
-<div class="market-value">—</div>
+<div class="market-value">
+—
+</div>
 
-<div class="market-status">India</div>
+<div class="market-status">
+India
+</div>
 
 </div>
 
 
+
 <div class="market-card">
 
-<div class="market-name">SENSEX</div>
+<div class="market-name">
+SENSEX
+</div>
 
-<div class="market-value">—</div>
+<div class="market-value">
+—
+</div>
 
-<div class="market-status">India</div>
+<div class="market-status">
+India
+</div>
 
 </div>
 
 
+
 <div class="market-card">
 
-<div class="market-name">S&P 500</div>
+<div class="market-name">
+S&P 500
+</div>
 
-<div class="market-value">—</div>
+<div class="market-value">
+—
+</div>
 
-<div class="market-status">United States</div>
+<div class="market-status">
+United States
+</div>
 
 </div>
 
 
+
 <div class="market-card">
 
-<div class="market-name">NASDAQ</div>
+<div class="market-name">
+NASDAQ
+</div>
 
-<div class="market-value">—</div>
+<div class="market-value">
+—
+</div>
 
-<div class="market-status">United States</div>
+<div class="market-status">
+United States
+</div>
 
 </div>
+
 
 </div>
 
 </section>
+
 
 
 <!-- TOP STORIES -->
@@ -732,11 +855,16 @@ The technologies creating new opportunities and challenges.
 
 <div class="section-header">
 
-<h2 class="section-title">Top Stories</h2>
+<h2 class="section-title">
+Top Stories
+</h2>
 
-<span class="view-all">LATEST</span>
+<span class="view-all">
+LATEST
+</span>
 
 </div>
+
 
 
 <div class="news-grid">
@@ -744,13 +872,17 @@ The technologies creating new opportunities and challenges.
 
 <article class="news-card">
 
+<a href="article.html">
+
 <div class="news-image">
 GLOBAL
 </div>
 
 <div class="news-content">
 
-<div class="category">Global</div>
+<div class="category">
+Global
+</div>
 
 <h3>
 What is moving the global economy?
@@ -762,10 +894,15 @@ Major developments around the world and what they could mean for businesses and 
 
 </div>
 
+</a>
+
 </article>
 
 
+
 <article class="news-card">
+
+<a href="article.html">
 
 <div class="news-image">
 MARKETS
@@ -773,7 +910,9 @@ MARKETS
 
 <div class="news-content">
 
-<div class="category">Markets</div>
+<div class="category">
+Markets
+</div>
 
 <h3>
 What investors are watching today
@@ -785,10 +924,15 @@ The economic signals, company developments and market themes investors are follo
 
 </div>
 
+</a>
+
 </article>
 
 
+
 <article class="news-card">
+
+<a href="article.html">
 
 <div class="news-image">
 BUSINESS
@@ -796,7 +940,9 @@ BUSINESS
 
 <div class="news-content">
 
-<div class="category">Business</div>
+<div class="category">
+Business
+</div>
 
 <h3>
 Business trends shaping tomorrow
@@ -808,6 +954,8 @@ Important developments across companies, industries and the global economy.
 
 </div>
 
+</a>
+
 </article>
 
 
@@ -816,17 +964,23 @@ Important developments across companies, industries and the global economy.
 </section>
 
 
+
 <!-- BUSINESS -->
 
 <section id="business">
 
 <div class="section-header">
 
-<h2 class="section-title">Business & Economy</h2>
+<h2 class="section-title">
+Business & Economy
+</h2>
 
-<span class="view-all">EXPLORE</span>
+<span class="view-all">
+EXPLORE
+</span>
 
 </div>
+
 
 
 <div class="two-column">
@@ -837,7 +991,11 @@ Important developments across companies, industries and the global economy.
 
 <div class="list-item">
 
-<div class="category">Business</div>
+<a href="article.html">
+
+<div class="category">
+Business
+</div>
 
 <h3>
 The companies and industries attracting attention
@@ -847,12 +1005,19 @@ The companies and industries attracting attention
 Follow corporate developments and industry trends that could shape markets.
 </p>
 
+</a>
+
 </div>
+
 
 
 <div class="list-item">
 
-<div class="category">Economy</div>
+<a href="article.html">
+
+<div class="category">
+Economy
+</div>
 
 <h3>
 Economic signals investors should understand
@@ -862,12 +1027,19 @@ Economic signals investors should understand
 Inflation, interest rates, employment and economic growth explained simply.
 </p>
 
+</a>
+
 </div>
+
 
 
 <div class="list-item">
 
-<div class="category">Markets</div>
+<a href="article.html">
+
+<div class="category">
+Markets
+</div>
 
 <h3>
 Why market sentiment can change so quickly
@@ -877,15 +1049,20 @@ Why market sentiment can change so quickly
 Understanding the factors behind movements in financial markets.
 </p>
 
+</a>
+
 </div>
 
 
 </div>
+
 
 
 <div class="list-card">
 
-<div class="category">WORLDLYN QUICK READ</div>
+<div class="category">
+WORLDLYN QUICK READ
+</div>
 
 <h3>
 What happened today?
@@ -897,7 +1074,9 @@ A short and simple summary of the most important developments.
 
 <br>
 
-<div class="category">WHY IT MATTERS</div>
+<div class="category">
+WHY IT MATTERS
+</div>
 
 <p style="color:#64748b;font-size:14px;">
 The bigger picture behind today's biggest stories.
@@ -911,17 +1090,23 @@ The bigger picture behind today's biggest stories.
 </section>
 
 
+
 <!-- TECHNOLOGY -->
 
 <section id="technology">
 
 <div class="section-header">
 
-<h2 class="section-title">Technology & AI</h2>
+<h2 class="section-title">
+Technology & AI
+</h2>
 
-<span class="view-all">LATEST</span>
+<span class="view-all">
+LATEST
+</span>
 
 </div>
+
 
 
 <div class="news-grid">
@@ -929,13 +1114,17 @@ The bigger picture behind today's biggest stories.
 
 <article class="news-card">
 
+<a href="article.html">
+
 <div class="news-image">
 AI
 </div>
 
 <div class="news-content">
 
-<div class="category">Artificial Intelligence</div>
+<div class="category">
+Artificial Intelligence
+</div>
 
 <h3>
 The AI developments businesses need to watch
@@ -947,10 +1136,15 @@ The technologies changing productivity, investment and competition.
 
 </div>
 
+</a>
+
 </article>
 
 
+
 <article class="news-card">
+
+<a href="article.html">
 
 <div class="news-image">
 TECH
@@ -958,7 +1152,9 @@ TECH
 
 <div class="news-content">
 
-<div class="category">Technology</div>
+<div class="category">
+Technology
+</div>
 
 <h3>
 Technology trends changing the global economy
@@ -970,10 +1166,15 @@ Understanding the innovations influencing industries and consumers.
 
 </div>
 
+</a>
+
 </article>
 
 
+
 <article class="news-card">
+
+<a href="article.html">
 
 <div class="news-image">
 DIGITAL
@@ -981,7 +1182,9 @@ DIGITAL
 
 <div class="news-content">
 
-<div class="category">Digital Economy</div>
+<div class="category">
+Digital Economy
+</div>
 
 <h3>
 The next wave of digital business
@@ -993,12 +1196,15 @@ How technology is creating new business models and opportunities.
 
 </div>
 
+</a>
+
 </article>
 
 
 </div>
 
 </section>
+
 
 
 <!-- INSIGHT -->
@@ -1029,6 +1235,7 @@ business and market developments into clear insights.
 </main>
 
 
+
 <!-- FOOTER -->
 
 <footer>
@@ -1038,7 +1245,9 @@ business and market developments into clear insights.
 
 <div>
 
-<div class="footer-logo">WORLDLYN</div>
+<div class="footer-logo">
+WORLDLYN
+</div>
 
 <p class="footer-description">
 Global trends, markets, business, economy,
@@ -1048,31 +1257,64 @@ technology and insights — explained clearly.
 </div>
 
 
-<div class="footer-column">
-
-<h4>Explore</h4>
-
-<a href="#global">Global</a>
-<a href="#markets">Markets</a>
-<a href="#business">Business</a>
-<a href="#technology">Technology & AI</a>
-
-</div>
-
 
 <div class="footer-column">
 
-<h4>WORLDLYN</h4>
+<h4>
+Explore
+</h4>
 
-<a href="#">About</a>
-<a href="#">Contact</a>
-<a href="#">Privacy</a>
-<a href="#">Disclaimer</a>
+<a href="#global">
+Global
+</a>
+
+<a href="#markets">
+Markets
+</a>
+
+<a href="#business">
+Business
+</a>
+
+<a href="#technology">
+Technology & AI
+</a>
+
+</div>
+
+
+
+<div class="footer-column">
+
+<h4>
+WORLDLYN
+</h4>
+
+<a href="article.html">
+Latest Article
+</a>
+
+<a href="#">
+About
+</a>
+
+<a href="#">
+Contact
+</a>
+
+<a href="#">
+Privacy
+</a>
+
+<a href="#">
+Disclaimer
+</a>
 
 </div>
 
 
 </div>
+
 
 
 <div class="copyright">
@@ -1081,8 +1323,10 @@ technology and insights — explained clearly.
 
 </div>
 
+
 </footer>
 
 
 </body>
+
 </html>
