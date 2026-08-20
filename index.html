@@ -1,409 +1,1088 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>WORLDLYN | Know What Moves the World</title>
+<title>WORLDLYN — Know What Moves the World</title>
 
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta name="description"
+content="WORLDLYN brings global trends, markets, business, economy, technology and insights together in one place.">
 
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            background: #f5f7fa;
-            color: #111827;
-        }
+<style>
 
-        header {
-            background: #0b1220;
-            color: white;
-            padding: 20px 6%;
-        }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-        .header-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+:root {
+    --navy: #07111f;
+    --navy2: #0d1b2e;
+    --blue: #2563eb;
+    --blue2: #3b82f6;
+    --red: #e11d48;
+    --green: #16a34a;
+    --text: #111827;
+    --muted: #64748b;
+    --light: #f5f7fb;
+    --white: #ffffff;
+    --border: #e5e7eb;
+}
 
-        .logo {
-            font-size: 30px;
-            font-weight: 800;
-            letter-spacing: 2px;
-        }
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: var(--light);
+    color: var(--text);
+    line-height: 1.5;
+}
 
-        .tagline {
-            font-size: 13px;
-            color: #b8c2d1;
-            margin-top: 4px;
-        }
+/* HEADER */
 
-        nav {
-            background: #111827;
-            padding: 14px 6%;
-            display: flex;
-            gap: 25px;
-            overflow-x: auto;
-            white-space: nowrap;
-        }
+header {
+    background: var(--navy);
+    color: white;
+}
 
-        nav a {
-            color: white;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 600;
-        }
+.header-container {
+    max-width: 1250px;
+    margin: auto;
+    padding: 25px 25px 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
-        nav a:hover {
-            color: #60a5fa;
-        }
+.logo {
+    font-size: 32px;
+    font-weight: 900;
+    letter-spacing: 3px;
+}
 
-        .container {
-            width: 88%;
-            max-width: 1200px;
-            margin: 30px auto;
-        }
+.tagline {
+    color: #9fb0c5;
+    font-size: 13px;
+    margin-top: 4px;
+}
 
-        .breaking {
-            background: #dc2626;
-            color: white;
-            padding: 10px 15px;
-            font-weight: bold;
-            border-radius: 5px;
-            margin-bottom: 25px;
-        }
+.header-right {
+    text-align: right;
+    color: #94a3b8;
+    font-size: 13px;
+}
 
-        .hero {
-            background: white;
-            border-radius: 12px;
-            padding: 35px;
-            margin-bottom: 30px;
-            box-shadow: 0 3px 12px rgba(0,0,0,0.07);
-        }
+/* NAVIGATION */
 
-        .hero-label {
-            color: #2563eb;
-            font-size: 13px;
-            font-weight: bold;
-            text-transform: uppercase;
-            margin-bottom: 12px;
-        }
+nav {
+    background: var(--navy2);
+    border-top: 1px solid rgba(255,255,255,0.07);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+}
 
-        .hero h1 {
-            font-size: 38px;
-            line-height: 1.15;
-            margin-bottom: 15px;
-        }
+.nav-container {
+    max-width: 1250px;
+    margin: auto;
+    padding: 0 25px;
+    display: flex;
+    align-items: center;
+    overflow-x: auto;
+}
 
-        .hero p {
-            color: #6b7280;
-            line-height: 1.6;
-            font-size: 16px;
-        }
+nav a {
+    color: #dbe4ef;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 17px 18px;
+    white-space: nowrap;
+}
 
-        .section-title {
-            font-size: 24px;
-            margin: 35px 0 18px;
-            border-left: 5px solid #2563eb;
-            padding-left: 12px;
-        }
+nav a:hover {
+    background: rgba(255,255,255,0.07);
+    color: white;
+}
 
-        .markets {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-        }
+nav a.active {
+    color: white;
+    border-bottom: 3px solid var(--blue2);
+}
 
-        .market-card {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        }
+/* MAIN */
 
-        .market-card h3 {
-            font-size: 14px;
-            color: #6b7280;
-            margin-bottom: 10px;
-        }
+.container {
+    max-width: 1250px;
+    margin: auto;
+    padding: 30px 25px 60px;
+}
 
-        .market-value {
-            font-size: 23px;
-            font-weight: bold;
-        }
+/* BREAKING */
 
-        .market-change {
-            color: #16a34a;
-            font-size: 14px;
-            margin-top: 5px;
-        }
+.breaking {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 11px 16px;
+    margin-bottom: 25px;
+    font-size: 14px;
+    font-weight: 700;
+}
 
-        .articles {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-        }
+.live-dot {
+    width: 9px;
+    height: 9px;
+    background: var(--red);
+    border-radius: 50%;
+    display: inline-block;
+}
 
-        .article {
-            background: white;
-            padding: 22px;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        }
+/* HERO */
 
-        .category {
-            color: #2563eb;
-            font-size: 12px;
-            font-weight: bold;
-            text-transform: uppercase;
-            margin-bottom: 10px;
-        }
+.hero-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 22px;
+}
 
-        .article h3 {
-            font-size: 19px;
-            line-height: 1.35;
-            margin-bottom: 10px;
-        }
+.hero {
+    min-height: 390px;
+    border-radius: 14px;
+    overflow: hidden;
+    position: relative;
+    background:
+        linear-gradient(
+            to top,
+            rgba(0,0,0,0.88),
+            rgba(0,0,0,0.08)
+        ),
+        linear-gradient(
+            135deg,
+            #173b6c,
+            #081827
+        );
+    color: white;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
 
-        .article p {
-            color: #6b7280;
-            font-size: 14px;
-            line-height: 1.5;
-        }
+.hero-label {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: #93c5fd;
+    margin-bottom: 12px;
+}
 
-        .insight {
-            background: #0b1220;
-            color: white;
-            border-radius: 12px;
-            padding: 30px;
-            margin-top: 35px;
-        }
+.hero h1 {
+    font-size: 38px;
+    line-height: 1.12;
+    max-width: 850px;
+    margin-bottom: 12px;
+}
 
-        .insight h2 {
-            margin-bottom: 12px;
-        }
+.hero p {
+    color: #dbeafe;
+    max-width: 750px;
+    font-size: 15px;
+}
 
-        .insight p {
-            color: #cbd5e1;
-            line-height: 1.6;
-        }
+.hero-meta {
+    margin-top: 16px;
+    color: #b9c8da;
+    font-size: 12px;
+}
 
-        footer {
-            background: #0b1220;
-            color: white;
-            text-align: center;
-            padding: 35px 20px;
-            margin-top: 50px;
-        }
+/* SIDE STORIES */
 
-        footer p {
-            color: #94a3b8;
-            margin-top: 8px;
-            font-size: 14px;
-        }
+.side-stories {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
 
-        @media (max-width: 800px) {
+.side-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    flex: 1;
+    transition: 0.2s;
+}
 
-            .hero h1 {
-                font-size: 28px;
-            }
+.side-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+}
 
-            .markets {
-                grid-template-columns: repeat(2, 1fr);
-            }
+.category {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--blue);
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    margin-bottom: 8px;
+}
 
-            .articles {
-                grid-template-columns: 1fr;
-            }
+.side-card h3 {
+    font-size: 18px;
+    line-height: 1.3;
+}
 
-            .header-top {
-                display: block;
-            }
+.side-card p {
+    color: var(--muted);
+    font-size: 13px;
+    margin-top: 8px;
+}
 
-            nav {
-                gap: 18px;
-            }
-        }
+/* SECTION */
 
-        @media (max-width: 450px) {
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 42px 0 17px;
+}
 
-            .markets {
-                grid-template-columns: 1fr 1fr;
-            }
+.section-title {
+    font-size: 24px;
+    font-weight: 800;
+    border-left: 5px solid var(--blue);
+    padding-left: 12px;
+}
 
-            .container {
-                width: 92%;
-            }
+.view-all {
+    color: var(--blue);
+    font-size: 13px;
+    font-weight: 700;
+}
 
-            .hero {
-                padding: 25px;
-            }
-        }
-    </style>
+/* MARKET DASHBOARD */
+
+.market-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+}
+
+.market-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    padding: 18px;
+}
+
+.market-name {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 700;
+}
+
+.market-value {
+    font-size: 22px;
+    font-weight: 800;
+    margin-top: 8px;
+}
+
+.market-status {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 5px;
+}
+
+.market-up {
+    color: var(--green);
+}
+
+/* NEWS GRID */
+
+.news-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+}
+
+.news-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: .2s;
+}
+
+.news-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0,0,0,.07);
+}
+
+.news-image {
+    height: 150px;
+    background:
+        linear-gradient(
+            135deg,
+            #dbeafe,
+            #94a3b8
+        );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1e3a8a;
+    font-weight: 800;
+    font-size: 13px;
+}
+
+.news-content {
+    padding: 18px;
+}
+
+.news-card h3 {
+    font-size: 18px;
+    line-height: 1.3;
+    margin-bottom: 8px;
+}
+
+.news-card p {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+/* TWO COLUMN */
+
+.two-column {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+}
+
+.list-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.list-item {
+    padding: 17px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.list-item:last-child {
+    border-bottom: none;
+}
+
+.list-item h3 {
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.list-item p {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+/* INSIGHT */
+
+.insight {
+    margin-top: 42px;
+    background: var(--navy);
+    color: white;
+    border-radius: 14px;
+    padding: 32px;
+}
+
+.insight-label {
+    color: #60a5fa;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+}
+
+.insight h2 {
+    font-size: 27px;
+    margin-bottom: 10px;
+}
+
+.insight p {
+    color: #b7c4d5;
+    max-width: 850px;
+}
+
+/* FOOTER */
+
+footer {
+    background: var(--navy);
+    color: white;
+    margin-top: 20px;
+}
+
+.footer-container {
+    max-width: 1250px;
+    margin: auto;
+    padding: 40px 25px;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 40px;
+}
+
+.footer-logo {
+    font-size: 24px;
+    font-weight: 900;
+    letter-spacing: 2px;
+}
+
+.footer-description {
+    color: #94a3b8;
+    font-size: 13px;
+    margin-top: 10px;
+    max-width: 350px;
+}
+
+.footer-column h4 {
+    margin-bottom: 12px;
+}
+
+.footer-column a {
+    display: block;
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 13px;
+    margin: 7px 0;
+}
+
+.footer-column a:hover {
+    color: white;
+}
+
+.copyright {
+    border-top: 1px solid rgba(255,255,255,.08);
+    text-align: center;
+    color: #64748b;
+    font-size: 12px;
+    padding: 18px;
+}
+
+/* MOBILE */
+
+@media (max-width: 850px) {
+
+    .header-container {
+        padding: 20px;
+    }
+
+    .header-right {
+        display: none;
+    }
+
+    .hero-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .hero {
+        min-height: 360px;
+    }
+
+    .hero h1 {
+        font-size: 30px;
+    }
+
+    .market-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .news-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .two-column {
+        grid-template-columns: 1fr;
+    }
+
+    .footer-container {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 520px) {
+
+    .logo {
+        font-size: 27px;
+    }
+
+    .container {
+        padding: 20px 15px 45px;
+    }
+
+    .hero {
+        padding: 24px;
+    }
+
+    .hero h1 {
+        font-size: 26px;
+    }
+
+    .market-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .market-value {
+        font-size: 18px;
+    }
+
+    .section-title {
+        font-size: 21px;
+    }
+
+    .footer-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+</style>
 </head>
+
 
 <body>
 
+<!-- HEADER -->
+
 <header>
-    <div class="header-top">
-        <div>
-            <div class="logo">WORLDLYN</div>
-            <div class="tagline">Know What Moves the World.</div>
-        </div>
-    </div>
+
+<div class="header-container">
+
+<div>
+<div class="logo">WORLDLYN</div>
+<div class="tagline">Know What Moves the World.</div>
+</div>
+
+<div class="header-right">
+GLOBAL • MARKETS • BUSINESS • TECHNOLOGY
+</div>
+
+</div>
+
 </header>
 
+
+<!-- NAVIGATION -->
+
 <nav>
-    <a href="#">HOME</a>
-    <a href="#">GLOBAL</a>
-    <a href="#">MARKETS</a>
-    <a href="#">BUSINESS</a>
-    <a href="#">ECONOMY</a>
-    <a href="#">TECH & AI</a>
-    <a href="#">INSIGHTS</a>
+
+<div class="nav-container">
+
+<a href="#" class="active">HOME</a>
+<a href="#global">GLOBAL</a>
+<a href="#markets">MARKETS</a>
+<a href="#business">BUSINESS</a>
+<a href="#economy">ECONOMY</a>
+<a href="#technology">TECH & AI</a>
+<a href="#insights">INSIGHTS</a>
+
+</div>
+
 </nav>
+
 
 <main class="container">
 
-    <div class="breaking">
-        🔴 WORLDLYN DAILY — Latest global developments
-    </div>
 
-    <section class="hero">
-        <div class="hero-label">WORLDLYN FEATURE</div>
+<!-- BREAKING -->
 
-        <h1>
-            Understanding the trends shaping markets and the world
-        </h1>
+<div class="breaking">
 
-        <p>
-            WORLDLYN brings together global developments, business,
-            markets, technology and economic trends — explained simply
-            and clearly.
-        </p>
-    </section>
+<span class="live-dot"></span>
 
-    <h2 class="section-title">Market Watch</h2>
+WORLDLYN DAILY — Understanding what is moving the world
 
-    <section class="markets">
+</div>
 
-        <div class="market-card">
-            <h3>NIFTY 50</h3>
-            <div class="market-value">—</div>
-            <div class="market-change">Market data coming soon</div>
-        </div>
 
-        <div class="market-card">
-            <h3>SENSEX</h3>
-            <div class="market-value">—</div>
-            <div class="market-change">Market data coming soon</div>
-        </div>
+<!-- HERO -->
 
-        <div class="market-card">
-            <h3>S&P 500</h3>
-            <div class="market-value">—</div>
-            <div class="market-change">Market data coming soon</div>
-        </div>
+<section class="hero-grid">
 
-        <div class="market-card">
-            <h3>NASDAQ</h3>
-            <div class="market-value">—</div>
-            <div class="market-change">Market data coming soon</div>
-        </div>
+<div class="hero">
 
-    </section>
+<div class="hero-label">WORLDLYN FEATURE</div>
 
-    <h2 class="section-title">Global</h2>
+<h1>
+The trends shaping global markets, business and the world
+</h1>
 
-    <section class="articles">
+<p>
+WORLDLYN brings together the stories, trends and developments
+that matter — and explains why they matter.
+</p>
 
-        <article class="article">
-            <div class="category">Global</div>
-            <h3>What is moving the global economy?</h3>
-            <p>
-                Follow major developments around the world and understand
-                why they matter.
-            </p>
-        </article>
+<div class="hero-meta">
+Global • Markets • Business • Insights
+</div>
 
-        <article class="article">
-            <div class="category">Markets</div>
-            <h3>What investors are watching today</h3>
-            <p>
-                Key market developments, company news and economic signals
-                in one place.
-            </p>
-        </article>
+</div>
 
-        <article class="article">
-            <div class="category">Business</div>
-            <h3>The business trends shaping tomorrow</h3>
-            <p>
-                Discover important developments across companies,
-                industries and economies.
-            </p>
-        </article>
 
-    </section>
+<div class="side-stories">
 
-    <h2 class="section-title">Technology & AI</h2>
+<div class="side-card">
 
-    <section class="articles">
+<div class="category">Markets</div>
 
-        <article class="article">
-            <div class="category">Technology</div>
-            <h3>Technology changing the way businesses operate</h3>
-            <p>
-                Follow the technologies influencing companies and markets.
-            </p>
-        </article>
+<h3>
+What investors are watching across global markets
+</h3>
 
-        <article class="article">
-            <div class="category">AI</div>
-            <h3>The latest developments in artificial intelligence</h3>
-            <p>
-                Understand the AI developments that could affect businesses
-                and the global economy.
-            </p>
-        </article>
+<p>
+Key developments shaping investor sentiment and market direction.
+</p>
 
-        <article class="article">
-            <div class="category">Insights</div>
-            <h3>Why today's biggest stories matter</h3>
-            <p>
-                WORLDLYN explains the story behind the headline.
-            </p>
-        </article>
+</div>
 
-    </section>
 
-    <section class="insight">
+<div class="side-card">
 
-        <h2>WORLDLYN INSIGHT</h2>
+<div class="category">Technology</div>
 
-        <p>
-            Our goal is simple: don't just tell you what happened.
-            We explain what happened, why it happened, and why it matters.
-        </p>
+<h3>
+How AI is changing businesses and the global economy
+</h3>
 
-    </section>
+<p>
+The technologies creating new opportunities and challenges.
+</p>
+
+</div>
+
+
+</div>
+
+</section>
+
+
+<!-- MARKET WATCH -->
+
+<section id="markets">
+
+<div class="section-header">
+
+<h2 class="section-title">Market Watch</h2>
+
+<span class="view-all">LIVE DATA — COMING SOON</span>
+
+</div>
+
+
+<div class="market-grid">
+
+<div class="market-card">
+
+<div class="market-name">NIFTY 50</div>
+
+<div class="market-value">—</div>
+
+<div class="market-status">India</div>
+
+</div>
+
+
+<div class="market-card">
+
+<div class="market-name">SENSEX</div>
+
+<div class="market-value">—</div>
+
+<div class="market-status">India</div>
+
+</div>
+
+
+<div class="market-card">
+
+<div class="market-name">S&P 500</div>
+
+<div class="market-value">—</div>
+
+<div class="market-status">United States</div>
+
+</div>
+
+
+<div class="market-card">
+
+<div class="market-name">NASDAQ</div>
+
+<div class="market-value">—</div>
+
+<div class="market-status">United States</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- TOP STORIES -->
+
+<section id="global">
+
+<div class="section-header">
+
+<h2 class="section-title">Top Stories</h2>
+
+<span class="view-all">LATEST</span>
+
+</div>
+
+
+<div class="news-grid">
+
+
+<article class="news-card">
+
+<div class="news-image">
+GLOBAL
+</div>
+
+<div class="news-content">
+
+<div class="category">Global</div>
+
+<h3>
+What is moving the global economy?
+</h3>
+
+<p>
+Major developments around the world and what they could mean for businesses and markets.
+</p>
+
+</div>
+
+</article>
+
+
+<article class="news-card">
+
+<div class="news-image">
+MARKETS
+</div>
+
+<div class="news-content">
+
+<div class="category">Markets</div>
+
+<h3>
+What investors are watching today
+</h3>
+
+<p>
+The economic signals, company developments and market themes investors are following.
+</p>
+
+</div>
+
+</article>
+
+
+<article class="news-card">
+
+<div class="news-image">
+BUSINESS
+</div>
+
+<div class="news-content">
+
+<div class="category">Business</div>
+
+<h3>
+Business trends shaping tomorrow
+</h3>
+
+<p>
+Important developments across companies, industries and the global economy.
+</p>
+
+</div>
+
+</article>
+
+
+</div>
+
+</section>
+
+
+<!-- BUSINESS -->
+
+<section id="business">
+
+<div class="section-header">
+
+<h2 class="section-title">Business & Economy</h2>
+
+<span class="view-all">EXPLORE</span>
+
+</div>
+
+
+<div class="two-column">
+
+
+<div class="list-card">
+
+
+<div class="list-item">
+
+<div class="category">Business</div>
+
+<h3>
+The companies and industries attracting attention
+</h3>
+
+<p>
+Follow corporate developments and industry trends that could shape markets.
+</p>
+
+</div>
+
+
+<div class="list-item">
+
+<div class="category">Economy</div>
+
+<h3>
+Economic signals investors should understand
+</h3>
+
+<p>
+Inflation, interest rates, employment and economic growth explained simply.
+</p>
+
+</div>
+
+
+<div class="list-item">
+
+<div class="category">Markets</div>
+
+<h3>
+Why market sentiment can change so quickly
+</h3>
+
+<p>
+Understanding the factors behind movements in financial markets.
+</p>
+
+</div>
+
+
+</div>
+
+
+<div class="list-card">
+
+<div class="category">WORLDLYN QUICK READ</div>
+
+<h3>
+What happened today?
+</h3>
+
+<p style="margin-top:10px;color:#64748b;font-size:14px;">
+A short and simple summary of the most important developments.
+</p>
+
+<br>
+
+<div class="category">WHY IT MATTERS</div>
+
+<p style="color:#64748b;font-size:14px;">
+The bigger picture behind today's biggest stories.
+</p>
+
+</div>
+
+
+</div>
+
+</section>
+
+
+<!-- TECHNOLOGY -->
+
+<section id="technology">
+
+<div class="section-header">
+
+<h2 class="section-title">Technology & AI</h2>
+
+<span class="view-all">LATEST</span>
+
+</div>
+
+
+<div class="news-grid">
+
+
+<article class="news-card">
+
+<div class="news-image">
+AI
+</div>
+
+<div class="news-content">
+
+<div class="category">Artificial Intelligence</div>
+
+<h3>
+The AI developments businesses need to watch
+</h3>
+
+<p>
+The technologies changing productivity, investment and competition.
+</p>
+
+</div>
+
+</article>
+
+
+<article class="news-card">
+
+<div class="news-image">
+TECH
+</div>
+
+<div class="news-content">
+
+<div class="category">Technology</div>
+
+<h3>
+Technology trends changing the global economy
+</h3>
+
+<p>
+Understanding the innovations influencing industries and consumers.
+</p>
+
+</div>
+
+</article>
+
+
+<article class="news-card">
+
+<div class="news-image">
+DIGITAL
+</div>
+
+<div class="news-content">
+
+<div class="category">Digital Economy</div>
+
+<h3>
+The next wave of digital business
+</h3>
+
+<p>
+How technology is creating new business models and opportunities.
+</p>
+
+</div>
+
+</article>
+
+
+</div>
+
+</section>
+
+
+<!-- INSIGHT -->
+
+<section id="insights">
+
+<div class="insight">
+
+<div class="insight-label">
+WORLDLYN INSIGHT
+</div>
+
+<h2>
+Don't just follow the headline. Understand the story.
+</h2>
+
+<p>
+Our goal is simple: explain what happened, why it happened,
+and why it matters. WORLDLYN turns complicated global,
+business and market developments into clear insights.
+</p>
+
+</div>
+
+</section>
+
 
 </main>
 
+
+<!-- FOOTER -->
+
 <footer>
 
-    <strong>WORLDLYN</strong>
+<div class="footer-container">
 
-    <p>Know What Moves the World.</p>
 
-    <p>© 2026 WORLDLYN. All rights reserved.</p>
+<div>
+
+<div class="footer-logo">WORLDLYN</div>
+
+<p class="footer-description">
+Global trends, markets, business, economy,
+technology and insights — explained clearly.
+</p>
+
+</div>
+
+
+<div class="footer-column">
+
+<h4>Explore</h4>
+
+<a href="#global">Global</a>
+<a href="#markets">Markets</a>
+<a href="#business">Business</a>
+<a href="#technology">Technology & AI</a>
+
+</div>
+
+
+<div class="footer-column">
+
+<h4>WORLDLYN</h4>
+
+<a href="#">About</a>
+<a href="#">Contact</a>
+<a href="#">Privacy</a>
+<a href="#">Disclaimer</a>
+
+</div>
+
+
+</div>
+
+
+<div class="copyright">
+
+© 2026 WORLDLYN. All rights reserved.
+
+</div>
 
 </footer>
+
 
 </body>
 </html>
