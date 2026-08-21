@@ -1,1053 +1,5986 @@
-/*
-===========================================================
-WORLDLYN API
-Cloudflare Worker
-===========================================================
+<!DOCTYPE html>
+<html lang="en">
 
-Required Cloudflare Worker Secrets:
+<head>
 
-GNEWS_API_KEY
-TWELVE_DATA_API_KEY
+  <meta charset="UTF-8">
 
-Endpoints:
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
-GET /
-GET /health
+  <title>
+    WORLDLYN — Know What Moves the World
+  </title>
 
-GET /news
-GET /news?category=world&lang=en&country=in&max=10
+  <meta
+    name="description"
+    content="WORLDLYN brings global news, markets, business, economy, technology, AI and crypto together in one place."
+  >
 
-GET /news/search?q=business
-GET /news/search?q=AI&lang=en&country=in&max=10
+  <meta
+    name="theme-color"
+    content="#071a33"
+  >
 
-GET /market/quote?symbol=AAPL
-GET /market/quote?symbol=RELIANCE&exchange=NSE
+  <!-- =====================================================
+       CHART.JS
+  ====================================================== -->
 
-GET /market/history?symbol=AAPL
-GET /market/history?symbol=AAPL&interval=1day&outputsize=30
-
-GET /market/search?symbol=apple
-
-===========================================================
-*/
-
-
-/* =========================================================
-   CORS
-   ========================================================= */
-
-/*
-   WORLDLYN is a public read-only API.
-
-   We do not use cookies or authentication from the browser,
-   so wildcard CORS is appropriate here.
-
-   This also prevents GitHub Pages from failing because of
-   an origin mismatch.
-*/
-
-function corsHeaders() {
-  return {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Accept, Origin",
-    "Access-Control-Max-Age": "86400",
-    "Access-Control-Expose-Headers": "Content-Type",
-    "Content-Type": "application/json; charset=utf-8",
-    "Cache-Control": "no-store"
-  };
-}
+  <script
+    src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"
+    defer
+  ></script>
 
 
-/* =========================================================
-   JSON RESPONSE
-   ========================================================= */
-
-function jsonResponse(data, status = 200) {
-  return new Response(
-    JSON.stringify(data),
-    {
-      status,
-      headers: corsHeaders()
-    }
-  );
-}
-
-
-/* =========================================================
-   NUMBER HELPER
-   ========================================================= */
-
-function clampNumber(value, fallback, min, max) {
-  const number = Number(value);
-
-  if (!Number.isFinite(number)) {
-    return fallback;
-  }
-
-  return Math.min(
-    Math.max(number, min),
-    max
-  );
-}
-
-
-/* =========================================================
-   FETCH JSON
-   ========================================================= */
-
-async function fetchJSON(url, options = {}) {
-  const response = await fetch(url, options);
-
-  const text = await response.text();
-
-  let data = {};
-
-  try {
-    data = text
-      ? JSON.parse(text)
-      : {};
-  } catch {
-    throw new Error(
-      `Upstream returned invalid JSON (${response.status}).`
-    );
-  }
-
-  return {
-    response,
-    data
-  };
-}
-
-
-/* =========================================================
-   WORKER
-   ========================================================= */
-
-export default {
-
-  async fetch(request, env) {
-
-    const url = new URL(request.url);
-
+  <style>
 
     /* =====================================================
-       CORS PREFLIGHT
-       ===================================================== */
+       RESET
+    ====================================================== */
 
-    if (request.method === "OPTIONS") {
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-      return new Response(
-        null,
-        {
-          status: 204,
-          headers: corsHeaders()
-        }
-      );
 
+    :root {
+
+      --navy: #071a33;
+      --navy-2: #0b2a52;
+
+      --blue: #2563eb;
+      --blue-light: #3b82f6;
+
+      --green: #16a34a;
+      --red: #dc2626;
+
+      --text: #172033;
+      --muted: #64748b;
+
+      --white: #ffffff;
+      --light: #f5f8fc;
+
+      --border: #dbe3ef;
+
+      --shadow:
+        0 12px 35px rgba(7, 26, 51, 0.08);
+
+      --shadow-lg:
+        0 20px 50px rgba(7, 26, 51, 0.12);
+
+      --radius: 18px;
+    }
+
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+
+    body {
+
+      font-family:
+        Inter,
+        Arial,
+        Helvetica,
+        sans-serif;
+
+      background:
+        linear-gradient(
+          180deg,
+          #f7faff 0%,
+          #f5f8fc 100%
+        );
+
+      color: var(--text);
+
+      line-height: 1.6;
+    }
+
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+
+    button,
+    input {
+      font: inherit;
+    }
+
+
+    button {
+      cursor: pointer;
+    }
+
+
+    img {
+      max-width: 100%;
+      display: block;
     }
 
 
     /* =====================================================
-       ONLY GET + OPTIONS
-       ===================================================== */
+       HEADER
+    ====================================================== */
 
-    if (request.method !== "GET") {
+    header {
 
-      return jsonResponse(
+      position: sticky;
+      top: 0;
+
+      z-index: 1000;
+
+      color: white;
+
+      background:
+        linear-gradient(
+          120deg,
+          #06162d,
+          #0a2a53,
+          #164d8d
+        );
+
+      box-shadow:
+        0 5px 25px rgba(0,0,0,0.15);
+    }
+
+
+    .header-inner {
+
+      width: min(1250px, 92%);
+
+      min-height: 82px;
+
+      margin: auto;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: space-between;
+
+      gap: 30px;
+    }
+
+
+    .brand {
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 14px;
+    }
+
+
+    .brand-mark {
+
+      width: 46px;
+      height: 46px;
+
+      border-radius: 13px;
+
+      background:
+        linear-gradient(
+          135deg,
+          #2563eb,
+          #60a5fa
+        );
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      font-size: 20px;
+
+      font-weight: 900;
+
+      box-shadow:
+        0 8px 25px
+        rgba(37,99,235,0.35);
+    }
+
+
+    .brand-name {
+
+      font-size: 27px;
+
+      font-weight: 900;
+
+      letter-spacing: 1.5px;
+    }
+
+
+    .brand-tagline {
+
+      color: #c8d8ec;
+
+      font-size: 12px;
+
+      margin-top: -2px;
+    }
+
+
+    .header-motto {
+
+      font-size: 12px;
+
+      font-weight: 800;
+
+      letter-spacing: 1.4px;
+
+      color: #dceaff;
+
+      text-transform: uppercase;
+    }
+
+
+    /* =====================================================
+       NAVIGATION
+    ====================================================== */
+
+    nav {
+
+      position: sticky;
+
+      top: 82px;
+
+      z-index: 999;
+
+      background:
+        rgba(255,255,255,0.97);
+
+      backdrop-filter:
+        blur(15px);
+
+      border-bottom:
+        1px solid var(--border);
+    }
+
+
+    .nav-inner {
+
+      width: min(1250px, 92%);
+
+      margin: auto;
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 28px;
+
+      overflow-x: auto;
+
+      white-space: nowrap;
+    }
+
+
+    .nav-inner a {
+
+      padding: 16px 2px;
+
+      color: #334155;
+
+      font-size: 12px;
+
+      font-weight: 900;
+
+      letter-spacing: .8px;
+
+      border-bottom:
+        3px solid transparent;
+
+      transition: .25s ease;
+    }
+
+
+    .nav-inner a:hover,
+    .nav-inner a.active {
+
+      color: var(--blue);
+
+      border-bottom-color:
+        var(--blue);
+    }
+
+
+    /* =====================================================
+       LIVE TICKER
+    ====================================================== */
+
+    .ticker {
+
+      background: white;
+
+      border-bottom:
+        1px solid var(--border);
+
+      overflow: hidden;
+    }
+
+
+    .ticker-inner {
+
+      width: min(1250px, 92%);
+
+      min-height: 42px;
+
+      margin: auto;
+
+      display: flex;
+
+      align-items: center;
+
+      overflow: hidden;
+    }
+
+
+    .ticker-label {
+
+      flex-shrink: 0;
+
+      background: var(--navy);
+
+      color: white;
+
+      padding: 6px 12px;
+
+      border-radius: 7px;
+
+      font-size: 10px;
+
+      font-weight: 900;
+
+      letter-spacing: 1px;
+
+      margin-right: 16px;
+    }
+
+
+    #tickerText {
+
+      color: #475569;
+
+      font-size: 12px;
+
+      white-space: nowrap;
+
+      overflow: hidden;
+
+      text-overflow: ellipsis;
+    }
+
+
+    /* =====================================================
+       MAIN
+    ====================================================== */
+
+    main {
+
+      width: min(1250px, 92%);
+
+      margin:
+        32px auto 80px;
+    }
+
+
+    section {
+
+      margin-top: 58px;
+
+      scroll-margin-top: 145px;
+    }
+
+
+    /* =====================================================
+       HERO
+    ====================================================== */
+
+    .hero {
+
+      position: relative;
+
+      overflow: hidden;
+
+      min-height: 420px;
+
+      border-radius: 24px;
+
+      padding: 65px;
+
+      display: flex;
+
+      align-items: center;
+
+      background:
+
+        radial-gradient(
+          circle at 85% 20%,
+          rgba(96,165,250,.35),
+          transparent 30%
+        ),
+
+        linear-gradient(
+          135deg,
+          #06172f,
+          #0b2d5b 55%,
+          #1c5ba4
+        );
+
+      color: white;
+
+      box-shadow:
+        var(--shadow-lg);
+    }
+
+
+    .hero::before {
+
+      content: "";
+
+      position: absolute;
+
+      width: 500px;
+      height: 500px;
+
+      border-radius: 50%;
+
+      border:
+        1px solid
+        rgba(255,255,255,.1);
+
+      right: -250px;
+      bottom: -280px;
+    }
+
+
+    .hero-content {
+
+      position: relative;
+
+      z-index: 2;
+
+      max-width: 800px;
+    }
+
+
+    .eyebrow {
+
+      display: inline-block;
+
+      color: #93c5fd;
+
+      font-size: 11px;
+
+      font-weight: 900;
+
+      letter-spacing: 2px;
+
+      text-transform: uppercase;
+
+      margin-bottom: 15px;
+    }
+
+
+    .hero h1 {
+
+      font-size:
+        clamp(38px, 5vw, 66px);
+
+      line-height: 1.04;
+
+      letter-spacing: -2px;
+
+      margin-bottom: 20px;
+    }
+
+
+    .hero p {
+
+      max-width: 720px;
+
+      color: #d8e7f8;
+
+      font-size: 16px;
+    }
+
+
+    .hero-buttons {
+
+      margin-top: 30px;
+
+      display: flex;
+
+      gap: 12px;
+
+      flex-wrap: wrap;
+    }
+
+
+    .hero-btn {
+
+      padding:
+        12px 19px;
+
+      border-radius: 10px;
+
+      font-size: 13px;
+
+      font-weight: 800;
+
+      border:
+        1px solid
+        rgba(255,255,255,.18);
+
+      transition: .25s ease;
+    }
+
+
+    .hero-btn.primary {
+
+      background: white;
+
+      color: var(--navy);
+    }
+
+
+    .hero-btn.secondary {
+
+      color: white;
+
+      background:
+        rgba(255,255,255,.08);
+    }
+
+
+    .hero-btn:hover {
+
+      transform:
+        translateY(-2px);
+    }
+
+
+    /* =====================================================
+       SECTION HEAD
+    ====================================================== */
+
+    .section-head {
+
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: end;
+
+      gap: 20px;
+
+      margin-bottom: 22px;
+    }
+
+
+    .section-kicker {
+
+      display: block;
+
+      color: var(--blue);
+
+      font-size: 10px;
+
+      font-weight: 900;
+
+      letter-spacing: 1.7px;
+
+      margin-bottom: 5px;
+    }
+
+
+    .section-head h2 {
+
+      font-size: 30px;
+
+      color: var(--navy);
+    }
+
+
+    .section-head p {
+
+      color: var(--muted);
+
+      font-size: 13px;
+    }
+
+
+    .section-link {
+
+      color: var(--blue);
+
+      font-size: 11px;
+
+      font-weight: 900;
+
+      white-space: nowrap;
+    }
+
+
+    /* =====================================================
+       SEARCH
+    ====================================================== */
+
+    .news-search {
+
+      display: flex;
+
+      gap: 10px;
+
+      margin-bottom: 22px;
+    }
+
+
+    .news-search input {
+
+      flex: 1;
+
+      min-width: 0;
+
+      padding: 13px 15px;
+
+      border:
+        1px solid var(--border);
+
+      border-radius: 10px;
+
+      background: white;
+
+      outline: none;
+    }
+
+
+    .news-search input:focus {
+
+      border-color:
+        var(--blue);
+
+      box-shadow:
+        0 0 0 3px
+        rgba(37,99,235,.1);
+    }
+
+
+    .blue-button {
+
+      border: none;
+
+      background: var(--blue);
+
+      color: white;
+
+      padding:
+        12px 20px;
+
+      border-radius: 10px;
+
+      font-weight: 800;
+    }
+
+
+    .blue-button:hover {
+      background: #1d4ed8;
+    }
+
+
+    /* =====================================================
+       NEWS GRID
+    ====================================================== */
+
+    .news-grid {
+
+      display: grid;
+
+      grid-template-columns:
+        repeat(3, 1fr);
+
+      gap: 22px;
+    }
+
+
+    .news-card {
+
+      background: white;
+
+      border:
+        1px solid var(--border);
+
+      border-radius: 17px;
+
+      overflow: hidden;
+
+      box-shadow:
+        0 6px 22px
+        rgba(7,26,51,.05);
+
+      transition:
+        transform .25s ease,
+        box-shadow .25s ease;
+    }
+
+
+    .news-card:hover {
+
+      transform:
+        translateY(-6px);
+
+      box-shadow:
+        0 18px 40px
+        rgba(7,26,51,.12);
+    }
+
+
+    .news-image-wrap {
+
+      position: relative;
+
+      height: 195px;
+
+      background:
+        linear-gradient(
+          135deg,
+          #dbeafe,
+          #cbd5e1
+        );
+
+      overflow: hidden;
+    }
+
+
+    .news-image {
+
+      width: 100%;
+
+      height: 100%;
+
+      object-fit: cover;
+
+      transition:
+        transform .5s ease;
+    }
+
+
+    .news-card:hover
+    .news-image {
+      transform: scale(1.04);
+    }
+
+
+    .image-fallback {
+
+      width: 100%;
+      height: 100%;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      color: #64748b;
+
+      font-size: 35px;
+
+      font-weight: 900;
+    }
+
+
+    .news-badge {
+
+      position: absolute;
+
+      left: 12px;
+      top: 12px;
+
+      background:
+        rgba(7,26,51,.9);
+
+      color: white;
+
+      padding:
+        5px 9px;
+
+      border-radius: 7px;
+
+      font-size: 9px;
+
+      font-weight: 900;
+
+      letter-spacing: 1px;
+    }
+
+
+    .news-content {
+      padding: 20px;
+    }
+
+
+    .news-category {
+
+      color: var(--blue);
+
+      font-size: 10px;
+
+      font-weight: 900;
+
+      letter-spacing: 1px;
+
+      text-transform: uppercase;
+
+      margin-bottom: 7px;
+    }
+
+
+    .news-card h3 {
+
+      color: var(--navy);
+
+      font-size: 19px;
+
+      line-height: 1.3;
+
+      margin-bottom: 9px;
+    }
+
+
+    .news-card p {
+
+      color: var(--muted);
+
+      font-size: 13px;
+
+      margin-bottom: 15px;
+    }
+
+
+    .news-meta {
+
+      display: flex;
+
+      justify-content: space-between;
+
+      gap: 10px;
+
+      color: #94a3b8;
+
+      font-size: 10px;
+
+      border-top:
+        1px solid #edf2f7;
+
+      padding-top: 12px;
+    }
+
+
+    /* =====================================================
+       LOADING / ERROR
+    ====================================================== */
+
+    .loading {
+
+      grid-column: 1 / -1;
+
+      background: white;
+
+      border:
+        1px solid var(--border);
+
+      border-radius: 14px;
+
+      padding: 35px;
+
+      text-align: center;
+
+      color: var(--muted);
+
+      font-size: 13px;
+    }
+
+
+    .error-box {
+
+      grid-column: 1 / -1;
+
+      background: #fff7f7;
+
+      border:
+        1px solid #fecaca;
+
+      color: #991b1b;
+
+      padding: 18px;
+
+      border-radius: 12px;
+
+      font-size: 13px;
+    }
+
+
+    /* =====================================================
+       MARKET TERMINAL
+    ====================================================== */
+
+    .terminal {
+
+      background: white;
+
+      border:
+        1px solid var(--border);
+
+      border-radius: 22px;
+
+      box-shadow:
+        var(--shadow);
+
+      overflow: hidden;
+    }
+
+
+    .terminal-top {
+
+      padding: 22px;
+
+      border-bottom:
+        1px solid var(--border);
+
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: center;
+
+      gap: 20px;
+
+      flex-wrap: wrap;
+    }
+
+
+    .terminal-title h3 {
+
+      font-size: 20px;
+
+      color: var(--navy);
+    }
+
+
+    .terminal-title p {
+
+      color: var(--muted);
+
+      font-size: 12px;
+    }
+
+
+    .market-search {
+
+      display: flex;
+
+      gap: 8px;
+
+      min-width:
+        min(100%, 390px);
+    }
+
+
+    .market-search input {
+
+      flex: 1;
+
+      min-width: 0;
+
+      border:
+        1px solid var(--border);
+
+      padding:
+        11px 13px;
+
+      border-radius: 9px;
+
+      outline: none;
+    }
+
+
+    .market-search button {
+
+      border: none;
+
+      background: var(--navy);
+
+      color: white;
+
+      padding:
+        10px 15px;
+
+      border-radius: 9px;
+
+      font-weight: 800;
+    }
+
+
+    .market-tabs {
+
+      display: flex;
+
+      gap: 8px;
+
+      overflow-x: auto;
+
+      padding:
+        15px 22px;
+
+      border-bottom:
+        1px solid var(--border);
+    }
+
+
+    .market-tab {
+
+      border:
+        1px solid var(--border);
+
+      background: white;
+
+      color: #475569;
+
+      padding:
+        8px 14px;
+
+      border-radius: 8px;
+
+      font-size: 11px;
+
+      font-weight: 800;
+
+      white-space: nowrap;
+    }
+
+
+    .market-tab.active {
+
+      background: var(--navy);
+
+      color: white;
+
+      border-color:
+        var(--navy);
+    }
+
+
+    /* =====================================================
+       WATCHLIST
+    ====================================================== */
+
+    .watchlist {
+
+      display: grid;
+
+      grid-template-columns:
+        repeat(4, 1fr);
+
+      gap: 12px;
+
+      padding:
+        18px 22px;
+
+      background:
+        #f8fafc;
+
+      border-bottom:
+        1px solid var(--border);
+    }
+
+
+    .watch-card {
+
+      background: white;
+
+      border:
+        1px solid var(--border);
+
+      border-radius: 12px;
+
+      padding: 13px;
+
+      cursor: pointer;
+
+      transition: .2s ease;
+    }
+
+
+    .watch-card:hover {
+
+      border-color:
+        var(--blue);
+
+      transform:
+        translateY(-2px);
+    }
+
+
+    .watch-symbol {
+
+      color: var(--navy);
+
+      font-weight: 900;
+
+      font-size: 12px;
+    }
+
+
+    .watch-price {
+
+      font-size: 18px;
+
+      font-weight: 900;
+
+      margin: 5px 0;
+    }
+
+
+    .watch-change {
+
+      font-size: 11px;
+
+      font-weight: 800;
+    }
+
+
+    .positive {
+      color: var(--green);
+    }
+
+
+    .negative {
+      color: var(--red);
+    }
+
+
+    /* =====================================================
+       MARKET BODY
+    ====================================================== */
+
+    .terminal-body {
+
+      display: grid;
+
+      grid-template-columns:
+        minmax(0, 1fr)
+        330px;
+
+      min-height: 540px;
+    }
+
+
+    .chart-area {
+
+      padding: 22px;
+
+      border-right:
+        1px solid var(--border);
+
+      min-width: 0;
+    }
+
+
+    .selected-header {
+
+      display: flex;
+
+      justify-content:
+        space-between;
+
+      align-items: start;
+
+      gap: 20px;
+
+      margin-bottom: 18px;
+    }
+
+
+    .selected-name {
+
+      font-size: 22px;
+
+      font-weight: 900;
+
+      color: var(--navy);
+    }
+
+
+    .selected-symbol {
+
+      color: var(--muted);
+
+      font-size: 11px;
+    }
+
+
+    .selected-price {
+      text-align: right;
+    }
+
+
+    .big-price {
+
+      font-size: 28px;
+
+      font-weight: 900;
+
+      color: var(--navy);
+    }
+
+
+    .big-change {
+
+      font-size: 12px;
+
+      font-weight: 900;
+    }
+
+
+    .chart-controls {
+
+      display: flex;
+
+      gap: 7px;
+
+      flex-wrap: wrap;
+
+      margin-bottom: 12px;
+    }
+
+
+    .chart-btn {
+
+      background: white;
+
+      border:
+        1px solid var(--border);
+
+      color: #475569;
+
+      border-radius: 7px;
+
+      padding:
+        6px 10px;
+
+      font-size: 10px;
+
+      font-weight: 800;
+    }
+
+
+    .chart-btn.active {
+
+      background: var(--blue);
+
+      color: white;
+
+      border-color:
+        var(--blue);
+    }
+
+
+    .chart-box {
+
+      height: 360px;
+
+      position: relative;
+    }
+
+
+    .market-note {
+
+      margin-top: 13px;
+
+      color: #94a3b8;
+
+      font-size: 10px;
+    }
+
+
+    /* =====================================================
+       MARKET DETAILS
+    ====================================================== */
+
+    .market-details {
+
+      padding: 22px;
+
+      background:
+        #fbfdff;
+    }
+
+
+    .details-heading {
+
+      font-size: 12px;
+
+      font-weight: 900;
+
+      color: var(--navy);
+
+      margin-bottom: 15px;
+
+      text-transform: uppercase;
+
+      letter-spacing: 1px;
+    }
+
+
+    .metric-grid {
+
+      display: grid;
+
+      grid-template-columns:
+        repeat(2, 1fr);
+
+      gap: 10px;
+    }
+
+
+    .metric {
+
+      border:
+        1px solid var(--border);
+
+      background: white;
+
+      border-radius: 10px;
+
+      padding: 12px;
+    }
+
+
+    .metric span {
+
+      display: block;
+
+      color: #94a3b8;
+
+      font-size: 9px;
+
+      font-weight: 800;
+
+      text-transform: uppercase;
+
+      margin-bottom: 4px;
+    }
+
+
+    .metric strong {
+
+      color: var(--navy);
+
+      font-size: 13px;
+    }
+
+
+    /* =====================================================
+       MARKET SEARCH RESULTS
+    ====================================================== */
+
+    .market-search-results {
+
+      margin-top: 18px;
+    }
+
+
+    .search-result {
+
+      display: block;
+
+      width: 100%;
+
+      text-align: left;
+
+      background: white;
+
+      border:
+        1px solid var(--border);
+
+      border-radius: 9px;
+
+      padding: 10px;
+
+      margin-bottom: 7px;
+
+      cursor: pointer;
+    }
+
+
+    .search-result:hover {
+
+      border-color:
+        var(--blue);
+
+      background:
+        #f8fbff;
+    }
+
+
+    .search-result strong {
+
+      color: var(--navy);
+
+      font-size: 12px;
+    }
+
+
+    .search-result small {
+
+      display: block;
+
+      color: var(--muted);
+
+      font-size: 9px;
+    }
+
+
+    /* =====================================================
+       MARKET NEWS
+    ====================================================== */
+
+    .market-news {
+
+      margin-top: 20px;
+    }
+
+
+    .market-news h4 {
+
+      font-size: 12px;
+
+      color: var(--navy);
+
+      margin-bottom: 10px;
+    }
+
+
+    .market-news-item {
+
+      padding:
+        9px 0;
+
+      border-bottom:
+        1px solid var(--border);
+    }
+
+
+    .market-news-item a {
+
+      color: #334155;
+
+      font-size: 11px;
+
+      font-weight: 700;
+    }
+
+
+    .market-news-item a:hover {
+      color: var(--blue);
+    }
+
+
+    /* =====================================================
+       CATEGORY CARDS
+    ====================================================== */
+
+    .category-grid {
+
+      display: grid;
+
+      grid-template-columns:
+        repeat(4, 1fr);
+
+      gap: 16px;
+    }
+
+
+    .category-card {
+
+      min-height: 150px;
+
+      padding: 22px;
+
+      border-radius: 16px;
+
+      color: white;
+
+      display: flex;
+
+      flex-direction: column;
+
+      justify-content: end;
+
+      overflow: hidden;
+
+      position: relative;
+
+      box-shadow:
+        var(--shadow);
+    }
+
+
+    .category-card::before {
+
+      content: "";
+
+      position: absolute;
+
+      inset: 0;
+
+      background:
+        linear-gradient(
+          transparent,
+          rgba(0,0,0,.6)
+        );
+    }
+
+
+    .category-card > * {
+
+      position: relative;
+
+      z-index: 2;
+    }
+
+
+    .category-card span {
+
+      font-size: 9px;
+
+      font-weight: 900;
+
+      letter-spacing: 1px;
+
+      margin-bottom: 4px;
+    }
+
+
+    .category-card h3 {
+      font-size: 21px;
+    }
+
+
+    .cat-global {
+
+      background:
+        linear-gradient(
+          135deg,
+          #0f2d52,
+          #2563eb
+        );
+    }
+
+
+    .cat-market {
+
+      background:
+        linear-gradient(
+          135deg,
+          #0f172a,
+          #475569
+        );
+    }
+
+
+    .cat-business {
+
+      background:
+        linear-gradient(
+          135deg,
+          #075985,
+          #0284c7
+        );
+    }
+
+
+    .cat-tech {
+
+      background:
+        linear-gradient(
+          135deg,
+          #312e81,
+          #6366f1
+        );
+    }
+
+
+    /* =====================================================
+       INSIGHT
+    ====================================================== */
+
+    .insight {
+
+      border-radius: 20px;
+
+      padding: 42px;
+
+      background:
+        linear-gradient(
+          135deg,
+          #071a33,
+          #123d72
+        );
+
+      color: white;
+
+      box-shadow:
+        var(--shadow-lg);
+    }
+
+
+    .insight-label {
+
+      color: #93c5fd;
+
+      font-size: 10px;
+
+      font-weight: 900;
+
+      letter-spacing: 1.5px;
+
+      margin-bottom: 10px;
+    }
+
+
+    .insight h2 {
+
+      font-size: 32px;
+
+      max-width: 800px;
+
+      line-height: 1.15;
+
+      margin-bottom: 12px;
+    }
+
+
+    .insight p {
+
+      color: #cbdcf0;
+
+      max-width: 800px;
+
+      font-size: 14px;
+    }
+
+
+    /* =====================================================
+       ABOUT / CONTACT
+    ====================================================== */
+
+    .about-grid,
+    .contact-grid {
+
+      display: grid;
+
+      grid-template-columns:
+        1fr 1fr;
+
+      gap: 22px;
+    }
+
+
+    .about-card,
+    .contact-card {
+
+      background: white;
+
+      border:
+        1px solid var(--border);
+
+      border-radius: 18px;
+
+      padding: 28px;
+
+      box-shadow:
+        var(--shadow);
+    }
+
+
+    .about-card h3,
+    .contact-card h3 {
+
+      color: var(--navy);
+
+      font-size: 22px;
+
+      margin-bottom: 10px;
+    }
+
+
+    .about-card p,
+    .contact-card p {
+
+      color: var(--muted);
+
+      font-size: 14px;
+
+      margin-bottom: 12px;
+    }
+
+
+    .creator {
+
+      display: flex;
+
+      gap: 18px;
+
+      align-items: center;
+    }
+
+
+    .creator-avatar {
+
+      width: 68px;
+      height: 68px;
+
+      flex-shrink: 0;
+
+      border-radius: 18px;
+
+      background:
+        linear-gradient(
+          135deg,
+          #2563eb,
+          #0b2a52
+        );
+
+      color: white;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      font-size: 25px;
+
+      font-weight: 900;
+    }
+
+
+    .creator h3 {
+      margin-bottom: 2px;
+    }
+
+
+    .creator small {
+
+      color: var(--blue);
+
+      font-weight: 800;
+    }
+
+
+    .contact-link {
+
+      display: inline-block;
+
+      margin-top: 14px;
+
+      color: var(--blue);
+
+      font-weight: 900;
+
+      font-size: 13px;
+    }
+
+
+    /* =====================================================
+       FOOTER
+    ====================================================== */
+
+    footer {
+
+      background: var(--navy);
+
+      color: white;
+
+      padding:
+        50px 0 25px;
+    }
+
+
+    .footer-inner {
+
+      width: min(1250px, 92%);
+
+      margin: auto;
+
+      display: grid;
+
+      grid-template-columns:
+        2fr 1fr 1fr;
+
+      gap: 40px;
+    }
+
+
+    .footer-logo {
+
+      font-size: 25px;
+
+      font-weight: 900;
+
+      letter-spacing: 1px;
+
+      margin-bottom: 8px;
+    }
+
+
+    .footer-description {
+
+      color: #b9c9df;
+
+      max-width: 430px;
+
+      font-size: 13px;
+    }
+
+
+    .footer-column h4 {
+
+      margin-bottom: 12px;
+
+      font-size: 12px;
+
+      text-transform: uppercase;
+
+      letter-spacing: 1px;
+    }
+
+
+    .footer-column a {
+
+      display: block;
+
+      color: #b9c9df;
+
+      font-size: 12px;
+
+      margin-bottom: 8px;
+    }
+
+
+    .footer-column a:hover {
+      color: white;
+    }
+
+
+    .copyright {
+
+      width: min(1250px, 92%);
+
+      margin:
+        35px auto 0;
+
+      padding-top: 20px;
+
+      border-top:
+        1px solid
+        rgba(255,255,255,.1);
+
+      color: #8fa4be;
+
+      font-size: 10px;
+    }
+
+
+    /* =====================================================
+       RESPONSIVE
+    ====================================================== */
+
+    @media (max-width: 1000px) {
+
+      .news-grid {
+        grid-template-columns:
+          repeat(2, 1fr);
+      }
+
+
+      .watchlist {
+        grid-template-columns:
+          repeat(2, 1fr);
+      }
+
+
+      .terminal-body {
+        grid-template-columns: 1fr;
+      }
+
+
+      .chart-area {
+
+        border-right: none;
+
+        border-bottom:
+          1px solid var(--border);
+      }
+
+
+      .category-grid {
+        grid-template-columns:
+          repeat(2, 1fr);
+      }
+
+    }
+
+
+    @media (max-width: 700px) {
+
+      .header-inner {
+        min-height: 70px;
+      }
+
+
+      .header-motto {
+        display: none;
+      }
+
+
+      nav {
+        top: 70px;
+      }
+
+
+      .nav-inner {
+        gap: 20px;
+      }
+
+
+      main {
+
+        width: 94%;
+
+        margin-top: 20px;
+      }
+
+
+      .hero {
+
+        padding:
+          38px 26px;
+
+        min-height: 360px;
+
+        border-radius: 18px;
+      }
+
+
+      .hero h1 {
+
+        font-size: 38px;
+
+        letter-spacing: -1px;
+      }
+
+
+      .section-head {
+        display: block;
+      }
+
+
+      .section-link {
+
+        display: block;
+
+        margin-top: 5px;
+      }
+
+
+      .news-grid {
+        grid-template-columns: 1fr;
+      }
+
+
+      .category-grid {
+        grid-template-columns: 1fr;
+      }
+
+
+      .about-grid,
+      .contact-grid {
+
+        grid-template-columns: 1fr;
+      }
+
+
+      .footer-inner {
+        grid-template-columns: 1fr;
+      }
+
+
+      .selected-header {
+        display: block;
+      }
+
+
+      .selected-price {
+
+        text-align: left;
+
+        margin-top: 10px;
+      }
+
+
+      .chart-box {
+        height: 290px;
+      }
+
+
+      .news-search {
+        display: block;
+      }
+
+
+      .news-search button {
+
+        width: 100%;
+
+        margin-top: 8px;
+      }
+
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+
+  <!-- =====================================================
+       HEADER
+  ====================================================== -->
+
+  <header>
+
+    <div class="header-inner">
+
+      <a
+        href="#home"
+        class="brand"
+      >
+
+        <div class="brand-mark">
+          W
+        </div>
+
+        <div>
+
+          <div class="brand-name">
+            WORLDLYN
+          </div>
+
+          <div class="brand-tagline">
+            Know What Moves the World.
+          </div>
+
+        </div>
+
+      </a>
+
+
+      <div class="header-motto">
+        GLOBAL • MARKETS • BUSINESS • TECHNOLOGY
+      </div>
+
+    </div>
+
+  </header>
+
+
+  <!-- =====================================================
+       NAVIGATION
+  ====================================================== -->
+
+  <nav>
+
+    <div class="nav-inner">
+
+      <a
+        href="#home"
+        class="active"
+      >
+        HOME
+      </a>
+
+      <a href="#global">
+        GLOBAL
+      </a>
+
+      <a href="#markets">
+        STOCK MARKET
+      </a>
+
+      <a href="#business">
+        BUSINESS
+      </a>
+
+      <a href="#economy">
+        ECONOMY
+      </a>
+
+      <a href="#technology">
+        TECHNOLOGY
+      </a>
+
+      <a href="#ai">
+        AI
+      </a>
+
+      <a href="#crypto">
+        CRYPTO
+      </a>
+
+      <a href="#about">
+        ABOUT
+      </a>
+
+      <a href="#contact">
+        CONTACT
+      </a>
+
+    </div>
+
+  </nav>
+
+
+  <!-- =====================================================
+       LIVE TICKER
+  ====================================================== -->
+
+  <div class="ticker">
+
+    <div class="ticker-inner">
+
+      <span class="ticker-label">
+        LIVE
+      </span>
+
+      <span id="tickerText">
+        WORLDLYN is loading the latest developments...
+      </span>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       MAIN
+  ====================================================== -->
+
+  <main id="home">
+
+
+    <!-- ===================================================
+         HERO
+    ==================================================== -->
+
+    <section style="margin-top:0;">
+
+      <div class="hero">
+
+        <div class="hero-content">
+
+          <span class="eyebrow">
+            WORLDLYN DAILY
+          </span>
+
+          <h1>
+            Understand what moves the world.
+          </h1>
+
+          <p>
+            The latest global news, stock markets,
+            business, economy, technology, AI and
+            crypto — brought together and explained
+            clearly.
+          </p>
+
+          <div class="hero-buttons">
+
+            <a
+              href="#markets"
+              class="hero-btn primary"
+            >
+              Explore Markets
+            </a>
+
+            <a
+              href="#global"
+              class="hero-btn secondary"
+            >
+              Read Latest News
+            </a>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         NEWS SEARCH
+    ==================================================== -->
+
+    <section>
+
+      <div class="section-head">
+
+        <div>
+
+          <span class="section-kicker">
+            WORLDLYN SEARCH
+          </span>
+
+          <h2>
+            Find the story.
+          </h2>
+
+          <p>
+            Search the latest news across topics.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="news-search">
+
+        <input
+          id="newsSearch"
+          type="search"
+          placeholder="Search latest news — AI, NIFTY, Tesla, economy..."
+          autocomplete="off"
+        >
+
+        <button
+          id="newsSearchButton"
+          class="blue-button"
+          type="button"
+        >
+          Search News
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         GLOBAL
+    ==================================================== -->
+
+    <section id="global">
+
+      <div class="section-head">
+
+        <div>
+
+          <span class="section-kicker">
+            GLOBAL
+          </span>
+
+          <h2>
+            What's moving the world?
+          </h2>
+
+          <p>
+            Fresh global stories, automatically updated.
+          </p>
+
+        </div>
+
+        <span class="section-link">
+          LIVE FEED
+        </span>
+
+      </div>
+
+
+      <div
+        id="globalNews"
+        class="news-grid"
+      >
+
+        <div class="loading">
+          Loading latest global news...
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         MARKET TERMINAL
+    ==================================================== -->
+
+    <section id="markets">
+
+      <div class="section-head">
+
+        <div>
+
+          <span class="section-kicker">
+            STOCK MARKET
+          </span>
+
+          <h2>
+            WORLDLYN Market Terminal
+          </h2>
+
+          <p>
+            Search instruments, follow prices and explore
+            historical market movements.
+          </p>
+
+        </div>
+
+        <span class="section-link">
+          LIVE MARKET DATA
+        </span>
+
+      </div>
+
+
+      <div class="terminal">
+
+
+        <!-- SEARCH -->
+
+        <div class="terminal-top">
+
+          <div class="terminal-title">
+
+            <h3>
+              Global Market Monitor
+            </h3>
+
+            <p>
+              Powered by live market-data APIs.
+            </p>
+
+          </div>
+
+
+          <div class="market-search">
+
+            <input
+              id="marketSearch"
+              type="search"
+              placeholder="Search stock, index or crypto..."
+              autocomplete="off"
+            >
+
+            <button
+              id="marketSearchButton"
+              type="button"
+            >
+              Search
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <!-- MARKET TABS -->
+
+        <div class="market-tabs">
+
+          <button
+            class="market-tab active"
+            data-market="india"
+            type="button"
+          >
+            INDIA
+          </button>
+
+          <button
+            class="market-tab"
+            data-market="global"
+            type="button"
+          >
+            GLOBAL
+          </button>
+
+          <button
+            class="market-tab"
+            data-market="technology"
+            type="button"
+          >
+            TECHNOLOGY
+          </button>
+
+          <button
+            class="market-tab"
+            data-market="crypto"
+            type="button"
+          >
+            CRYPTO
+          </button>
+
+        </div>
+
+
+        <!-- WATCHLIST -->
+
+        <div
+          id="watchlist"
+          class="watchlist"
+        >
+
+          <div class="loading">
+            Loading market watchlist...
+          </div>
+
+        </div>
+
+
+        <!-- TERMINAL BODY -->
+
+        <div class="terminal-body">
+
+
+          <!-- CHART -->
+
+          <div class="chart-area">
+
+            <div class="selected-header">
+
+              <div>
+
+                <div
+                  id="selectedName"
+                  class="selected-name"
+                >
+                  NIFTY 50
+                </div>
+
+                <div
+                  id="selectedSymbol"
+                  class="selected-symbol"
+                >
+                  NIFTY • NSE
+                </div>
+
+              </div>
+
+
+              <div class="selected-price">
+
+                <div
+                  id="selectedPrice"
+                  class="big-price"
+                >
+                  —
+                </div>
+
+                <div
+                  id="selectedChange"
+                  class="big-change"
+                >
+                  Loading...
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <!-- CHART PERIODS -->
+
+            <div class="chart-controls">
+
+              <button
+                class="chart-btn active"
+                data-period="1day"
+                type="button"
+              >
+                1D
+              </button>
+
+              <button
+                class="chart-btn"
+                data-period="5day"
+                type="button"
+              >
+                5D
+              </button>
+
+              <button
+                class="chart-btn"
+                data-period="1month"
+                type="button"
+              >
+                1M
+              </button>
+
+              <button
+                class="chart-btn"
+                data-period="3month"
+                type="button"
+              >
+                3M
+              </button>
+
+              <button
+                class="chart-btn"
+                data-period="6month"
+                type="button"
+              >
+                6M
+              </button>
+
+              <button
+                class="chart-btn"
+                data-period="1year"
+                type="button"
+              >
+                1Y
+              </button>
+
+            </div>
+
+
+            <div class="chart-box">
+
+              <canvas
+                id="marketChart"
+              ></canvas>
+
+            </div>
+
+
+            <div class="market-note">
+
+              Market prices may be real-time,
+              delayed or unavailable depending on
+              instrument, exchange and API plan.
+
+            </div>
+
+          </div>
+
+
+          <!-- MARKET DETAILS -->
+
+          <aside class="market-details">
+
+            <div class="details-heading">
+              Market Information
+            </div>
+
+
+            <div class="metric-grid">
+
+
+              <div class="metric">
+
+                <span>
+                  Open
+                </span>
+
+                <strong id="metricOpen">
+                  —
+                </strong>
+
+              </div>
+
+
+              <div class="metric">
+
+                <span>
+                  Previous Close
+                </span>
+
+                <strong id="metricPrevious">
+                  —
+                </strong>
+
+              </div>
+
+
+              <div class="metric">
+
+                <span>
+                  Day High
+                </span>
+
+                <strong id="metricHigh">
+                  —
+                </strong>
+
+              </div>
+
+
+              <div class="metric">
+
+                <span>
+                  Day Low
+                </span>
+
+                <strong id="metricLow">
+                  —
+                </strong>
+
+              </div>
+
+
+              <div class="metric">
+
+                <span>
+                  Volume
+                </span>
+
+                <strong id="metricVolume">
+                  —
+                </strong>
+
+              </div>
+
+
+              <div class="metric">
+
+                <span>
+                  Currency
+                </span>
+
+                <strong id="metricCurrency">
+                  —
+                </strong>
+
+              </div>
+
+
+              <div class="metric">
+
+                <span>
+                  52W High
+                </span>
+
+                <strong id="metric52High">
+                  —
+                </strong>
+
+              </div>
+
+
+              <div class="metric">
+
+                <span>
+                  52W Low
+                </span>
+
+                <strong id="metric52Low">
+                  —
+                </strong>
+
+              </div>
+
+
+            </div>
+
+
+            <!-- SEARCH RESULTS -->
+
+            <div
+              id="marketSearchResults"
+              class="market-search-results"
+            ></div>
+
+
+            <!-- MARKET NEWS -->
+
+            <div class="market-news">
+
+              <h4>
+                Market Headlines
+              </h4>
+
+              <div id="marketNewsList">
+                Loading...
+              </div>
+
+            </div>
+
+          </aside>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         BUSINESS
+    ==================================================== -->
+
+    <section id="business">
+
+      <div class="section-head">
+
+        <div>
+
+          <span class="section-kicker">
+            BUSINESS
+          </span>
+
+          <h2>
+            Business moves worth watching.
+          </h2>
+
+          <p>
+            Companies, industries and corporate developments.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div
+        id="businessNews"
+        class="news-grid"
+      >
+
+        <div class="loading">
+          Loading latest business news...
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         ECONOMY
+    ==================================================== -->
+
+    <section id="economy">
+
+      <div class="section-head">
+
+        <div>
+
+          <span class="section-kicker">
+            ECONOMY
+          </span>
+
+          <h2>
+            The bigger economic picture.
+          </h2>
+
+          <p>
+            Inflation, interest rates, GDP, jobs and growth.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div
+        id="economyNews"
+        class="news-grid"
+      >
+
+        <div class="loading">
+          Loading latest economy news...
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         TECHNOLOGY
+    ==================================================== -->
+
+    <section id="technology">
+
+      <div class="section-head">
+
+        <div>
+
+          <span class="section-kicker">
+            TECHNOLOGY
+          </span>
+
+          <h2>
+            Technology changing the world.
+          </h2>
+
+          <p>
+            The newest technology developments and trends.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div
+        id="technologyNews"
+        class="news-grid"
+      >
+
+        <div class="loading">
+          Loading latest technology news...
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         AI
+    ==================================================== -->
+
+    <section id="ai">
+
+      <div class="section-head">
+
+        <div>
+
+          <span class="section-kicker">
+            ARTIFICIAL INTELLIGENCE
+          </span>
+
+          <h2>
+            AI is changing everything.
+          </h2>
+
+          <p>
+            The latest AI developments, companies and trends.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div
+        id="aiNews"
+        class="news-grid"
+      >
+
+        <div class="loading">
+          Loading latest AI news...
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         CRYPTO
+    ==================================================== -->
+
+    <section id="crypto">
+
+      <div class="section-head">
+
+        <div>
+
+          <span class="section-kicker">
+            CRYPTO
+          </span>
+
+          <h2>
+            Digital assets and blockchain.
+          </h2>
+
+          <p>
+            Follow Bitcoin, Ethereum and the crypto economy.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div
+        id="cryptoNews"
+        class="news-grid"
+      >
+
+        <div class="loading">
+          Loading latest crypto news...
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         CATEGORY EXPLORER
+    ==================================================== -->
+
+    <section>
+
+      <div class="section-head">
+
+        <div>
+
+          <span class="section-kicker">
+            EXPLORE
+          </span>
+
+          <h2>
+            Follow what interests you.
+          </h2>
+
+          <p>
+            Jump directly into a WORLDLYN topic.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="category-grid">
+
+        <a
+          href="#global"
+          class="category-card cat-global"
+        >
+
+          <span>
+            WORLD
+          </span>
+
+          <h3>
+            Global
+          </h3>
+
+        </a>
+
+
+        <a
+          href="#markets"
+          class="category-card cat-market"
+        >
+
+          <span>
+            INVESTING
+          </span>
+
+          <h3>
+            Stock Market
+          </h3>
+
+        </a>
+
+
+        <a
+          href="#business"
+          class="category-card cat-business"
+        >
+
+          <span>
+            COMPANIES
+          </span>
+
+          <h3>
+            Business
+          </h3>
+
+        </a>
+
+
+        <a
+          href="#technology"
+          class="category-card cat-tech"
+        >
+
+          <span>
+            INNOVATION
+          </span>
+
+          <h3>
+            Technology
+          </h3>
+
+        </a>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         INSIGHT
+    ==================================================== -->
+
+    <section>
+
+      <div class="insight">
+
+        <div class="insight-label">
+          WORLDLYN INSIGHT
+        </div>
+
+        <h2>
+          Don't just follow the headline.
+          Understand the story.
+        </h2>
+
+        <p>
+          WORLDLYN is built around a simple idea:
+          tell readers what happened, why it happened,
+          and why it matters — instead of simply
+          adding another headline to the internet.
+        </p>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         ABOUT
+    ==================================================== -->
+
+    <section id="about">
+
+      <div class="section-head">
+
+        <div>
+
+          <span class="section-kicker">
+            ABOUT WORLDLYN
+          </span>
+
+          <h2>
+            Built with curiosity.
+          </h2>
+
+        </div>
+
+      </div>
+
+
+      <div class="about-grid">
+
+
+        <div class="about-card">
+
+          <div class="creator">
+
+            <div class="creator-avatar">
+              SW
+            </div>
+
+            <div>
+
+              <h3>
+                Saurabh Waghmare
+              </h3>
+
+              <small>
+                Founder & Creator of WORLDLYN
+              </small>
+
+            </div>
+
+          </div>
+
+
+          <br>
+
+
+          <p>
+            WORLDLYN is an independent digital platform
+            created to bring global developments,
+            financial markets, business, economy,
+            technology and emerging trends together
+            in one place.
+          </p>
+
+
+          <p>
+            The idea behind WORLDLYN is to make complex
+            developments easier to understand while
+            giving readers a broader view of what is
+            happening around them.
+          </p>
+
+        </div>
+
+
+        <div class="about-card">
+
+          <h3>
+            Why WORLDLYN?
+          </h3>
+
+          <p>
+            News is everywhere. Context is not.
+          </p>
+
+          <p>
+            WORLDLYN focuses on the connection between
+            world events, markets, businesses,
+            technology and the economy.
+          </p>
+
+          <p>
+            The platform is being developed as a
+            continuously updated digital news and
+            market-information experience.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         CONTACT
+    ==================================================== -->
+
+    <section id="contact">
+
+      <div class="section-head">
+
+        <div>
+
+          <span class="section-kicker">
+            CONTACT
+          </span>
+
+          <h2>
+            Get in touch.
+          </h2>
+
+          <p>
+            Have feedback, ideas or suggestions for WORLDLYN?
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="contact-grid">
+
+
+        <div class="contact-card">
+
+          <h3>
+            WORLDLYN
+          </h3>
+
+          <p>
+            For feedback, collaboration ideas,
+            corrections or suggestions, you can
+            contact the creator of WORLDLYN.
+          </p>
+
+          <!-- CHANGE THIS EMAIL -->
+
+          <a
+            class="contact-link"
+            href="mailto:YOUR_EMAIL@example.com"
+          >
+            YOUR_EMAIL@example.com →
+          </a>
+
+        </div>
+
+
+        <div class="contact-card">
+
+          <h3>
+            Follow the journey
+          </h3>
+
+          <p>
+            WORLDLYN is an evolving project.
+            New categories, market tools, analysis
+            and features will continue to be added.
+          </p>
+
+          <a
+            href="#home"
+            class="contact-link"
+          >
+            Back to WORLDLYN →
+          </a>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+  </main>
+
+
+  <!-- =====================================================
+       FOOTER
+  ====================================================== -->
+
+  <footer>
+
+    <div class="footer-inner">
+
+
+      <div>
+
+        <div class="footer-logo">
+          WORLDLYN
+        </div>
+
+        <p class="footer-description">
+          Global news, markets, business,
+          economy, technology, AI and crypto —
+          explained clearly.
+        </p>
+
+      </div>
+
+
+      <div class="footer-column">
+
+        <h4>
+          Explore
+        </h4>
+
+        <a href="#global">
+          Global
+        </a>
+
+        <a href="#markets">
+          Stock Market
+        </a>
+
+        <a href="#business">
+          Business
+        </a>
+
+        <a href="#technology">
+          Technology
+        </a>
+
+        <a href="#ai">
+          AI
+        </a>
+
+        <a href="#crypto">
+          Crypto
+        </a>
+
+      </div>
+
+
+      <div class="footer-column">
+
+        <h4>
+          WORLDLYN
+        </h4>
+
+        <a href="#about">
+          About
+        </a>
+
+        <a href="#contact">
+          Contact
+        </a>
+
+        <a href="#home">
+          Home
+        </a>
+
+      </div>
+
+
+    </div>
+
+
+    <div class="copyright">
+
+      © 2026 WORLDLYN.
+      All rights reserved.
+
+      <br><br>
+
+      Market data and news are provided by
+      third-party data providers and may be
+      delayed or subject to availability.
+
+    </div>
+
+  </footer>
+
+
+  <!-- =====================================================
+       JAVASCRIPT
+  ====================================================== -->
+
+  <script>
+
+    /* =====================================================
+       WORLDLYN CONFIGURATION
+    ====================================================== */
+
+    const CONFIG = {
+
+      /*
+        IMPORTANT:
+        API KEYS ARE NOT HERE.
+
+        Browser
+           ↓
+        Cloudflare Worker
+           ↓
+        GNews / Twelve Data
+      */
+
+      WORKER_BASE:
+        "https://worldlyn-api.saurabhw100.workers.dev",
+
+      NEWS_REFRESH:
+        15 * 60 * 1000,
+
+      MARKET_REFRESH:
+        5 * 60 * 1000,
+
+      API_TIMEOUT:
+        15000,
+
+      NEWS_LIMIT:
+        6
+
+    };
+
+
+    /* =====================================================
+       GLOBAL STATE
+    ====================================================== */
+
+    let marketChart = null;
+
+    let selectedSymbol =
+      "NIFTY";
+
+    let selectedExchange =
+      "NSE";
+
+    let selectedPeriod =
+      "1day";
+
+    let currentMarketGroup =
+      "india";
+
+    let newsRequestCounter =
+      0;
+
+    let marketRequestCounter =
+      0;
+
+
+    /* =====================================================
+       MARKET GROUPS
+    ====================================================== */
+
+    const MARKET_GROUPS = {
+
+      india: [
+
         {
-          error: "Method not allowed",
-          allowed_methods: [
-            "GET",
-            "OPTIONS"
-          ]
+          symbol: "NIFTY",
+          exchange: "NSE",
+          name: "NIFTY 50"
         },
-        405
-      );
 
+        {
+          symbol: "SENSEX",
+          exchange: "BSE",
+          name: "SENSEX"
+        },
+
+        {
+          symbol: "BANKNIFTY",
+          exchange: "NSE",
+          name: "BANK NIFTY"
+        },
+
+        {
+          symbol: "RELIANCE",
+          exchange: "NSE",
+          name: "Reliance Industries"
+        }
+
+      ],
+
+
+      global: [
+
+        {
+          symbol: "SPX",
+          name: "S&P 500"
+        },
+
+        {
+          symbol: "IXIC",
+          name: "NASDAQ Composite"
+        },
+
+        {
+          symbol: "DJI",
+          name: "Dow Jones"
+        },
+
+        {
+          symbol: "FTSE",
+          name: "FTSE 100"
+        }
+
+      ],
+
+
+      technology: [
+
+        {
+          symbol: "AAPL",
+          exchange: "NASDAQ",
+          name: "Apple"
+        },
+
+        {
+          symbol: "MSFT",
+          exchange: "NASDAQ",
+          name: "Microsoft"
+        },
+
+        {
+          symbol: "NVDA",
+          exchange: "NASDAQ",
+          name: "NVIDIA"
+        },
+
+        {
+          symbol: "TSLA",
+          exchange: "NASDAQ",
+          name: "Tesla"
+        }
+
+      ],
+
+
+      crypto: [
+
+        {
+          symbol: "BTC/USD",
+          name: "Bitcoin"
+        },
+
+        {
+          symbol: "ETH/USD",
+          name: "Ethereum"
+        },
+
+        {
+          symbol: "SOL/USD",
+          name: "Solana"
+        },
+
+        {
+          symbol: "XRP/USD",
+          name: "XRP"
+        }
+
+      ]
+
+    };
+
+
+    /* =====================================================
+       HELPERS
+    ====================================================== */
+
+    function escapeHTML(value) {
+
+      return String(value ?? "")
+
+        .replaceAll("&", "&amp;")
+
+        .replaceAll("<", "&lt;")
+
+        .replaceAll(">", "&gt;")
+
+        .replaceAll('"', "&quot;")
+
+        .replaceAll("'", "&#039;");
     }
 
 
-    try {
+    function timeAgo(dateString) {
 
-
-      /* ===================================================
-         HEALTH CHECK
-         =================================================== */
-
-      if (url.pathname === "/health") {
-
-        return jsonResponse(
-          {
-            status: "ok",
-            service: "WORLDLYN API",
-            message: "Worker is running",
-            timestamp: new Date().toISOString()
-          },
-          200
-        );
-
+      if (!dateString) {
+        return "Recently";
       }
 
-
-      /* ===================================================
-         GNEWS — TOP HEADLINES
-         =================================================== */
-
-      if (url.pathname === "/news") {
-
-        const apiKey =
-          env.GNEWS_API_KEY;
-
-
-        if (!apiKey) {
-
-          return jsonResponse(
-            {
-              error:
-                "GNews API key is not configured.",
-              message:
-                "Add GNEWS_API_KEY as a Cloudflare Worker secret."
-            },
-            500
-          );
-
-        }
-
-
-        const category =
-          url.searchParams.get("category")
-          || "business";
-
-
-        const lang =
-          url.searchParams.get("lang")
-          || "en";
-
-
-        const country =
-          url.searchParams.get("country")
-          || "in";
-
-
-        const max =
-          clampNumber(
-            url.searchParams.get("max"),
-            10,
-            1,
-            100
-          );
-
-
-        const gnewsURL =
-          new URL(
-            "https://gnews.io/api/v4/top-headlines"
-          );
-
-
-        gnewsURL.searchParams.set(
-          "category",
-          category
-        );
-
-
-        gnewsURL.searchParams.set(
-          "lang",
-          lang
-        );
-
-
-        gnewsURL.searchParams.set(
-          "country",
-          country
-        );
-
-
-        gnewsURL.searchParams.set(
-          "max",
-          String(max)
-        );
-
-
-        gnewsURL.searchParams.set(
-          "apikey",
-          apiKey
-        );
-
-
-        const {
-          response,
-          data
-        } = await fetchJSON(
-          gnewsURL.toString()
-        );
-
-
-        if (
-          !response.ok ||
-          data.errors
-        ) {
-
-          return jsonResponse(
-            {
-              error:
-                "GNews request failed.",
-
-              upstream_status:
-                response.status,
-
-              details:
-                data
-            },
-            response.status || 502
-          );
-
-        }
-
-
-        return jsonResponse(
-          {
-            status: "ok",
-            service: "GNews",
-
-            totalArticles:
-              data.totalArticles ?? 0,
-
-            articles:
-              Array.isArray(data.articles)
-                ? data.articles
-                : []
-          },
-          200
-        );
-
-      }
-
-
-      /* ===================================================
-         GNEWS — SEARCH
-         =================================================== */
+      const date =
+        new Date(dateString);
 
       if (
-        url.pathname === "/news/search"
+        Number.isNaN(
+          date.getTime()
+        )
       ) {
+        return "Recently";
+      }
 
-        const apiKey =
-          env.GNEWS_API_KEY;
-
-
-        if (!apiKey) {
-
-          return jsonResponse(
-            {
-              error:
-                "GNews API key is not configured.",
-              message:
-                "Add GNEWS_API_KEY as a Cloudflare Worker secret."
-            },
-            500
-          );
-
-        }
-
-
-        const query =
-          url.searchParams.get("q")
-          || "";
-
-
-        if (!query.trim()) {
-
-          return jsonResponse(
-            {
-              error:
-                "Missing search query.",
-              message:
-                "Use /news/search?q=business"
-            },
-            400
-          );
-
-        }
-
-
-        const lang =
-          url.searchParams.get("lang")
-          || "en";
-
-
-        const country =
-          url.searchParams.get("country")
-          || "in";
-
-
-        const max =
-          clampNumber(
-            url.searchParams.get("max"),
-            10,
-            1,
-            100
-          );
-
-
-        const gnewsURL =
-          new URL(
-            "https://gnews.io/api/v4/search"
-          );
-
-
-        gnewsURL.searchParams.set(
-          "q",
-          query.trim().slice(0, 200)
+      const seconds =
+        Math.max(
+          0,
+          Math.floor(
+            (Date.now() -
+              date.getTime()) / 1000
+          )
         );
 
 
-        gnewsURL.searchParams.set(
-          "lang",
-          lang
-        );
-
-
-        gnewsURL.searchParams.set(
-          "country",
-          country
-        );
-
-
-        gnewsURL.searchParams.set(
-          "max",
-          String(max)
-        );
-
-
-        gnewsURL.searchParams.set(
-          "sortby",
-          "publishedAt"
-        );
-
-
-        gnewsURL.searchParams.set(
-          "apikey",
-          apiKey
-        );
-
-
-        const {
-          response,
-          data
-        } = await fetchJSON(
-          gnewsURL.toString()
-        );
-
-
-        if (
-          !response.ok ||
-          data.errors
-        ) {
-
-          return jsonResponse(
-            {
-              error:
-                "GNews search request failed.",
-
-              upstream_status:
-                response.status,
-
-              details:
-                data
-            },
-            response.status || 502
-          );
-
-        }
-
-
-        return jsonResponse(
-          {
-            status: "ok",
-            service: "GNews",
-
-            totalArticles:
-              data.totalArticles ?? 0,
-
-            articles:
-              Array.isArray(data.articles)
-                ? data.articles
-                : []
-          },
-          200
-        );
-
+      if (seconds < 60) {
+        return "Just now";
       }
 
 
-      /* ===================================================
-         TWELVE DATA — QUOTE
-         =================================================== */
-
-      if (
-        url.pathname === "/market/quote"
-      ) {
-
-        const apiKey =
-          env.TWELVE_DATA_API_KEY;
-
-
-        if (!apiKey) {
-
-          return jsonResponse(
-            {
-              error:
-                "Twelve Data API key is not configured.",
-
-              message:
-                "Add TWELVE_DATA_API_KEY as a Cloudflare Worker secret."
-            },
-            500
-          );
-
-        }
-
-
-        const symbol =
-          (
-            url.searchParams.get("symbol")
-            || ""
-          ).trim();
-
-
-        const exchange =
-          (
-            url.searchParams.get("exchange")
-            || ""
-          ).trim();
-
-
-        if (!symbol) {
-
-          return jsonResponse(
-            {
-              error:
-                "Missing symbol.",
-
-              message:
-                "Use /market/quote?symbol=AAPL"
-            },
-            400
-          );
-
-        }
-
-
-        const twelveURL =
-          new URL(
-            "https://api.twelvedata.com/quote"
-          );
-
-
-        twelveURL.searchParams.set(
-          "symbol",
-          symbol
+      const minutes =
+        Math.floor(
+          seconds / 60
         );
 
 
-        if (exchange) {
+      if (minutes < 60) {
+        return `${minutes}m ago`;
+      }
 
-          twelveURL.searchParams.set(
-            "exchange",
-            exchange
+
+      const hours =
+        Math.floor(
+          minutes / 60
+        );
+
+
+      if (hours < 24) {
+        return `${hours}h ago`;
+      }
+
+
+      const days =
+        Math.floor(
+          hours / 24
+        );
+
+
+      if (days < 7) {
+        return `${days}d ago`;
+      }
+
+
+      return date.toLocaleDateString(
+        "en-IN",
+        {
+          day: "2-digit",
+          month: "short",
+          year: "numeric"
+        }
+      );
+    }
+
+
+    function formatMarketValue(
+      value,
+      decimals = 2
+    ) {
+
+      if (
+        value === null ||
+        value === undefined ||
+        value === "" ||
+        !Number.isFinite(
+          Number(value)
+        )
+      ) {
+        return "—";
+      }
+
+      return Number(value)
+        .toLocaleString(
+          "en-IN",
+          {
+            maximumFractionDigits:
+              decimals
+          }
+        );
+    }
+
+
+    /* =====================================================
+       WORKER
+    ====================================================== */
+
+    function buildWorkerURL(
+      path,
+      params = {}
+    ) {
+
+      const base =
+        CONFIG.WORKER_BASE
+          .replace(/\/+$/, "");
+
+      const url =
+        new URL(
+          `${base}/${path.replace(
+            /^\/+/,
+            ""
+          )}`
+        );
+
+
+      Object.entries(params)
+        .forEach(
+          ([key, value]) => {
+
+            if (
+              value !== undefined &&
+              value !== null &&
+              value !== ""
+            ) {
+
+              url.searchParams.set(
+                key,
+                String(value)
+              );
+
+            }
+
+          }
+        );
+
+
+      return url.toString();
+    }
+
+
+    async function workerFetch(
+      path,
+      params = {}
+    ) {
+
+      const controller =
+        new AbortController();
+
+
+      const timeout =
+        setTimeout(
+          () =>
+            controller.abort(),
+          CONFIG.API_TIMEOUT
+        );
+
+
+      try {
+
+        const response =
+          await fetch(
+            buildWorkerURL(
+              path,
+              params
+            ),
+            {
+              method: "GET",
+
+              cache:
+                "no-store",
+
+              headers: {
+                Accept:
+                  "application/json"
+              },
+
+              signal:
+                controller.signal
+            }
           );
 
-        }
+
+        const text =
+          await response.text();
 
 
-        /*
-          Twelve Data accepts the API key through
-          the Authorization header.
-        */
-
-        let response;
-
-        let data;
+        let data = {};
 
 
         try {
 
-          response =
-            await fetch(
-              twelveURL.toString(),
-              {
-                headers: {
-                  "Authorization":
-                    `apikey ${apiKey}`,
+          data =
+            text
+              ? JSON.parse(text)
+              : {};
 
-                  "Accept":
-                    "application/json"
-                }
-              }
-            );
+        } catch {
 
-
-          const text =
-            await response.text();
-
-
-          try {
-
-            data =
-              text
-                ? JSON.parse(text)
-                : {};
-
-          } catch {
-
-            return jsonResponse(
-              {
-                error:
-                  "Twelve Data returned invalid JSON.",
-
-                upstream_status:
-                  response.status
-              },
-              502
-            );
-
-          }
-
-        } catch (error) {
-
-          return jsonResponse(
-            {
-              error:
-                "Unable to connect to Twelve Data.",
-
-              message:
-                error?.message ||
-                String(error)
-            },
-            502
+          throw new Error(
+            `Worker returned invalid JSON (${response.status}).`
           );
 
         }
 
+
+        if (!response.ok) {
+
+          throw new Error(
+            data.message ||
+            data.error ||
+            `Worker HTTP ${response.status}`
+          );
+
+        }
+
+
+        if (data.error) {
+
+          throw new Error(
+            data.message ||
+            data.error
+          );
+
+        }
+
+
+        return data;
+
+      } catch (error) {
 
         if (
-          !response.ok ||
-          data.status === "error"
+          error.name ===
+          "AbortError"
         ) {
 
-          return jsonResponse(
-            {
-              error:
-                data.message ||
-                "Twelve Data quote request failed.",
-
-              code:
-                data.code || null,
-
-              upstream_status:
-                response.status,
-
-              details:
-                data
-            },
-            response.status || 400
+          throw new Error(
+            "Request timed out. Please try again."
           );
 
         }
 
+        throw error;
 
-        return jsonResponse(
-          data,
-          200
-        );
+      } finally {
+
+        clearTimeout(timeout);
 
       }
 
-
-      /* ===================================================
-         TWELVE DATA — HISTORICAL DATA
-         =================================================== */
-
-      if (
-        url.pathname === "/market/history"
-      ) {
-
-        const apiKey =
-          env.TWELVE_DATA_API_KEY;
+    }
 
 
-        if (!apiKey) {
+    /* =====================================================
+       NEWS CARD
+    ====================================================== */
 
-          return jsonResponse(
-            {
-              error:
-                "Twelve Data API key is not configured.",
+    function createNewsCard(
+      article,
+      category
+    ) {
 
-              message:
-                "Add TWELVE_DATA_API_KEY as a Cloudflare Worker secret."
-            },
-            500
-          );
-
-        }
-
-
-        const symbol =
-          (
-            url.searchParams.get("symbol")
-            || ""
-          ).trim();
-
-
-        if (!symbol) {
-
-          return jsonResponse(
-            {
-              error:
-                "Missing symbol.",
-
-              message:
-                "Use /market/history?symbol=AAPL"
-            },
-            400
-          );
-
-        }
-
-
-        const exchange =
-          (
-            url.searchParams.get("exchange")
-            || ""
-          ).trim();
-
-
-        const interval =
-          (
-            url.searchParams.get("interval")
-            || "1day"
-          ).trim();
-
-
-        const outputsize =
-          clampNumber(
-            url.searchParams.get(
-              "outputsize"
-            ),
-            30,
-            1,
-            5000
-          );
-
-
-        const orderParam =
-          (
-            url.searchParams.get("order")
-            || "asc"
-          ).toLowerCase();
-
-
-        const order =
-          orderParam === "desc"
-            ? "desc"
-            : "asc";
-
-
-        const twelveURL =
-          new URL(
-            "https://api.twelvedata.com/time_series"
-          );
-
-
-        twelveURL.searchParams.set(
-          "symbol",
-          symbol
+      const title =
+        escapeHTML(
+          article.title ||
+          "Untitled story"
         );
 
 
-        twelveURL.searchParams.set(
-          "interval",
-          interval
+      const description =
+        escapeHTML(
+          article.description ||
+          "Read the latest developments."
         );
 
 
-        twelveURL.searchParams.set(
-          "outputsize",
-          String(outputsize)
+      const source =
+        escapeHTML(
+          article.source?.name ||
+          "WORLDLYN"
         );
 
 
-        twelveURL.searchParams.set(
-          "order",
-          order
+      const url =
+        article.url ||
+        "#";
+
+
+      const image =
+        article.image ||
+        "";
+
+
+      const published =
+        timeAgo(
+          article.publishedAt
         );
 
 
-        if (exchange) {
+      const imageHTML =
+        image
 
-          twelveURL.searchParams.set(
-            "exchange",
-            exchange
-          );
+          ? `
 
-        }
+            <img
+              class="news-image"
+              src="${escapeHTML(image)}"
+              alt=""
+              loading="lazy"
+              onerror="
+                this.style.display='none';
+                this.nextElementSibling.style.display='flex';
+              "
+            >
+
+            <div
+              class="image-fallback"
+              style="display:none;"
+            >
+              W
+            </div>
+
+          `
+
+          : `
+
+            <div class="image-fallback">
+              W
+            </div>
+
+          `;
 
 
-        twelveURL.searchParams.set(
-          "apikey",
-          apiKey
+      return `
+
+        <article class="news-card">
+
+          <a
+            href="${escapeHTML(url)}"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+
+            <div class="news-image-wrap">
+
+              ${imageHTML}
+
+              <span class="news-badge">
+                ${escapeHTML(category)}
+              </span>
+
+            </div>
+
+
+            <div class="news-content">
+
+              <div class="news-category">
+                ${escapeHTML(category)}
+              </div>
+
+              <h3>
+                ${title}
+              </h3>
+
+              <p>
+                ${description}
+              </p>
+
+              <div class="news-meta">
+
+                <span>
+                  ${source}
+                </span>
+
+                <span>
+                  ${published}
+                </span>
+
+              </div>
+
+            </div>
+
+          </a>
+
+        </article>
+
+      `;
+    }
+
+
+    /* =====================================================
+       NEWS LOADER
+    ====================================================== */
+
+    async function loadNewsCategory(
+      category,
+      containerId,
+      displayCategory
+    ) {
+
+      const container =
+        document.getElementById(
+          containerId
         );
 
 
-        const {
-          response,
-          data
-        } = await fetchJSON(
-          twelveURL.toString()
-        );
-
-
-        if (
-          !response.ok ||
-          data.status === "error"
-        ) {
-
-          return jsonResponse(
-            {
-              error:
-                data.message ||
-                "Twelve Data history request failed.",
-
-              code:
-                data.code || null,
-
-              upstream_status:
-                response.status,
-
-              details:
-                data
-            },
-            response.status || 400
-          );
-
-        }
-
-
-        return jsonResponse(
-          data,
-          200
-        );
-
+      if (!container) {
+        return;
       }
 
 
-      /* ===================================================
-         TWELVE DATA — SYMBOL SEARCH
-         =================================================== */
-
-      if (
-        url.pathname === "/market/search"
-      ) {
-
-        const apiKey =
-          env.TWELVE_DATA_API_KEY;
+      const requestId =
+        ++newsRequestCounter;
 
 
-        if (!apiKey) {
+      container.innerHTML = `
 
-          return jsonResponse(
-            {
-              error:
-                "Twelve Data API key is not configured.",
+        <div class="loading">
 
-              message:
-                "Add TWELVE_DATA_API_KEY as a Cloudflare Worker secret."
-            },
-            500
-          );
+          Loading latest
+          ${escapeHTML(
+            displayCategory
+              .toLowerCase()
+          )}
+          news...
 
-        }
+        </div>
 
-
-        const symbol =
-          (
-            url.searchParams.get("symbol")
-            || ""
-          ).trim();
+      `;
 
 
-        if (!symbol) {
+      try {
 
-          return jsonResponse(
-            {
-              error:
-                "Missing symbol search.",
-
-              message:
-                "Use /market/search?symbol=apple"
-            },
-            400
-          );
-
-        }
-
-
-        const twelveURL =
-          new URL(
-            "https://api.twelvedata.com/symbol_search"
-          );
-
-
-        twelveURL.searchParams.set(
-          "symbol",
-          symbol.slice(0, 100)
-        );
-
-
-        twelveURL.searchParams.set(
-          "apikey",
-          apiKey
-        );
-
-
-        const {
-          response,
-          data
-        } = await fetchJSON(
-          twelveURL.toString()
-        );
-
-
-        if (
-          !response.ok ||
-          data.status === "error"
-        ) {
-
-          return jsonResponse(
-            {
-              error:
-                data.message ||
-                "Twelve Data symbol search failed.",
-
-              code:
-                data.code || null,
-
-              upstream_status:
-                response.status,
-
-              details:
-                data
-            },
-            response.status || 400
-          );
-
-        }
-
-
-        return jsonResponse(
-          data,
-          200
-        );
-
-      }
-
-
-      /* ===================================================
-         ROOT
-         =================================================== */
-
-      if (
-        url.pathname === "/" ||
-        url.pathname === ""
-      ) {
-
-        return jsonResponse(
-          {
-            status: "ok",
-
-            service:
-              "WORLDLYN API",
-
-            message:
-              "WORLDLYN API is running.",
-
-            endpoints: {
-
-              health:
-                "/health",
-
-              news:
-                "/news?category=world&lang=en&country=in&max=10",
-
-              newsSearch:
-                "/news/search?q=business&lang=en&country=in&max=10",
-
-              marketQuote:
-                "/market/quote?symbol=AAPL",
-
-              marketHistory:
-                "/market/history?symbol=AAPL",
-
-              marketSearch:
-                "/market/search?symbol=apple"
-
-            }
-          },
-          200
-        );
-
-      }
-
-
-      /* ===================================================
-         404
-         =================================================== */
-
-      return jsonResponse(
-        {
-          error:
-            "Endpoint not found",
-
-          path:
-            url.pathname,
-
-          available_endpoints: [
-            "/",
-            "/health",
+        const data =
+          await workerFetch(
             "/news",
+            {
+              category,
+              lang: "en",
+              country: "in",
+              max:
+                CONFIG.NEWS_LIMIT
+            }
+          );
+
+
+        if (
+          requestId !==
+          newsRequestCounter
+        ) {
+          return;
+        }
+
+
+        const articles =
+          Array.isArray(
+            data.articles
+          )
+
+            ? data.articles
+                .filter(
+                  article =>
+                    article?.title
+                )
+                .sort(
+                  (a, b) =>
+                    new Date(
+                      b.publishedAt
+                    ) -
+                    new Date(
+                      a.publishedAt
+                    )
+                )
+
+            : [];
+
+
+        if (!articles.length) {
+
+          container.innerHTML = `
+
+            <div class="loading">
+
+              No
+              ${escapeHTML(
+                displayCategory
+                  .toLowerCase()
+              )}
+              stories are available
+              right now.
+
+            </div>
+
+          `;
+
+          return;
+        }
+
+
+        container.innerHTML =
+          articles
+            .map(
+              article =>
+                createNewsCard(
+                  article,
+                  displayCategory
+                )
+            )
+            .join("");
+
+
+        if (
+          articles[0]?.title
+        ) {
+
+          updateTicker(
+            articles[0].title
+          );
+
+        }
+
+
+      } catch (error) {
+
+        console.error(
+          `${displayCategory} news error:`,
+          error
+        );
+
+
+        container.innerHTML = `
+
+          <div class="error-box">
+
+            Unable to load current
+            ${escapeHTML(
+              displayCategory
+            )}
+            news right now.
+
+            <br><br>
+
+            <small>
+              ${escapeHTML(
+                error.message
+              )}
+            </small>
+
+            <br><br>
+
+            WORLDLYN will automatically
+            retry.
+
+          </div>
+
+        `;
+
+      }
+
+    }
+
+
+    /* =====================================================
+       NEWS SEARCH API
+    ====================================================== */
+
+    async function searchNewsAPI(
+      query,
+      containerId,
+      displayCategory = "Search"
+    ) {
+
+      const container =
+        document.getElementById(
+          containerId
+        );
+
+
+      if (!container) {
+        return;
+      }
+
+
+      container.innerHTML = `
+
+        <div class="loading">
+
+          Searching latest
+          ${escapeHTML(
+            displayCategory
+              .toLowerCase()
+          )}
+          stories...
+
+        </div>
+
+      `;
+
+
+      try {
+
+        const data =
+          await workerFetch(
             "/news/search",
-            "/market/quote",
-            "/market/history",
-            "/market/search"
-          ]
-        },
-        404
+            {
+              q: query,
+              lang: "en",
+              country: "in",
+              max:
+                CONFIG.NEWS_LIMIT
+            }
+          );
+
+
+        const articles =
+          Array.isArray(
+            data.articles
+          )
+
+            ? data.articles
+                .filter(
+                  article =>
+                    article?.title
+                )
+                .sort(
+                  (a, b) =>
+                    new Date(
+                      b.publishedAt
+                    ) -
+                    new Date(
+                      a.publishedAt
+                    )
+                )
+
+            : [];
+
+
+        if (!articles.length) {
+
+          container.innerHTML = `
+
+            <div class="loading">
+
+              No recent stories found.
+
+            </div>
+
+          `;
+
+          return;
+        }
+
+
+        container.innerHTML =
+          articles
+            .map(
+              article =>
+                createNewsCard(
+                  article,
+                  displayCategory
+                )
+            )
+            .join("");
+
+
+      } catch (error) {
+
+        console.error(
+          "News search error:",
+          error
+        );
+
+
+        container.innerHTML = `
+
+          <div class="error-box">
+
+            News search is temporarily
+            unavailable.
+
+            <br><br>
+
+            <small>
+              ${escapeHTML(
+                error.message
+              )}
+            </small>
+
+          </div>
+
+        `;
+
+      }
+
+    }
+
+
+    /* =====================================================
+       LOAD ALL NEWS
+    ====================================================== */
+
+    function loadAllNews() {
+
+      loadNewsCategory(
+        "world",
+        "globalNews",
+        "Global"
       );
 
 
-    } catch (error) {
-
-      console.error(
-        "WORLDLYN Worker Error:",
-        error
+      loadNewsCategory(
+        "business",
+        "businessNews",
+        "Business"
       );
 
 
-      return jsonResponse(
-        {
-          error:
-            "Worker request failed",
+      searchNewsAPI(
+        "economy OR inflation OR GDP OR interest rates",
+        "economyNews",
+        "Economy"
+      );
 
-          message:
-            error?.message ||
-            String(error)
-        },
-        500
+
+      loadNewsCategory(
+        "technology",
+        "technologyNews",
+        "Technology"
+      );
+
+
+      searchNewsAPI(
+        '"artificial intelligence" OR AI',
+        "aiNews",
+        "AI"
+      );
+
+
+      searchNewsAPI(
+        "bitcoin OR ethereum OR cryptocurrency OR blockchain",
+        "cryptoNews",
+        "Crypto"
       );
 
     }
 
-  }
 
-};
+    /* =====================================================
+       NEWS SEARCH BUTTON
+    ====================================================== */
+
+    async function searchNews() {
+
+      const input =
+        document.getElementById(
+          "newsSearch"
+        );
+
+
+      if (!input) {
+        return;
+      }
+
+
+      const query =
+        input.value.trim();
+
+
+      if (!query) {
+
+        loadAllNews();
+
+        return;
+      }
+
+
+      await searchNewsAPI(
+        query,
+        "globalNews",
+        "Search"
+      );
+
+
+      document
+        .getElementById("global")
+        ?.scrollIntoView({
+          behavior: "smooth"
+        });
+
+    }
+
+
+    /* =====================================================
+       TICKER
+    ====================================================== */
+
+    function updateTicker(
+      message
+    ) {
+
+      const ticker =
+        document.getElementById(
+          "tickerText"
+        );
+
+
+      if (
+        ticker &&
+        message
+      ) {
+
+        ticker.textContent =
+          message;
+
+      }
+
+    }
+
+
+    /* =====================================================
+       MARKET API
+    ====================================================== */
+
+    async function marketQuote(
+      symbol,
+      exchange = ""
+    ) {
+
+      return workerFetch(
+        "/market/quote",
+        {
+          symbol,
+          exchange
+        }
+      );
+
+    }
+
+
+    async function marketHistory(
+      symbol,
+      period,
+      exchange = ""
+    ) {
+
+      let interval =
+        "1day";
+
+      let outputsize =
+        30;
+
+
+      switch (period) {
+
+        case "1day":
+
+          interval =
+            "5min";
+
+          outputsize =
+            80;
+
+          break;
+
+
+        case "5day":
+
+          interval =
+            "30min";
+
+          outputsize =
+            80;
+
+          break;
+
+
+        case "1month":
+
+          interval =
+            "1day";
+
+          outputsize =
+            30;
+
+          break;
+
+
+        case "3month":
+
+          interval =
+            "1day";
+
+          outputsize =
+            90;
+
+          break;
+
+
+        case "6month":
+
+          interval =
+            "1day";
+
+          outputsize =
+            180;
+
+          break;
+
+
+        case "1year":
+
+          interval =
+            "1day";
+
+          outputsize =
+            250;
+
+          break;
+
+      }
+
+
+      return workerFetch(
+        "/market/history",
+        {
+          symbol,
+          exchange,
+          interval,
+          outputsize,
+          order: "asc"
+        }
+      );
+
+    }
+
+
+    async function marketSearch(
+      symbol
+    ) {
+
+      return workerFetch(
+        "/market/search",
+        {
+          symbol
+        }
+      );
+
+    }
+
+
+    /* =====================================================
+       WATCHLIST
+    ====================================================== */
+
+    async function loadWatchlist() {
+
+      const container =
+        document.getElementById(
+          "watchlist"
+        );
+
+
+      if (!container) {
+        return;
+      }
+
+
+      const list =
+        MARKET_GROUPS[
+          currentMarketGroup
+        ] || [];
+
+
+      container.innerHTML = "";
+
+
+      if (!list.length) {
+
+        container.innerHTML = `
+
+          <div class="loading">
+            No markets configured.
+          </div>
+
+        `;
+
+        return;
+      }
+
+
+      for (
+        const item of list
+      ) {
+
+        const card =
+          document.createElement(
+            "div"
+          );
+
+
+        card.className =
+          "watch-card";
+
+
+        card.innerHTML = `
+
+          <div class="watch-symbol">
+
+            ${escapeHTML(
+              item.name
+            )}
+
+          </div>
+
+          <div class="watch-price">
+            —
+          </div>
+
+          <div class="watch-change">
+            Loading...
+          </div>
+
+        `;
+
+
+        card.addEventListener(
+          "click",
+          () => {
+
+            selectMarket(
+              item.symbol,
+              item.name,
+              item.exchange || ""
+            );
+
+          }
+        );
+
+
+        container.appendChild(
+          card
+        );
+
+
+        try {
+
+          const quote =
+            await marketQuote(
+              item.symbol,
+              item.exchange || ""
+            );
+
+
+          const price =
+            quote.close ??
+            quote.price ??
+            quote.last;
+
+
+          const percent =
+            Number(
+              quote.percent_change
+            );
+
+
+          card.querySelector(
+            ".watch-price"
+          ).textContent =
+            formatMarketValue(
+              price
+            );
+
+
+          const change =
+            card.querySelector(
+              ".watch-change"
+            );
+
+
+          if (
+            Number.isFinite(
+              percent
+            )
+          ) {
+
+            change.textContent =
+              `${percent >= 0
+                ? "▲"
+                : "▼"}
+              ${percent.toFixed(2)}%`;
+
+
+            change.className =
+              `watch-change ${
+                percent >= 0
+                  ? "positive"
+                  : "negative"
+              }`;
+
+          } else {
+
+            change.textContent =
+              "Data available";
+
+          }
+
+
+        } catch (error) {
+
+          console.warn(
+            `Watchlist ${item.symbol}:`,
+            error.message
+          );
+
+
+          card.querySelector(
+            ".watch-change"
+          ).textContent =
+            "Unavailable";
+
+        }
+
+      }
+
+    }
+
+
+    /* =====================================================
+       SELECT MARKET
+    ====================================================== */
+
+    async function selectMarket(
+      symbol,
+      name,
+      exchange = ""
+    ) {
+
+      selectedSymbol =
+        symbol;
+
+      selectedExchange =
+        exchange || "";
+
+
+      document.getElementById(
+        "selectedName"
+      ).textContent =
+        name;
+
+
+      document.getElementById(
+        "selectedSymbol"
+      ).textContent =
+        exchange
+          ? `${symbol} • ${exchange}`
+          : symbol;
+
+
+      await loadSelectedMarket();
+
+    }
+
+
+    /* =====================================================
+       SELECTED MARKET
+    ====================================================== */
+
+    async function loadSelectedMarket() {
+
+      const requestId =
+        ++marketRequestCounter;
+
+
+      try {
+
+        const quote =
+          await marketQuote(
+            selectedSymbol,
+            selectedExchange
+          );
+
+
+        if (
+          requestId !==
+          marketRequestCounter
+        ) {
+          return;
+        }
+
+
+        updateMarketDetails(
+          quote
+        );
+
+
+        const history =
+          await marketHistory(
+            selectedSymbol,
+            selectedPeriod,
+            selectedExchange
+          );
+
+
+        if (
+          requestId !==
+          marketRequestCounter
+        ) {
+          return;
+        }
+
+
+        drawMarketChart(
+          history
+        );
+
+
+        loadMarketNews(
+          selectedSymbol
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "Market error:",
+          error
+        );
+
+
+        document.getElementById(
+          "selectedPrice"
+        ).textContent =
+          "Unavailable";
+
+
+        document.getElementById(
+          "selectedChange"
+        ).textContent =
+          error.message ||
+          "Market data unavailable";
+
+
+        document.getElementById(
+          "marketNewsList"
+        ).innerHTML = `
+
+          <div class="error-box">
+
+            Market data for
+            <strong>
+              ${escapeHTML(
+                selectedSymbol
+              )}
+            </strong>
+            is not currently available.
+
+            <br><br>
+
+            <small>
+              ${escapeHTML(
+                error.message
+              )}
+            </small>
+
+          </div>
+
+        `;
+
+      }
+
+    }
+
+
+    /* =====================================================
+       MARKET DETAILS
+    ====================================================== */
+
+    function updateMarketDetails(
+      quote
+    ) {
+
+      const price =
+        quote.close ??
+        quote.price ??
+        quote.last;
+
+
+      const change =
+        Number(
+          quote.change
+        );
+
+
+      const percent =
+        Number(
+          quote.percent_change
+        );
+
+
+      document.getElementById(
+        "selectedPrice"
+      ).textContent =
+        formatMarketValue(
+          price
+        );
+
+
+      const changeElement =
+        document.getElementById(
+          "selectedChange"
+        );
+
+
+      if (
+        Number.isFinite(
+          percent
+        )
+      ) {
+
+        const arrow =
+          Number.isFinite(
+            change
+          ) &&
+          change < 0
+            ? "▼"
+            : "▲";
+
+
+        changeElement.textContent =
+          `${arrow}
+          ${
+            Number.isFinite(
+              change
+            )
+              ? formatMarketValue(
+                  change
+                )
+              : "—"
+          }
+          (${percent.toFixed(2)}%)`;
+
+
+        changeElement.className =
+          `big-change ${
+            percent >= 0
+              ? "positive"
+              : "negative"
+          }`;
+
+      } else {
+
+        changeElement.textContent =
+          "Latest available data";
+
+        changeElement.className =
+          "big-change";
+
+      }
+
+
+      document.getElementById(
+        "metricOpen"
+      ).textContent =
+        formatMarketValue(
+          quote.open
+        );
+
+
+      document.getElementById(
+        "metricPrevious"
+      ).textContent =
+        formatMarketValue(
+          quote.previous_close
+        );
+
+
+      document.getElementById(
+        "metricHigh"
+      ).textContent =
+        formatMarketValue(
+          quote.high
+        );
+
+
+      document.getElementById(
+        "metricLow"
+      ).textContent =
+        formatMarketValue(
+          quote.low
+        );
+
+
+      document.getElementById(
+        "metricVolume"
+      ).textContent =
+        formatMarketValue(
+          quote.volume,
+          0
+        );
+
+
+      document.getElementById(
+        "metricCurrency"
+      ).textContent =
+        quote.currency ||
+        "—";
+
+
+      document.getElementById(
+        "metric52High"
+      ).textContent =
+        formatMarketValue(
+          quote.fifty_two_week
+            ?.high
+        );
+
+
+      document.getElementById(
+        "metric52Low"
+      ).textContent =
+        formatMarketValue(
+          quote.fifty_two_week
+            ?.low
+        );
+
+    }
+
+
+    /* =====================================================
+       CHART
+    ====================================================== */
+
+    function drawMarketChart(
+      history
+    ) {
+
+      if (
+        typeof Chart ===
+        "undefined"
+      ) {
+
+        console.warn(
+          "Chart.js has not loaded yet."
+        );
+
+        return;
+      }
+
+
+      const values =
+        Array.isArray(
+          history?.values
+        )
+
+          ? history.values
+
+          : [];
+
+
+      const cleaned =
+        values
+
+          .filter(
+            item =>
+              Number.isFinite(
+                Number(
+                  item.close
+                )
+              )
+          )
+
+          .map(
+            item => ({
+
+              datetime:
+                item.datetime,
+
+              close:
+                Number(
+                  item.close
+                )
+
+            })
+          );
+
+
+      if (!cleaned.length) {
+
+        const canvas =
+          document.getElementById(
+            "marketChart"
+          );
+
+
+        if (canvas) {
+
+          const context =
+            canvas.getContext(
+              "2d"
+            );
+
+
+          context.clearRect(
+            0,
+            0,
+            canvas.width,
+            canvas.height
+          );
+
+        }
+
+        return;
+      }
+
+
+      const labels =
+        cleaned.map(
+          item =>
+            item.datetime
+        );
+
+
+      const prices =
+        cleaned.map(
+          item =>
+            item.close
+        );
+
+
+      const canvas =
+        document.getElementById(
+          "marketChart"
+        );
+
+
+      if (!canvas) {
+        return;
+      }
+
+
+      if (marketChart) {
+
+        marketChart.destroy();
+
+      }
+
+
+      marketChart =
+        new Chart(
+          canvas,
+          {
+
+            type: "line",
+
+            data: {
+
+              labels,
+
+              datasets: [
+
+                {
+
+                  label:
+                    selectedSymbol,
+
+                  data:
+                    prices,
+
+                  borderColor:
+                    "#2563eb",
+
+                  backgroundColor:
+                    "rgba(37,99,235,0.10)",
+
+                  borderWidth:
+                    2,
+
+                  fill:
+                    true,
+
+                  tension:
+                    .25,
+
+                  pointRadius:
+                    0,
+
+                  pointHoverRadius:
+                    5
+
+                }
+
+              ]
+
+            },
+
+
+            options: {
+
+              responsive:
+                true,
+
+              maintainAspectRatio:
+                false,
+
+
+              interaction: {
+
+                intersect:
+                  false,
+
+                mode:
+                  "index"
+
+              },
+
+
+              plugins: {
+
+                legend: {
+                  display: false
+                }
+
+              },
+
+
+              scales: {
+
+                x: {
+
+                  grid: {
+                    display: false
+                  },
+
+                  ticks: {
+
+                    maxTicksLimit:
+                      8,
+
+                    color:
+                      "#94a3b8",
+
+                    font: {
+                      size: 9
+                    }
+
+                  }
+
+                },
+
+
+                y: {
+
+                  position:
+                    "right",
+
+                  grid: {
+
+                    color:
+                      "#edf2f7"
+
+                  },
+
+                  ticks: {
+
+                    color:
+                      "#94a3b8",
+
+                    font: {
+                      size: 9
+                    }
+
+                  }
+
+                }
+
+              }
+
+            }
+
+          }
+        );
+
+    }
+
+
+    /* =====================================================
+       CHART PERIOD
+    ====================================================== */
+
+    async function changeChartPeriod(
+      period,
+      button
+    ) {
+
+      selectedPeriod =
+        period;
+
+
+      document
+        .querySelectorAll(
+          ".chart-btn"
+        )
+        .forEach(
+          btn =>
+            btn.classList.remove(
+              "active"
+            )
+        );
+
+
+      button?.classList.add(
+        "active"
+      );
+
+
+      try {
+
+        const history =
+          await marketHistory(
+            selectedSymbol,
+            selectedPeriod,
+            selectedExchange
+          );
+
+
+        drawMarketChart(
+          history
+        );
+
+      } catch (error) {
+
+        console.error(
+          "Chart error:",
+          error
+        );
+
+      }
+
+    }
+
+
+    /* =====================================================
+       MARKET GROUP
+    ====================================================== */
+
+    function changeMarketGroup(
+      group,
+      button
+    ) {
+
+      currentMarketGroup =
+        group;
+
+
+      document
+        .querySelectorAll(
+          ".market-tab"
+        )
+        .forEach(
+          tab =>
+            tab.classList.remove(
+              "active"
+            )
+        );
+
+
+      button?.classList.add(
+        "active"
+      );
+
+
+      loadWatchlist();
+
+
+      const first =
+        MARKET_GROUPS[group]?.[0];
+
+
+      if (first) {
+
+        selectMarket(
+          first.symbol,
+          first.name,
+          first.exchange || ""
+        );
+
+      }
+
+    }
+
+
+    /* =====================================================
+       MARKET SEARCH
+    ====================================================== */
+
+    async function searchMarket() {
+
+      const input =
+        document.getElementById(
+          "marketSearch"
+        );
+
+
+      const results =
+        document.getElementById(
+          "marketSearchResults"
+        );
+
+
+      if (
+        !input ||
+        !results
+      ) {
+        return;
+      }
+
+
+      const query =
+        input.value.trim();
+
+
+      if (!query) {
+
+        results.innerHTML =
+          "";
+
+        return;
+      }
+
+
+      results.innerHTML = `
+
+        <div class="loading">
+
+          Searching markets...
+
+        </div>
+
+      `;
+
+
+      try {
+
+        const data =
+          await marketSearch(
+            query
+          );
+
+
+        const matches =
+          Array.isArray(
+            data.data
+          )
+
+            ? data.data
+
+            : [];
+
+
+        if (!matches.length) {
+
+          results.innerHTML = `
+
+            <div class="loading">
+
+              No instruments found.
+
+            </div>
+
+          `;
+
+          return;
+        }
+
+
+        results.innerHTML =
+          matches
+            .slice(0, 8)
+            .map(
+              (item, index) => `
+
+                <button
+                  class="search-result"
+                  type="button"
+                  data-index="${index}"
+                >
+
+                  <strong>
+
+                    ${escapeHTML(
+                      item.symbol
+                    )}
+
+                  </strong>
+
+                  <small>
+
+                    ${escapeHTML(
+                      item.instrument_name ||
+                      item.name ||
+                      ""
+                    )}
+
+                    •
+                    ${escapeHTML(
+                      item.exchange ||
+                      ""
+                    )}
+
+                    •
+                    ${escapeHTML(
+                      item.country ||
+                      ""
+                    )}
+
+                  </small>
+
+                </button>
+
+              `
+            )
+            .join("");
+
+
+        results
+          .querySelectorAll(
+            ".search-result"
+          )
+          .forEach(
+            button => {
+
+              button.addEventListener(
+                "click",
+                () => {
+
+                  const index =
+                    Number(
+                      button.dataset.index
+                    );
+
+
+                  const item =
+                    matches[index];
+
+
+                  if (!item) {
+                    return;
+                  }
+
+
+                  selectMarket(
+                    item.symbol,
+                    item.instrument_name ||
+                      item.name ||
+                      item.symbol,
+                    item.exchange ||
+                      ""
+                  );
+
+
+                  results.innerHTML =
+                    "";
+
+                }
+              );
+
+            }
+          );
+
+
+      } catch (error) {
+
+        console.error(
+          "Market search error:",
+          error
+        );
+
+
+        results.innerHTML = `
+
+          <div class="error-box">
+
+            Market search is
+            temporarily unavailable.
+
+            <br><br>
+
+            <small>
+              ${escapeHTML(
+                error.message
+              )}
+            </small>
+
+          </div>
+
+        `;
+
+      }
+
+    }
+
+
+    /* =====================================================
+       MARKET NEWS
+    ====================================================== */
+
+    async function loadMarketNews(
+      symbol
+    ) {
+
+      const container =
+        document.getElementById(
+          "marketNewsList"
+        );
+
+
+      if (!container) {
+        return;
+      }
+
+
+      try {
+
+        const data =
+          await workerFetch(
+            "/news/search",
+            {
+              q:
+                `"${symbol}" OR stock market`,
+
+              lang:
+                "en",
+
+              country:
+                "in",
+
+              max:
+                4
+            }
+          );
+
+
+        const articles =
+          Array.isArray(
+            data.articles
+          )
+
+            ? data.articles
+
+            : [];
+
+
+        if (!articles.length) {
+
+          container.innerHTML =
+            "No recent market headlines.";
+
+          return;
+        }
+
+
+        container.innerHTML =
+          articles
+            .map(
+              article => `
+
+                <div
+                  class="market-news-item"
+                >
+
+                  <a
+                    href="${escapeHTML(
+                      article.url ||
+                      "#"
+                    )}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+
+                    ${escapeHTML(
+                      article.title ||
+                      "Untitled headline"
+                    )}
+
+                  </a>
+
+                </div>
+
+              `
+            )
+            .join("");
+
+
+      } catch (error) {
+
+        console.error(
+          "Market news error:",
+          error
+        );
+
+
+        container.innerHTML =
+          "Market news unavailable.";
+
+      }
+
+    }
+
+
+    /* =====================================================
+       EVENT LISTENERS
+    ====================================================== */
+
+    document
+      .getElementById(
+        "newsSearchButton"
+      )
+      ?.addEventListener(
+        "click",
+        searchNews
+      );
+
+
+    document
+      .getElementById(
+        "newsSearch"
+      )
+      ?.addEventListener(
+        "keydown",
+        event => {
+
+          if (
+            event.key ===
+            "Enter"
+          ) {
+
+            searchNews();
+
+          }
+
+        }
+      );
+
+
+    document
+      .getElementById(
+        "marketSearchButton"
+      )
+      ?.addEventListener(
+        "click",
+        searchMarket
+      );
+
+
+    document
+      .getElementById(
+        "marketSearch"
+      )
+      ?.addEventListener(
+        "keydown",
+        event => {
+
+          if (
+            event.key ===
+            "Enter"
+          ) {
+
+            searchMarket();
+
+          }
+
+        }
+      );
+
+
+    document
+      .querySelectorAll(
+        ".market-tab"
+      )
+      .forEach(
+        button => {
+
+          button.addEventListener(
+            "click",
+            () => {
+
+              changeMarketGroup(
+                button.dataset.market,
+                button
+              );
+
+            }
+          );
+
+        }
+      );
+
+
+    document
+      .querySelectorAll(
+        ".chart-btn"
+      )
+      .forEach(
+        button => {
+
+          button.addEventListener(
+            "click",
+            () => {
+
+              changeChartPeriod(
+                button.dataset.period,
+                button
+              );
+
+            }
+          );
+
+        }
+      );
+
+
+    /* =====================================================
+       NAV ACTIVE STATE
+    ====================================================== */
+
+    const navLinks =
+      document.querySelectorAll(
+        ".nav-inner a"
+      );
+
+
+    navLinks.forEach(
+      link => {
+
+        link.addEventListener(
+          "click",
+          () => {
+
+            navLinks.forEach(
+              item =>
+                item.classList.remove(
+                  "active"
+                )
+            );
+
+
+            link.classList.add(
+              "active"
+            );
+
+          }
+        );
+
+      }
+    );
+
+
+    /* =====================================================
+       AUTO REFRESH — NEWS
+    ====================================================== */
+
+    setInterval(
+      () => {
+
+        if (
+          document.visibilityState ===
+          "visible"
+        ) {
+
+          loadAllNews();
+
+        }
+
+      },
+      CONFIG.NEWS_REFRESH
+    );
+
+
+    /* =====================================================
+       AUTO REFRESH — MARKET
+    ====================================================== */
+
+    setInterval(
+      () => {
+
+        if (
+          document.visibilityState ===
+          "visible"
+        ) {
+
+          loadWatchlist();
+
+          loadSelectedMarket();
+
+        }
+
+      },
+      CONFIG.MARKET_REFRESH
+    );
+
+
+    /* =====================================================
+       VISIBILITY REFRESH
+    ====================================================== */
+
+    document.addEventListener(
+      "visibilitychange",
+      () => {
+
+        if (
+          document.visibilityState ===
+          "visible"
+        ) {
+
+          loadAllNews();
+
+          loadWatchlist();
+
+          loadSelectedMarket();
+
+        }
+
+      }
+    );
+
+
+    /* =====================================================
+       WAIT FOR CHART.JS
+    ====================================================== */
+
+    function waitForChart() {
+
+      return new Promise(
+        resolve => {
+
+          if (
+            typeof Chart !==
+            "undefined"
+          ) {
+
+            resolve();
+
+            return;
+          }
+
+
+          const started =
+            Date.now();
+
+
+          const timer =
+            setInterval(
+              () => {
+
+                if (
+                  typeof Chart !==
+                  "undefined"
+                ) {
+
+                  clearInterval(
+                    timer
+                  );
+
+                  resolve();
+
+                  return;
+                }
+
+
+                if (
+                  Date.now() -
+                  started >
+                  10000
+                ) {
+
+                  clearInterval(
+                    timer
+                  );
+
+                  resolve();
+
+                }
+
+              },
+              50
+            );
+
+        }
+      );
+
+    }
+
+
+    /* =====================================================
+       INITIAL LOAD
+    ====================================================== */
+
+    window.addEventListener(
+      "load",
+      async () => {
+
+        loadAllNews();
+
+        loadWatchlist();
+
+
+        await waitForChart();
+
+
+        selectMarket(
+          "NIFTY",
+          "NIFTY 50",
+          "NSE"
+        );
+
+      }
+    );
+
+  </script>
+
+
+</body>
+
+</html>
