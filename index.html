@@ -3546,8 +3546,77 @@
 
 
     /* =====================================================
-       API HELPERS
+       API HELPERS — SECURE WORKER ROUTING
+       API keys stay inside Cloudflare Worker.
     ====================================================== */
+
+    function escapeHTML(value) {
+      return String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function timeAgo(dateString) {
+      if (!dateString) return 'Recently';
+      const date = new Date(dateString);
+      if (Number.isNaN(date.getTime())) return 'Recently';
+      const seconds = Math.max(0, Math.floor((Date.now() - date.getTime()) / 1000));
+      if (seconds < 60) return 'Just now';
+      const minutes = Math.floor(seconds / 60);
+      if (minutes < 60) return `${minutes}m ago`;
+      const hours = Math.floor(minutes / 60);
+      if (hours < 24) return `${hours}h ago`;
+      const days = Math.floor(hours / 24);
+      if (days < 7) return `${days}d ago`;
+      return date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    function hasWorker() {
+      return Boolean(CONFIG.WORKER_BASE && /^https:\/\//i.test(CONFIG.WORKER_BASE));
+    }
+
+    function hasGNewsKey() {
+      return hasWorker();
+    }
+
+    function hasMarketKey() {
+      return hasWorker();
+    }
+
+    async function apiFetch(upstreamURL) {
+      if (!hasWorker()) throw new Error('WORLDLYN Worker is not configured.');
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), CONFIG.API_TIMEOUT);
+
+      try {
+        const endpoint = `${CONFIG.WORKER_BASE.replace(/\/$/, '')}/proxy?url=${encodeURIComponent(upstreamURL)}`;
+        const response = await fetch(endpoint, {
+          method: 'GET',
+          cache: 'no-store',
+          headers: { Accept: 'application/json' },
+          signal: controller.signal
+        });
+
+        const text = await response.text();
+        let data = {};
+        try { data = text ? JSON.parse(text) : {}; }
+        catch { throw new Error(`Worker returned invalid JSON (${response.status}).`); }
+
+        if (!response.ok) {
+          throw new Error(data.message || data.error || `Worker HTTP ${response.status}`);
+        }
+        if (data.status === 'error' || data.code || data.error) {
+          throw new Error(data.message || data.error || 'Upstream API request failed.');
+        }
+        return data;
+      } finally {
+        clearTimeout(timeout);
+      }
+    }
 
     /* =====================================================
        NEWS CARD
