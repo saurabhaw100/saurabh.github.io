@@ -3460,16 +3460,11 @@
     const CONFIG = {
 
       /*
-        IMPORTANT:
-        Keep these as placeholders in a public GitHub file.
-        For production, use a server-side proxy/serverless function
-        so your API keys are not exposed to visitors.
+        The browser now talks only to the Cloudflare Worker.
+        API keys remain private inside the Worker.
       */
-      GNEWS_API_KEY:
-        "YOUR_GNEWS_KEY_HERE",
-
-      TWELVE_DATA_API_KEY:
-        "YOUR_TWELVE_DATA_KEY_HERE",
+      WORKER_BASE:
+        "https://worldlyn-api.saurabhw100.workers.dev",
 
       /* News refresh: every 15 minutes */
       NEWS_REFRESH:
@@ -3553,190 +3548,6 @@
     /* =====================================================
        API HELPERS
     ====================================================== */
-
-    function isRealApiKey(value) {
-
-      if (!value) return false;
-
-      const key =
-        String(value).trim();
-
-      if (!key) return false;
-
-      const placeholders = [
-        "YOUR_GNEWS_KEY_HERE",
-        "YOUR_TWELVE_DATA_KEY_HERE",
-        "PASTE_YOUR",
-        "YOUR_API_KEY",
-        "REPLACE_ME",
-        "CHANGE_ME"
-      ];
-
-      return !placeholders.some(
-        placeholder =>
-          key.toUpperCase().includes(
-            placeholder.toUpperCase()
-          )
-      );
-
-    }
-
-
-    function hasGNewsKey() {
-
-      return isRealApiKey(
-        CONFIG.GNEWS_API_KEY
-      );
-
-    }
-
-
-    function hasMarketKey() {
-
-      return isRealApiKey(
-        CONFIG.TWELVE_DATA_API_KEY
-      );
-
-    }
-
-
-    async function apiFetch(url) {
-
-      const controller =
-        new AbortController();
-
-      const timeout =
-        setTimeout(
-          () =>
-            controller.abort(),
-          CONFIG.API_TIMEOUT
-        );
-
-      try {
-
-        const response =
-          await fetch(
-            url,
-            {
-              cache: "no-store",
-              signal:
-                controller.signal
-            }
-          );
-
-        const data =
-          await response
-            .json()
-            .catch(
-              () => ({})
-            );
-
-        if (!response.ok) {
-
-          throw new Error(
-            data.message ||
-            `HTTP ${response.status}`
-          );
-
-        }
-
-        if (
-          data.status === "error" ||
-          data.code
-        ) {
-
-          throw new Error(
-            data.message ||
-            "API request failed"
-          );
-
-        }
-
-        return data;
-
-      } finally {
-
-        clearTimeout(timeout);
-
-      }
-
-    }
-
-
-    /* =====================================================
-       ESCAPE HTML
-    ====================================================== */
-
-    function escapeHTML(value) {
-
-      if (!value) return "";
-
-      return String(value)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-
-    }
-
-
-    /* =====================================================
-       TIME HELPERS
-    ====================================================== */
-
-    function timeAgo(dateString) {
-
-      if (!dateString)
-        return "Recently";
-
-
-      const date =
-        new Date(dateString);
-
-      const now =
-        new Date();
-
-      const seconds =
-        Math.floor(
-          (now - date) / 1000
-        );
-
-
-      if (seconds < 60)
-        return "Just now";
-
-
-      const minutes =
-        Math.floor(
-          seconds / 60
-        );
-
-
-      if (minutes < 60)
-        return `${minutes}m ago`;
-
-
-      const hours =
-        Math.floor(
-          minutes / 60
-        );
-
-
-      if (hours < 24)
-        return `${hours}h ago`;
-
-
-      const days =
-        Math.floor(
-          hours / 24
-        );
-
-
-      return `${days}d ago`;
-
-    }
-
 
     /* =====================================================
        NEWS CARD
@@ -3958,8 +3769,6 @@
             from:
               getFreshNewsDate(),
 
-            apikey:
-              CONFIG.GNEWS_API_KEY
 
           });
 
@@ -4117,8 +3926,6 @@
             from:
               getFreshNewsDate(),
 
-            apikey:
-              CONFIG.GNEWS_API_KEY
 
           });
 
@@ -4365,10 +4172,7 @@
 
       const paramsObject = {
         symbol:
-          symbol,
-        apikey:
-          CONFIG.TWELVE_DATA_API_KEY
-      };
+          symbol,};
 
       if (exchange) {
         paramsObject.exchange =
@@ -4479,12 +4283,7 @@
           outputsize,
 
         order:
-          "asc",
-
-        apikey:
-          CONFIG.TWELVE_DATA_API_KEY
-
-      };
+          "asc",};
 
       if (exchange) {
         paramsObject.exchange =
@@ -5374,8 +5173,6 @@
             outputsize:
               "12",
 
-            apikey:
-              CONFIG.TWELVE_DATA_API_KEY
 
           });
 
@@ -5532,8 +5329,6 @@
             from:
               getFreshNewsDate(),
 
-            apikey:
-              CONFIG.GNEWS_API_KEY
 
           });
 
