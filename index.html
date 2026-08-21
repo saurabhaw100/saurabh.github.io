@@ -3443,2169 +3443,1164 @@
   ====================================================== -->
 
   <script>
+/* =========================================================
+   WORLDLYN — FINAL FRONTEND
+   Secure architecture:
+   Browser → Cloudflare Worker → GNews / Twelve Data
 
-    /* =====================================================
-       WORLDLYN CONFIGURATION
+   IMPORTANT:
+   API keys are NOT stored in this file.
+========================================================= */
 
-       IMPORTANT:
-       Put your API keys here.
+const CONFIG = {
+  WORKER_BASE: "https://worldlyn-api.saurabhw100.workers.dev",
+  NEWS_REFRESH: 15 * 60 * 1000,
+  MARKET_REFRESH: 5 * 60 * 1000,
+  API_TIMEOUT: 15000,
+  NEWS_LIMIT: 6
+};
 
-       GNews:
-       https://gnews.io/
+let marketChart = null;
+let selectedSymbol = "NIFTY";
+let selectedExchange = "NSE";
+let selectedPeriod = "1day";
+let currentMarketGroup = "india";
+let lastNewsRequestId = 0;
+let lastMarketRequestId = 0;
 
-       Twelve Data:
-       https://twelvedata.com/
-    ====================================================== */
+const MARKET_GROUPS = {
+  india: [
+    { symbol: "NIFTY", exchange: "NSE", name: "NIFTY 50" },
+    { symbol: "SENSEX", exchange: "BSE", name: "SENSEX" },
+    { symbol: "BANKNIFTY", exchange: "NSE", name: "BANK NIFTY" },
+    { symbol: "RELIANCE", exchange: "NSE", name: "Reliance Industries" }
+  ],
+  global: [
+    { symbol: "SPX", name: "S&P 500" },
+    { symbol: "IXIC", name: "NASDAQ Composite" },
+    { symbol: "DJI", name: "Dow Jones" },
+    { symbol: "FTSE", name: "FTSE 100" }
+  ],
+  technology: [
+    { symbol: "AAPL", exchange: "NASDAQ", name: "Apple" },
+    { symbol: "MSFT", exchange: "NASDAQ", name: "Microsoft" },
+    { symbol: "NVDA", exchange: "NASDAQ", name: "NVIDIA" },
+    { symbol: "TSLA", exchange: "NASDAQ", name: "Tesla" }
+  ],
+  crypto: [
+    { symbol: "BTC/USD", name: "Bitcoin" },
+    { symbol: "ETH/USD", name: "Ethereum" },
+    { symbol: "SOL/USD", name: "Solana" },
+    { symbol: "XRP/USD", name: "XRP" }
+  ]
+};
 
-    const CONFIG = {
+/* =========================================================
+   GENERAL HELPERS
+========================================================= */
 
-      /*
-        The browser now talks only to the Cloudflare Worker.
-        API keys remain private inside the Worker.
-      */
-      WORKER_BASE:
-        "https://worldlyn-api.saurabhw100.workers.dev",
+function escapeHTML(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
 
-      /* News refresh: every 15 minutes */
-      NEWS_REFRESH:
-        15 * 60 * 1000,
+function timeAgo(dateString) {
+  if (!dateString) return "Recently";
 
-      /* Market refresh: every 5 minutes */
-      MARKET_REFRESH:
-        5 * 60 * 1000,
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return "Recently";
 
-      API_TIMEOUT:
-        15000
+  const seconds = Math.max(
+    0,
+    Math.floor((Date.now() - date.getTime()) / 1000)
+  );
 
-    };
+  if (seconds < 60) return "Just now";
 
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
 
-    /* =====================================================
-       GLOBAL STATE
-    ====================================================== */
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
 
-    let marketChart = null;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${days}d ago`;
 
-    let selectedSymbol =
-      "NIFTY";
+  return date.toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric"
+  });
+}
 
-    let selectedExchange =
-      "NSE";
+function hasWorker() {
+  return Boolean(
+    CONFIG.WORKER_BASE &&
+    /^https:\/\//i.test(CONFIG.WORKER_BASE)
+  );
+}
 
-    let selectedPeriod =
-      "1day";
+function workerURL(path, params = {}) {
+  if (!hasWorker()) {
+    throw new Error("WORLDLYN Worker is not configured.");
+  }
 
-    let currentMarketGroup =
-      "india";
+  const url = new URL(
+    path.replace(/^\//, ""),
+    `${CONFIG.WORKER_BASE.replace(/\/+$/, "")}/`
+  );
 
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== "") {
+      url.searchParams.set(key, String(value));
+    }
+  });
 
-    /* =====================================================
-       MARKET GROUPS
+  return url.toString();
+}
 
-       If your Twelve Data account uses a different
-       symbol identifier, use the MARKET SEARCH box
-       to find the exact instrument.
-    ====================================================== */
+async function workerFetch(path, params = {}) {
+  const controller = new AbortController();
+  const timeout = setTimeout(
+    () => controller.abort(),
+    CONFIG.API_TIMEOUT
+  );
 
-    const MARKET_GROUPS = {
+  try {
+    const response = await fetch(workerURL(path, params), {
+      method: "GET",
+      cache: "no-store",
+      headers: {
+        Accept: "application/json"
+      },
+      signal: controller.signal
+    });
 
-      /*
-        Twelve Data accepts the ticker in `symbol` and, where useful,
-        the exchange separately. This avoids the old NIFTY:NSE-style
-        identifiers that caused symbol lookup problems.
-      */
-      india: [
-        { symbol: "NIFTY", exchange: "NSE", name: "NIFTY 50" },
-        { symbol: "SENSEX", exchange: "BSE", name: "SENSEX" },
-        { symbol: "BANKNIFTY", exchange: "NSE", name: "BANK NIFTY" },
-        { symbol: "RELIANCE", exchange: "NSE", name: "Reliance Industries" }
-      ],
+    const text = await response.text();
 
-      global: [
-        { symbol: "SPX", name: "S&P 500" },
-        { symbol: "IXIC", name: "NASDAQ Composite" },
-        { symbol: "DJI", name: "Dow Jones" },
-        { symbol: "FTSE", name: "FTSE 100" }
-      ],
+    let data = {};
+    try {
+      data = text ? JSON.parse(text) : {};
+    } catch {
+      throw new Error(
+        `Worker returned invalid JSON (${response.status}).`
+      );
+    }
 
-      technology: [
-        { symbol: "AAPL", exchange: "NASDAQ", name: "Apple" },
-        { symbol: "MSFT", exchange: "NASDAQ", name: "Microsoft" },
-        { symbol: "NVDA", exchange: "NASDAQ", name: "NVIDIA" },
-        { symbol: "TSLA", exchange: "NASDAQ", name: "Tesla" }
-      ],
+    if (!response.ok) {
+      throw new Error(
+        data.message ||
+        data.error ||
+        `Worker HTTP ${response.status}`
+      );
+    }
 
-      crypto: [
-        { symbol: "BTC/USD", name: "Bitcoin" },
-        { symbol: "ETH/USD", name: "Ethereum" },
-        { symbol: "SOL/USD", name: "Solana" },
-        { symbol: "XRP/USD", name: "XRP" }
+    if (data.error || data.status === "error") {
+      throw new Error(
+        data.message ||
+        data.error ||
+        "API request failed."
+      );
+    }
+
+    return data;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+/* =========================================================
+   NEWS
+========================================================= */
+
+function createNewsCard(article, category) {
+  const title = escapeHTML(
+    article.title || "Untitled story"
+  );
+
+  const description = escapeHTML(
+    article.description ||
+    "Read the latest developments."
+  );
+
+  const source = escapeHTML(
+    article.source?.name || "WORLDLYN"
+  );
+
+  const published = timeAgo(article.publishedAt);
+  const url = article.url || "#";
+  const image = article.image || "";
+
+  const imageHTML = image
+    ? `
+      <img
+        class="news-image"
+        src="${escapeHTML(image)}"
+        alt=""
+        loading="lazy"
+        onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+      >
+      <div class="image-fallback" style="display:none;">W</div>
+    `
+    : `
+      <div class="image-fallback">W</div>
+    `;
+
+  return `
+    <article class="news-card">
+      <a
+        href="${escapeHTML(url)}"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <div class="news-image-wrap">
+          ${imageHTML}
+          <span class="news-badge">
+            ${escapeHTML(category)}
+          </span>
+        </div>
+
+        <div class="news-content">
+          <div class="news-category">
+            ${escapeHTML(category)}
+          </div>
+
+          <h3>${title}</h3>
+
+          <p>${description}</p>
+
+          <div class="news-meta">
+            <span>${source}</span>
+            <span>${published}</span>
+          </div>
+        </div>
+      </a>
+    </article>
+  `;
+}
+
+async function fetchNewsCategory(
+  category,
+  containerId,
+  displayCategory
+) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  const requestId = ++lastNewsRequestId;
+
+  container.innerHTML = `
+    <div class="loading">
+      Loading latest ${escapeHTML(displayCategory.toLowerCase())} news...
+    </div>
+  `;
+
+  try {
+    const data = await workerFetch("/news", {
+      category,
+      lang: "en",
+      country: "in",
+      max: CONFIG.NEWS_LIMIT
+    });
+
+    if (requestId !== lastNewsRequestId) return;
+
+    const articles = (data.articles || [])
+      .filter(article => article?.title && article?.publishedAt)
+      .sort(
+        (a, b) =>
+          new Date(b.publishedAt) -
+          new Date(a.publishedAt)
+      );
+
+    if (!articles.length) {
+      container.innerHTML = `
+        <div class="loading">
+          No ${escapeHTML(displayCategory.toLowerCase())}
+          stories are available right now.
+          <br><br>
+          WORLDLYN will automatically try again.
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = articles
+      .map(article => createNewsCard(article, displayCategory))
+      .join("");
+
+    if (articles[0]?.title) {
+      updateTicker(articles[0].title);
+    }
+  } catch (error) {
+    console.error(`${displayCategory} news error:`, error);
+
+    container.innerHTML = `
+      <div class="error-box">
+        Unable to load current
+        ${escapeHTML(displayCategory)}
+        news right now.
+        <br><br>
+        <small>${escapeHTML(error.message)}</small>
+        <br><br>
+        WORLDLYN will automatically retry.
+      </div>
+    `;
+  }
+}
+
+async function fetchNewsSearch(
+  query,
+  containerId,
+  displayCategory
+) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  const requestId = ++lastNewsRequestId;
+
+  container.innerHTML = `
+    <div class="loading">
+      Loading latest ${escapeHTML(displayCategory.toLowerCase())} stories...
+    </div>
+  `;
+
+  try {
+    const data = await workerFetch("/news/search", {
+      q: query,
+      lang: "en",
+      country: "in",
+      max: CONFIG.NEWS_LIMIT
+    });
+
+    if (requestId !== lastNewsRequestId) return;
+
+    const articles = (data.articles || [])
+      .filter(article => article?.title && article?.publishedAt)
+      .sort(
+        (a, b) =>
+          new Date(b.publishedAt) -
+          new Date(a.publishedAt)
+      );
+
+    if (!articles.length) {
+      container.innerHTML = `
+        <div class="loading">
+          No recent ${escapeHTML(displayCategory)}
+          stories found.
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = articles
+      .map(article => createNewsCard(article, displayCategory))
+      .join("");
+  } catch (error) {
+    console.error(`${displayCategory} search error:`, error);
+
+    container.innerHTML = `
+      <div class="error-box">
+        ${escapeHTML(displayCategory)}
+        news is temporarily unavailable.
+        <br><br>
+        <small>${escapeHTML(error.message)}</small>
+      </div>
+    `;
+  }
+}
+
+function loadAllNews() {
+  fetchNewsCategory("world", "globalNews", "Global");
+  fetchNewsCategory("business", "businessNews", "Business");
+  fetchNewsSearch(
+    "economy OR inflation OR GDP OR interest rates",
+    "economyNews",
+    "Economy"
+  );
+  fetchNewsCategory("technology", "technologyNews", "Technology");
+  fetchNewsSearch(
+    '"artificial intelligence" OR AI',
+    "aiNews",
+    "AI"
+  );
+  fetchNewsSearch(
+    "bitcoin OR ethereum OR cryptocurrency OR blockchain",
+    "cryptoNews",
+    "Crypto"
+  );
+}
+
+/* =========================================================
+   NEWS SEARCH
+========================================================= */
+
+async function searchNews() {
+  const input = document.getElementById("newsSearch");
+  const container = document.getElementById("globalNews");
+
+  if (!input || !container) return;
+
+  const query = input.value.trim();
+
+  if (!query) {
+    loadAllNews();
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="loading">
+      Searching the latest news for
+      "<strong>${escapeHTML(query)}</strong>"...
+    </div>
+  `;
+
+  await fetchNewsSearch(
+    query,
+    "globalNews",
+    "Search"
+  );
+
+  document
+    .getElementById("global")
+    ?.scrollIntoView({
+      behavior: "smooth"
+    });
+}
+
+document
+  .getElementById("newsSearch")
+  ?.addEventListener("keydown", event => {
+    if (event.key === "Enter") {
+      searchNews();
+    }
+  });
+
+/* =========================================================
+   TICKER
+========================================================= */
+
+function updateTicker(message) {
+  const ticker = document.getElementById("tickerText");
+
+  if (ticker && message) {
+    ticker.textContent = message;
+  }
+}
+
+/* =========================================================
+   MARKET API
+========================================================= */
+
+async function marketQuote(symbol, exchange = "") {
+  return workerFetch("/market/quote", {
+    symbol,
+    exchange
+  });
+}
+
+async function marketHistory(
+  symbol,
+  period,
+  exchange = ""
+) {
+  let interval = "1day";
+  let outputsize = 30;
+
+  switch (period) {
+    case "1day":
+      interval = "5min";
+      outputsize = 80;
+      break;
+
+    case "5day":
+      interval = "30min";
+      outputsize = 80;
+      break;
+
+    case "1month":
+      interval = "1day";
+      outputsize = 30;
+      break;
+
+    case "3month":
+      interval = "1day";
+      outputsize = 90;
+      break;
+
+    case "6month":
+      interval = "1day";
+      outputsize = 180;
+      break;
+
+    case "1year":
+      interval = "1day";
+      outputsize = 250;
+      break;
+  }
+
+  return workerFetch("/market/history", {
+    symbol,
+    exchange,
+    interval,
+    outputsize,
+    order: "asc"
+  });
+}
+
+async function marketSearch(symbol) {
+  return workerFetch("/market/search", {
+    symbol
+  });
+}
+
+function formatMarketValue(value, decimals = 2) {
+  if (
+    value === null ||
+    value === undefined ||
+    value === "" ||
+    Number.isNaN(Number(value))
+  ) {
+    return "—";
+  }
+
+  return Number(value).toLocaleString("en-IN", {
+    maximumFractionDigits: decimals
+  });
+}
+
+/* =========================================================
+   WATCHLIST
+========================================================= */
+
+async function loadWatchlist() {
+  const container = document.getElementById("watchlist");
+  if (!container) return;
+
+  const list = MARKET_GROUPS[currentMarketGroup] || [];
+
+  container.innerHTML = "";
+
+  for (const item of list) {
+    const card = document.createElement("div");
+    card.className = "watch-card";
+
+    card.innerHTML = `
+      <div class="watch-symbol">
+        ${escapeHTML(item.name)}
+      </div>
+
+      <div class="watch-price">—</div>
+
+      <div class="watch-change">
+        Loading...
+      </div>
+    `;
+
+    card.onclick = () =>
+      selectMarket(
+        item.symbol,
+        item.name,
+        item.exchange || ""
+      );
+
+    container.appendChild(card);
+
+    try {
+      const quote = await marketQuote(
+        item.symbol,
+        item.exchange || ""
+      );
+
+      const price =
+        quote.close ??
+        quote.price ??
+        quote.last;
+
+      const change = Number(
+        quote.percent_change
+      );
+
+      card.querySelector(".watch-price").textContent =
+        formatMarketValue(price);
+
+      const changeEl =
+        card.querySelector(".watch-change");
+
+      if (Number.isFinite(change)) {
+        changeEl.textContent =
+          `${change >= 0 ? "▲" : "▼"} ${change.toFixed(2)}%`;
+
+        changeEl.className =
+          `watch-change ${
+            change >= 0 ? "positive" : "negative"
+          }`;
+      } else {
+        changeEl.textContent = "Data available";
+      }
+    } catch (error) {
+      console.warn(
+        `Watchlist ${item.symbol}:`,
+        error.message
+      );
+
+      card.querySelector(".watch-change").textContent =
+        "Unavailable";
+    }
+  }
+}
+
+/* =========================================================
+   SELECT MARKET
+========================================================= */
+
+async function selectMarket(
+  symbol,
+  name,
+  exchange = ""
+) {
+  selectedSymbol = symbol;
+  selectedExchange = exchange || "";
+
+  document.getElementById("selectedName").textContent =
+    name;
+
+  document.getElementById("selectedSymbol").textContent =
+    selectedExchange
+      ? `${symbol} • ${selectedExchange}`
+      : symbol;
+
+  await loadSelectedMarket();
+}
+
+/* =========================================================
+   SELECTED MARKET
+========================================================= */
+
+async function loadSelectedMarket() {
+  const requestId = ++lastMarketRequestId;
+
+  try {
+    const quote = await marketQuote(
+      selectedSymbol,
+      selectedExchange
+    );
+
+    if (requestId !== lastMarketRequestId) return;
+
+    updateMarketDetails(quote);
+
+    const history = await marketHistory(
+      selectedSymbol,
+      selectedPeriod,
+      selectedExchange
+    );
+
+    if (requestId !== lastMarketRequestId) return;
+
+    drawMarketChart(history);
+
+    loadMarketNews(selectedSymbol);
+  } catch (error) {
+    console.error("Market error:", error);
+
+    document.getElementById("selectedPrice").textContent =
+      "Unavailable";
+
+    document.getElementById("selectedChange").textContent =
+      "Check symbol or API access";
+
+    document.getElementById("marketNewsList").innerHTML = `
+      <div class="error-box">
+        Market data for
+        <strong>${escapeHTML(selectedSymbol)}</strong>
+        is not currently available.
+        <br><br>
+        <small>${escapeHTML(error.message)}</small>
+        <br><br>
+        Try searching for the instrument using
+        the market search box.
+      </div>
+    `;
+  }
+}
+
+/* =========================================================
+   MARKET DETAILS
+========================================================= */
+
+function updateMarketDetails(quote) {
+  const price =
+    quote.close ??
+    quote.price ??
+    quote.last;
+
+  const change = Number(quote.change);
+  const percent = Number(quote.percent_change);
+
+  document.getElementById("selectedPrice").textContent =
+    formatMarketValue(price);
+
+  const changeElement =
+    document.getElementById("selectedChange");
+
+  if (Number.isFinite(percent)) {
+    const arrow =
+      Number.isFinite(change) && change < 0
+        ? "▼"
+        : "▲";
+
+    changeElement.textContent =
+      `${arrow} ${
+        Number.isFinite(change)
+          ? formatMarketValue(change)
+          : "—"
+      } (${percent.toFixed(2)}%)`;
+
+    changeElement.className =
+      `big-change ${
+        percent >= 0 ? "positive" : "negative"
+      }`;
+  } else {
+    changeElement.textContent =
+      "Latest available data";
+    changeElement.className = "big-change";
+  }
+
+  document.getElementById("metricOpen").textContent =
+    formatMarketValue(quote.open);
+
+  document.getElementById("metricPrevious").textContent =
+    formatMarketValue(quote.previous_close);
+
+  document.getElementById("metricHigh").textContent =
+    formatMarketValue(quote.high);
+
+  document.getElementById("metricLow").textContent =
+    formatMarketValue(quote.low);
+
+  document.getElementById("metricVolume").textContent =
+    formatMarketValue(quote.volume, 0);
+
+  document.getElementById("metricCurrency").textContent =
+    quote.currency || "—";
+
+  document.getElementById("metric52High").textContent =
+    formatMarketValue(
+      quote.fifty_two_week?.high
+    );
+
+  document.getElementById("metric52Low").textContent =
+    formatMarketValue(
+      quote.fifty_two_week?.low
+    );
+}
+
+/* =========================================================
+   CHART
+========================================================= */
+
+function drawMarketChart(history) {
+  if (typeof Chart === "undefined") {
+    console.warn("Chart.js has not loaded yet.");
+    return;
+  }
+
+  const values = Array.isArray(history?.values)
+    ? history.values
+    : [];
+
+  if (!values.length) {
+    console.warn("No historical values returned.");
+    return;
+  }
+
+  const cleaned = values
+    .filter(item => Number.isFinite(Number(item.close)))
+    .map(item => ({
+      datetime: item.datetime,
+      close: Number(item.close)
+    }));
+
+  if (!cleaned.length) return;
+
+  const labels = cleaned.map(item => item.datetime);
+  const prices = cleaned.map(item => item.close);
+
+  const canvas =
+    document.getElementById("marketChart");
+
+  if (!canvas) return;
+
+  if (marketChart) {
+    marketChart.destroy();
+  }
+
+  marketChart = new Chart(canvas, {
+    type: "line",
+
+    data: {
+      labels,
+
+      datasets: [
+        {
+          label: selectedSymbol,
+          data: prices,
+          borderColor: "#2563eb",
+          backgroundColor: "rgba(37,99,235,0.10)",
+          borderWidth: 2,
+          fill: true,
+          tension: 0.25,
+          pointRadius: 0,
+          pointHoverRadius: 5
+        }
       ]
+    },
 
-    };
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
 
+      interaction: {
+        intersect: false,
+        mode: "index"
+      },
 
-    /* =====================================================
-       API HELPERS — SECURE WORKER ROUTING
-       API keys stay inside Cloudflare Worker.
-    ====================================================== */
-
-    function escapeHTML(value) {
-      return String(value ?? '')
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#039;');
-    }
-
-    function timeAgo(dateString) {
-      if (!dateString) return 'Recently';
-      const date = new Date(dateString);
-      if (Number.isNaN(date.getTime())) return 'Recently';
-      const seconds = Math.max(0, Math.floor((Date.now() - date.getTime()) / 1000));
-      if (seconds < 60) return 'Just now';
-      const minutes = Math.floor(seconds / 60);
-      if (minutes < 60) return `${minutes}m ago`;
-      const hours = Math.floor(minutes / 60);
-      if (hours < 24) return `${hours}h ago`;
-      const days = Math.floor(hours / 24);
-      if (days < 7) return `${days}d ago`;
-      return date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
-    }
-
-    function hasWorker() {
-      return Boolean(CONFIG.WORKER_BASE && /^https:\/\//i.test(CONFIG.WORKER_BASE));
-    }
-
-    function hasGNewsKey() {
-      return hasWorker();
-    }
-
-    function hasMarketKey() {
-      return hasWorker();
-    }
-
-    async function apiFetch(upstreamURL) {
-      if (!hasWorker()) throw new Error('WORLDLYN Worker is not configured.');
-
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), CONFIG.API_TIMEOUT);
-
-      try {
-        const endpoint = `${CONFIG.WORKER_BASE.replace(/\/$/, '')}/proxy?url=${encodeURIComponent(upstreamURL)}`;
-        const response = await fetch(endpoint, {
-          method: 'GET',
-          cache: 'no-store',
-          headers: { Accept: 'application/json' },
-          signal: controller.signal
-        });
-
-        const text = await response.text();
-        let data = {};
-        try { data = text ? JSON.parse(text) : {}; }
-        catch { throw new Error(`Worker returned invalid JSON (${response.status}).`); }
-
-        if (!response.ok) {
-          throw new Error(data.message || data.error || `Worker HTTP ${response.status}`);
+      plugins: {
+        legend: {
+          display: false
         }
-        if (data.status === 'error' || data.code || data.error) {
-          throw new Error(data.message || data.error || 'Upstream API request failed.');
+      },
+
+      scales: {
+        x: {
+          grid: {
+            display: false
+          },
+
+          ticks: {
+            maxTicksLimit: 8,
+            color: "#94a3b8",
+            font: {
+              size: 9
+            }
+          }
+        },
+
+        y: {
+          position: "right",
+
+          grid: {
+            color: "#edf2f7"
+          },
+
+          ticks: {
+            color: "#94a3b8",
+            font: {
+              size: 9
+            }
+          }
         }
-        return data;
-      } finally {
-        clearTimeout(timeout);
       }
     }
+  });
+}
 
-    /* =====================================================
-       NEWS CARD
-    ====================================================== */
+async function changeChartPeriod(period, button) {
+  selectedPeriod = period;
 
-    function createNewsCard(
-      article,
-      category
-    ) {
+  document
+    .querySelectorAll(".chart-btn")
+    .forEach(btn => btn.classList.remove("active"));
 
-      const title =
-        escapeHTML(
-          article.title ||
-          "Untitled story"
-        );
+  if (button) {
+    button.classList.add("active");
+  }
 
+  try {
+    const history = await marketHistory(
+      selectedSymbol,
+      selectedPeriod,
+      selectedExchange
+    );
 
-      const description =
-        escapeHTML(
-          article.description ||
-          "Read the latest developments."
-        );
+    drawMarketChart(history);
+  } catch (error) {
+    console.error(
+      "Chart period error:",
+      error
+    );
+  }
+}
 
+/* =========================================================
+   MARKET GROUP
+========================================================= */
 
-      const source =
-        escapeHTML(
-          article.source?.name ||
-          "WORLDLYN"
-        );
+function changeMarketGroup(group, button) {
+  currentMarketGroup = group;
 
+  document
+    .querySelectorAll(".market-tab")
+    .forEach(tab =>
+      tab.classList.remove("active")
+    );
 
-      const published =
-        article.publishedAt
-          ? timeAgo(
-              article.publishedAt
-            )
-          : "Recently";
+  if (button) {
+    button.classList.add("active");
+  }
 
+  loadWatchlist();
 
-      const url =
-        article.url || "#";
+  const first =
+    MARKET_GROUPS[group]?.[0];
 
+  if (first) {
+    selectMarket(
+      first.symbol,
+      first.name,
+      first.exchange || ""
+    );
+  }
+}
 
-      const image =
-        article.image;
+/* =========================================================
+   MARKET SEARCH
+========================================================= */
 
+async function searchMarket() {
+  const input =
+    document.getElementById("marketSearch");
 
-      const imageHTML =
-        image
+  const results =
+    document.getElementById("marketSearchResults");
 
-          ? `
-            <img
-              class="news-image"
-              src="${escapeHTML(image)}"
-              alt=""
-              loading="lazy"
-              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
-            >
+  if (!input || !results) return;
 
-            <div
-              class="image-fallback"
-              style="display:none;"
-            >
-              W
-            </div>
-          `
+  const query = input.value.trim();
 
-          : `
+  if (!query) {
+    results.innerHTML = "";
+    return;
+  }
 
-            <div class="image-fallback">
-              W
-            </div>
+  results.innerHTML = `
+    <div class="loading">
+      Searching markets...
+    </div>
+  `;
 
-          `;
+  try {
+    const data = await marketSearch(query);
+    const matches = Array.isArray(data.data)
+      ? data.data
+      : [];
 
+    if (!matches.length) {
+      results.innerHTML = `
+        <div class="loading">
+          No instruments found.
+        </div>
+      `;
+      return;
+    }
 
-      return `
+    results.innerHTML = matches
+      .slice(0, 8)
+      .map((item, index) => {
+        const symbol =
+          String(item.symbol || "")
+            .replaceAll("'", "\\'");
+        const name =
+          String(item.instrument_name || item.name || "")
+            .replaceAll("'", "\\'");
+        const exchange =
+          String(item.exchange || "")
+            .replaceAll("'", "\\'");
 
-        <article class="news-card">
+        return `
+          <button
+            class="search-result"
+            type="button"
+            data-result-index="${index}"
+          >
+            <strong>
+              ${escapeHTML(item.symbol)}
+            </strong>
 
+            <small>
+              ${escapeHTML(
+                item.instrument_name ||
+                item.name ||
+                ""
+              )}
+              •
+              ${escapeHTML(item.exchange || "")}
+              •
+              ${escapeHTML(item.country || "")}
+            </small>
+          </button>
+        `;
+      })
+      .join("");
+
+    results
+      .querySelectorAll(".search-result")
+      .forEach((button, index) => {
+        button.addEventListener("click", () => {
+          const item = matches[index];
+
+          selectMarket(
+            item.symbol,
+            item.instrument_name ||
+              item.name ||
+              item.symbol,
+            item.exchange || ""
+          );
+
+          results.innerHTML = "";
+        });
+      });
+  } catch (error) {
+    console.error("Market search error:", error);
+
+    results.innerHTML = `
+      <div class="error-box">
+        Market search is temporarily unavailable.
+        <br><br>
+        <small>${escapeHTML(error.message)}</small>
+      </div>
+    `;
+  }
+}
+
+document
+  .getElementById("marketSearch")
+  ?.addEventListener("keydown", event => {
+    if (event.key === "Enter") {
+      searchMarket();
+    }
+  });
+
+/* =========================================================
+   MARKET NEWS
+========================================================= */
+
+async function loadMarketNews(symbol) {
+  const container =
+    document.getElementById("marketNewsList");
+
+  if (!container) return;
+
+  try {
+    const data = await workerFetch(
+      "/news/search",
+      {
+        q: `"${symbol}" OR stock market`,
+        lang: "en",
+        country: "in",
+        max: 4
+      }
+    );
+
+    const articles = Array.isArray(data.articles)
+      ? data.articles
+      : [];
+
+    if (!articles.length) {
+      container.innerHTML =
+        "No recent market headlines.";
+      return;
+    }
+
+    container.innerHTML = articles
+      .map(article => `
+        <div class="market-news-item">
           <a
-            href="${escapeHTML(url)}"
+            href="${escapeHTML(article.url || "#")}"
             target="_blank"
             rel="noopener noreferrer"
           >
-
-            <div class="news-image-wrap">
-
-              ${imageHTML}
-
-              <span class="news-badge">
-                ${escapeHTML(category)}
-              </span>
-
-            </div>
-
-
-            <div class="news-content">
-
-              <div class="news-category">
-                ${escapeHTML(category)}
-              </div>
-
-              <h3>
-                ${title}
-              </h3>
-
-              <p>
-                ${description}
-              </p>
-
-              <div class="news-meta">
-
-                <span>
-                  ${source}
-                </span>
-
-                <span>
-                  ${published}
-                </span>
-
-              </div>
-
-            </div>
-
+            ${escapeHTML(
+              article.title ||
+              "Untitled headline"
+            )}
           </a>
-
-        </article>
-
-      `;
-
-    }
-
-
-    /* =====================================================
-       NEWS DATE WINDOW
-    ====================================================== */
-
-    function getFreshNewsDate() {
-
-      const date =
-        new Date();
-
-      /*
-        Keep the main feed recent.
-        GNews itself determines current/trending
-        articles; this adds another freshness filter.
-      */
-
-      date.setHours(
-        date.getHours() - 48
-      );
-
-
-      return date.toISOString();
-
-    }
-
-
-    /* =====================================================
-       TOP HEADLINES
-    ====================================================== */
-
-    async function fetchNewsCategory(
-      category,
-      containerId,
-      displayCategory
-    ) {
-
-      const container =
-        document.getElementById(
-          containerId
-        );
-
-
-      if (!container)
-        return;
-
-
-      if (!hasGNewsKey()) {
-
-        container.innerHTML = `
-
-          <div class="loading">
-
-            <strong>
-              ${escapeHTML(displayCategory)}
-            </strong>
-
-            <br><br>
-
-            Add your GNews API key in
-            the CONFIG section of this file
-            to activate automatic live news.
-
-          </div>
-
-        `;
-
-        return;
-
-      }
-
-
-      try {
-
-        const params =
-          new URLSearchParams({
-
-            category:
-              category,
-
-            lang:
-              "en",
-
-            max:
-              "6",
-
-            from:
-              getFreshNewsDate(),
-
-
-          });
-
-
-        const data =
-          await apiFetch(
-            "https://gnews.io/api/v4/top-headlines?"
-            + params.toString()
-          );
-
-
-        const articles =
-          (data.articles || [])
-
-            .filter(
-              article =>
-                article.publishedAt
-            )
-
-            .sort(
-              (a,b) =>
-                new Date(b.publishedAt) -
-                new Date(a.publishedAt)
-            );
-
-
-        if (!articles.length) {
-
-          container.innerHTML = `
-
-            <div class="loading">
-
-              No sufficiently recent
-              ${escapeHTML(displayCategory)}
-              stories are available right now.
-
-              <br><br>
-
-              WORLDLYN will check again automatically.
-
-            </div>
-
-          `;
-
-          return;
-
-        }
-
-
-        container.innerHTML =
-          articles
-            .map(
-              article =>
-                createNewsCard(
-                  article,
-                  displayCategory
-                )
-            )
-            .join("");
-
-
-        if (articles[0]) {
-
-          updateTicker(
-            articles[0].title
-          );
-
-        }
-
-
-      } catch (error) {
-
-        console.error(
-          displayCategory,
-          error
-        );
-
-
-        container.innerHTML = `
-
-          <div class="error-box">
-
-            Unable to load current
-            ${escapeHTML(displayCategory)}
-            news right now.
-
-            <br><br>
-
-            WORLDLYN will automatically retry.
-
-          </div>
-
-        `;
-
-      }
-
-    }
-
-
-    /* =====================================================
-       SEARCH-BASED NEWS
-    ====================================================== */
-
-    async function fetchNewsSearch(
-      query,
-      containerId,
-      displayCategory
-    ) {
-
-      const container =
-        document.getElementById(
-          containerId
-        );
-
-
-      if (!container)
-        return;
-
-
-      if (!hasGNewsKey()) {
-
-        container.innerHTML = `
-
-          <div class="loading">
-
-            Add your GNews API key
-            to activate this section.
-
-          </div>
-
-        `;
-
-        return;
-
-      }
-
-
-      try {
-
-        const params =
-          new URLSearchParams({
-
-            q:
-              query,
-
-            lang:
-              "en",
-
-            max:
-              "6",
-
-            sortby:
-              "publishedAt",
-
-            from:
-              getFreshNewsDate(),
-
-
-          });
-
-
-        const data =
-          await apiFetch(
-            "https://gnews.io/api/v4/search?"
-            + params.toString()
-          );
-
-
-        const articles =
-          (data.articles || [])
-
-            .filter(
-              article =>
-                article.publishedAt
-            )
-
-            .sort(
-              (a,b) =>
-                new Date(b.publishedAt) -
-                new Date(a.publishedAt)
-            );
-
-
-        if (!articles.length) {
-
-          container.innerHTML = `
-
-            <div class="loading">
-
-              No recent
-              ${escapeHTML(displayCategory)}
-              stories found.
-
-            </div>
-
-          `;
-
-          return;
-
-        }
-
-
-        container.innerHTML =
-          articles
-            .map(
-              article =>
-                createNewsCard(
-                  article,
-                  displayCategory
-                )
-            )
-            .join("");
-
-
-      } catch (error) {
-
-        console.error(error);
-
-
-        container.innerHTML = `
-
-          <div class="error-box">
-
-            ${escapeHTML(displayCategory)}
-            news is temporarily unavailable.
-
-          </div>
-
-        `;
-
-      }
-
-    }
-
-
-    /* =====================================================
-       NEWS SEARCH
-    ====================================================== */
-
-    async function searchNews() {
-
-      const input =
-        document.getElementById(
-          "newsSearch"
-        );
-
-
-      const query =
-        input.value.trim();
-
-
-      if (!query) {
-
-        loadAllNews();
-
-        return;
-
-      }
-
-
-      const container =
-        document.getElementById(
-          "globalNews"
-        );
-
-
-      container.innerHTML = `
-
-        <div class="loading">
-
-          Searching the latest news for
-          "<strong>${escapeHTML(query)}</strong>"...
-
         </div>
-
-      `;
-
-
-      await fetchNewsSearch(
-        query,
-        "globalNews",
-        "Search"
-      );
-
-
-      document
-        .getElementById("global")
-        ?.scrollIntoView({
-          behavior: "smooth"
-        });
-
-    }
-
-
-    document
-      .getElementById("newsSearch")
-      ?.addEventListener(
-        "keydown",
-        event => {
-
-          if (
-            event.key === "Enter"
-          ) {
-
-            searchNews();
-
-          }
-
-        }
-      );
-
-
-    /* =====================================================
-       LOAD ALL NEWS
-    ====================================================== */
-
-    function loadAllNews() {
-
-      fetchNewsCategory(
-        "world",
-        "globalNews",
-        "Global"
-      );
-
-
-      fetchNewsCategory(
-        "business",
-        "businessNews",
-        "Business"
-      );
-
-
-      fetchNewsSearch(
-        "economy OR inflation OR GDP OR interest rates",
-        "economyNews",
-        "Economy"
-      );
-
-
-      fetchNewsCategory(
-        "technology",
-        "technologyNews",
-        "Technology"
-      );
-
-
-      fetchNewsSearch(
-        "\"artificial intelligence\" OR AI",
-        "aiNews",
-        "AI"
-      );
-
-
-      fetchNewsSearch(
-        "bitcoin OR ethereum OR cryptocurrency OR blockchain",
-        "cryptoNews",
-        "Crypto"
-      );
-
-    }
-
-
-    /* =====================================================
-       TICKER
-    ====================================================== */
-
-    function updateTicker(message) {
-
-      const ticker =
-        document.getElementById(
-          "tickerText"
-        );
-
-
-      if (ticker && message) {
-
-        ticker.textContent =
-          message;
-
-      }
-
-    }
-
-
-    /* =====================================================
-       MARKET API
-    ====================================================== */
-
-    async function marketQuote(
-      symbol,
-      exchange = ""
-    ) {
-
-      if (!hasMarketKey()) {
-
-        throw new Error(
-          "Twelve Data API key missing"
-        );
-
-      }
-
-      const paramsObject = {
-        symbol:
-          symbol,};
-
-      if (exchange) {
-        paramsObject.exchange =
-          exchange;
-      }
-
-      const params =
-        new URLSearchParams(
-          paramsObject
-        );
-
-      return apiFetch(
-        "https://api.twelvedata.com/quote?"
-        + params.toString()
-      );
-
-    }
-
-
-    /* =====================================================
-       MARKET HISTORY
-    ====================================================== */
-
-    async function marketHistory(
-      symbol,
-      period,
-      exchange = ""
-    ) {
-
-      if (!hasMarketKey()) {
-
-        throw new Error(
-          "Twelve Data API key missing"
-        );
-
-      }
-
-
-      let interval =
-        "1day";
-
-      let outputsize =
-        30;
-
-
-      if (period === "1day") {
-
-        interval = "5min";
-        outputsize = 80;
-
-      }
-
-      else if (
-        period === "5day"
-      ) {
-
-        interval = "30min";
-        outputsize = 80;
-
-      }
-
-      else if (
-        period === "1month"
-      ) {
-
-        interval = "1day";
-        outputsize = 30;
-
-      }
-
-      else if (
-        period === "3month"
-      ) {
-
-        interval = "1day";
-        outputsize = 90;
-
-      }
-
-      else if (
-        period === "6month"
-      ) {
-
-        interval = "1day";
-        outputsize = 180;
-
-      }
-
-      else if (
-        period === "1year"
-      ) {
-
-        interval = "1day";
-        outputsize = 250;
-
-      }
-
-
-      const paramsObject = {
-
-        symbol:
-          symbol,
-
-        interval:
-          interval,
-
-        outputsize:
-          outputsize,
-
-        order:
-          "asc",};
-
-      if (exchange) {
-        paramsObject.exchange =
-          exchange;
-      }
-
-      const params =
-        new URLSearchParams(
-          paramsObject
-        );
-
-
-      return apiFetch(
-        "https://api.twelvedata.com/time_series?"
-        + params.toString()
-      );
-
-    }
-
-
-    /* =====================================================
-       FORMAT MARKET VALUE
-    ====================================================== */
-
-    function formatMarketValue(
-      value,
-      decimals = 2
-    ) {
-
-      if (
-        value === null ||
-        value === undefined ||
-        value === "" ||
-        Number.isNaN(
-          Number(value)
-        )
-      ) {
-
-        return "—";
-
-      }
-
-
-      return Number(value)
-        .toLocaleString(
-          "en-IN",
-          {
-            maximumFractionDigits:
-              decimals
-          }
-        );
-
-    }
-
-
-    /* =====================================================
-       LOAD WATCHLIST
-    ====================================================== */
-
-    async function loadWatchlist() {
-
-      const container =
-        document.getElementById(
-          "watchlist"
-        );
-
-
-      const list =
-        MARKET_GROUPS[
-          currentMarketGroup
-        ];
-
-
-      container.innerHTML = "";
-
-
-      for (
-        const item of list
-      ) {
-
-        const card =
-          document.createElement(
-            "div"
-          );
-
-
-        card.className =
-          "watch-card";
-
-
-        card.innerHTML = `
-
-          <div class="watch-symbol">
-            ${escapeHTML(item.name)}
-          </div>
-
-          <div class="watch-price">
-            —
-          </div>
-
-          <div class="watch-change">
-            Loading...
-          </div>
-
-        `;
-
-
-        card.onclick =
-          () =>
-            selectMarket(
-              item.symbol,
-              item.name,
-              item.exchange || ""
-            );
-
-
-        container.appendChild(
-          card
-        );
-
-
-        if (!hasMarketKey()) {
-
-          card.querySelector(
-            ".watch-change"
-          ).textContent =
-            "API key required";
-
-          continue;
-
-        }
-
-
-        try {
-
-          const quote =
-            await marketQuote(
-              item.symbol,
-              item.exchange || ""
-            );
-
-
-          const price =
-            quote.close ||
-            quote.price;
-
-
-          const change =
-            Number(
-              quote.percent_change
-            );
-
-
-          card.querySelector(
-            ".watch-price"
-          ).textContent =
-            formatMarketValue(
-              price
-            );
-
-
-          const changeEl =
-            card.querySelector(
-              ".watch-change"
-            );
-
-
-          if (
-            Number.isFinite(
-              change
-            )
-          ) {
-
-            changeEl.textContent =
-              `${change >= 0 ? "▲" : "▼"} ${change.toFixed(2)}%`;
-
-            changeEl.className =
-              "watch-change "
-              +
-              (
-                change >= 0
-                  ? "positive"
-                  : "negative"
-              );
-
-          }
-
-          else {
-
-            changeEl.textContent =
-              "Data available";
-
-          }
-
-
-        } catch (error) {
-
-          card.querySelector(
-            ".watch-change"
-          ).textContent =
-            "Unavailable";
-
-        }
-
-      }
-
-    }
-
-
-    /* =====================================================
-       SELECT MARKET
-    ====================================================== */
-
-    async function selectMarket(
-      symbol,
-      name,
-      exchange = ""
-    ) {
-
-      selectedSymbol =
-        symbol;
-
-      selectedExchange =
-        exchange || "";
-
-
-      document
-        .getElementById(
-          "selectedName"
-        )
-        .textContent =
-        name;
-
-
-      document
-        .getElementById(
-          "selectedSymbol"
-        )
-        .textContent =
-        symbol;
-
-
-      if (!hasMarketKey()) {
-
-        showMarketSetupMessage();
-
-        return;
-
-      }
-
-
-      await loadSelectedMarket();
-
-    }
-
-
-    /* =====================================================
-       SELECTED MARKET
-    ====================================================== */
-
-    async function loadSelectedMarket() {
-
-      try {
-
-        const quote =
-          await marketQuote(
-            selectedSymbol,
-            selectedExchange
-          );
-
-
-        updateMarketDetails(
-          quote
-        );
-
-
-        const history =
-          await marketHistory(
-            selectedSymbol,
-            selectedPeriod,
-            selectedExchange
-          );
-
-
-        drawMarketChart(
-          history
-        );
-
-
-        loadMarketNews(
-          selectedSymbol
-        );
-
-
-      } catch (error) {
-
-        console.error(
-          "Market error:",
-          error
-        );
-
-
-        document
-          .getElementById(
-            "selectedPrice"
-          )
-          .textContent =
-          "Unavailable";
-
-
-        document
-          .getElementById(
-            "selectedChange"
-          )
-          .textContent =
-          "Check symbol/API access";
-
-
-        document
-          .getElementById(
-            "marketNewsList"
-          )
-          .innerHTML = `
-
-            <div class="error-box">
-
-              Market data for
-              <strong>
-                ${escapeHTML(selectedSymbol)}
-              </strong>
-              is not currently available.
-
-              <br><br>
-
-              Try searching for the instrument
-              using the market search box.
-
-            </div>
-
-          `;
-
-      }
-
-    }
-
-
-    /* =====================================================
-       MARKET DETAILS
-    ====================================================== */
-
-    function updateMarketDetails(
-      quote
-    ) {
-
-      const price =
-        quote.close ||
-        quote.price;
-
-
-      const change =
-        Number(
-          quote.change
-        );
-
-
-      const percent =
-        Number(
-          quote.percent_change
-        );
-
-
-      document
-        .getElementById(
-          "selectedPrice"
-        )
-        .textContent =
-        formatMarketValue(
-          price
-        );
-
-
-      const changeElement =
-        document
-          .getElementById(
-            "selectedChange"
-          );
-
-
-      if (
-        Number.isFinite(percent)
-      ) {
-
-        changeElement.textContent =
-
-          `${change >= 0 ? "▲" : "▼"}
-           ${formatMarketValue(change)}
-           (${percent.toFixed(2)}%)`;
-
-
-        changeElement.className =
-          "big-change "
-          +
-          (
-            percent >= 0
-              ? "positive"
-              : "negative"
-          );
-
-      }
-
-      else {
-
-        changeElement.textContent =
-          "Latest available data";
-
-        changeElement.className =
-          "big-change";
-
-      }
-
-
-      document
-        .getElementById(
-          "metricOpen"
-        )
-        .textContent =
-        formatMarketValue(
-          quote.open
-        );
-
-
-      document
-        .getElementById(
-          "metricPrevious"
-        )
-        .textContent =
-        formatMarketValue(
-          quote.previous_close
-        );
-
-
-      document
-        .getElementById(
-          "metricHigh"
-        )
-        .textContent =
-        formatMarketValue(
-          quote.high
-        );
-
-
-      document
-        .getElementById(
-          "metricLow"
-        )
-        .textContent =
-        formatMarketValue(
-          quote.low
-        );
-
-
-      document
-        .getElementById(
-          "metricVolume"
-        )
-        .textContent =
-        formatMarketValue(
-          quote.volume,
-          0
-        );
-
-
-      document
-        .getElementById(
-          "metricCurrency"
-        )
-        .textContent =
-        quote.currency ||
-        "—";
-
-
-      document
-        .getElementById(
-          "metric52High"
-        )
-        .textContent =
-        formatMarketValue(
-          quote.fifty_two_week?.high
-        );
-
-
-      document
-        .getElementById(
-          "metric52Low"
-        )
-        .textContent =
-        formatMarketValue(
-          quote.fifty_two_week?.low
-        );
-
-    }
-
-
-    /* =====================================================
-       DRAW CHART
-    ====================================================== */
-
-    function drawMarketChart(
-      history
-    ) {
-
-      if (
-        typeof Chart ===
-        "undefined"
-      ) {
-
-        return;
-
-      }
-
-
-      const values =
-        history.values || [];
-
-
-      if (!values.length) {
-
-        return;
-
-      }
-
-
-      const labels =
-        values.map(
-          item =>
-            item.datetime
-        );
-
-
-      const prices =
-        values.map(
-          item =>
-            Number(item.close)
-        );
-
-
-      const ctx =
-        document
-          .getElementById(
-            "marketChart"
-          );
-
-
-      if (marketChart) {
-
-        marketChart.destroy();
-
-      }
-
-
-      marketChart =
-        new Chart(
-          ctx,
-          {
-
-            type:
-              "line",
-
-            data: {
-
-              labels:
-                labels,
-
-              datasets: [
-
-                {
-
-                  label:
-                    selectedSymbol,
-
-                  data:
-                    prices,
-
-                  borderColor:
-                    "#2563eb",
-
-                  backgroundColor:
-                    "rgba(37,99,235,0.10)",
-
-                  borderWidth:
-                    2,
-
-                  fill:
-                    true,
-
-                  tension:
-                    0.25,
-
-                  pointRadius:
-                    0,
-
-                  pointHoverRadius:
-                    5
-
-                }
-
-              ]
-
-            },
-
-            options: {
-
-              responsive:
-                true,
-
-              maintainAspectRatio:
-                false,
-
-              interaction: {
-
-                intersect:
-                  false,
-
-                mode:
-                  "index"
-
-              },
-
-              plugins: {
-
-                legend: {
-
-                  display:
-                    false
-
-                }
-
-              },
-
-              scales: {
-
-                x: {
-
-                  grid: {
-
-                    display:
-                      false
-
-                  },
-
-                  ticks: {
-
-                    maxTicksLimit:
-                      8,
-
-                    color:
-                      "#94a3b8",
-
-                    font: {
-
-                      size:
-                        9
-
-                    }
-
-                  }
-
-                },
-
-                y: {
-
-                  position:
-                    "right",
-
-                  grid: {
-
-                    color:
-                      "#edf2f7"
-
-                  },
-
-                  ticks: {
-
-                    color:
-                      "#94a3b8",
-
-                    font: {
-
-                      size:
-                        9
-
-                    }
-
-                  }
-
-                }
-
-              }
-
-            }
-
-          }
-
-        );
-
-    }
-
-
-    /* =====================================================
-       CHART PERIOD
-    ====================================================== */
-
-    async function changeChartPeriod(
-      period,
-      button
-    ) {
-
-      selectedPeriod =
-        period;
-
-
-      document
-        .querySelectorAll(
-          ".chart-btn"
-        )
-        .forEach(
-          btn =>
-            btn.classList.remove(
-              "active"
-            )
-        );
-
-
-      button.classList.add(
-        "active"
-      );
-
-
-      if (hasMarketKey()) {
-
-        try {
-
-          const history =
-            await marketHistory(
-              selectedSymbol,
-              selectedPeriod,
-              selectedExchange
-            );
-
-
-          drawMarketChart(
-            history
-          );
-
-        } catch (error) {
-
-          console.error(error);
-
-        }
-
-      }
-
-    }
-
-
-    /* =====================================================
-       MARKET GROUP
-    ====================================================== */
-
-    function changeMarketGroup(
-      group,
-      button
-    ) {
-
-      currentMarketGroup =
-        group;
-
-
-      document
-        .querySelectorAll(
-          ".market-tab"
-        )
-        .forEach(
-          tab =>
-            tab.classList.remove(
-              "active"
-            )
-        );
-
-
-      button.classList.add(
-        "active"
-      );
-
-
+      `)
+      .join("");
+  } catch (error) {
+    console.error("Market news error:", error);
+
+    container.innerHTML =
+      "Market news unavailable.";
+  }
+}
+
+/* =========================================================
+   AUTO REFRESH
+========================================================= */
+
+setInterval(() => {
+  loadAllNews();
+}, CONFIG.NEWS_REFRESH);
+
+setInterval(() => {
+  loadWatchlist();
+  loadSelectedMarket();
+}, CONFIG.MARKET_REFRESH);
+
+/* =========================================================
+   VISIBILITY REFRESH
+========================================================= */
+
+document.addEventListener(
+  "visibilitychange",
+  () => {
+    if (document.visibilityState === "visible") {
+      loadAllNews();
       loadWatchlist();
-
-
-      const first =
-        MARKET_GROUPS[
-          group
-        ][0];
-
-
-      if (first) {
-
-        selectMarket(
-          first.symbol,
-          first.name,
-          first.exchange || ""
-        );
-
-      }
-
+      loadSelectedMarket();
     }
-
-
-    /* =====================================================
-       MARKET SEARCH
-    ====================================================== */
-
-    async function searchMarket() {
-
-      const input =
-        document.getElementById(
-          "marketSearch"
-        );
-
-
-      const query =
-        input.value.trim();
-
-
-      const results =
-        document.getElementById(
-          "marketSearchResults"
-        );
-
-
-      if (!query) {
-
-        results.innerHTML =
-          "";
-
-        return;
-
-      }
-
-
-      if (!hasMarketKey()) {
-
-        results.innerHTML = `
-
-          <div class="error-box">
-
-            Add your Twelve Data API key
-            to activate market search.
-
-          </div>
-
-        `;
-
-        return;
-
-      }
-
-
-      results.innerHTML = `
-
-        <div class="loading">
-
-          Searching markets...
-
-        </div>
-
-      `;
-
-
-      try {
-
-        const params =
-          new URLSearchParams({
-
-            symbol:
-              query,
-
-            outputsize:
-              "12",
-
-
-          });
-
-
-        const data =
-          await apiFetch(
-            "https://api.twelvedata.com/symbol_search?"
-            + params.toString()
-          );
-
-
-        const matches =
-          data.data || [];
-
-
-        if (!matches.length) {
-
-          results.innerHTML = `
-
-            <div class="loading">
-
-              No instruments found.
-
-            </div>
-
-          `;
-
-          return;
-
-        }
-
-
-        results.innerHTML =
-          matches
-            .slice(0, 8)
-            .map(
-              item => `
-
-                <button
-                  class="search-result"
-                  onclick="
-                    selectMarket(
-                      '${escapeHTML(item.symbol)}',
-                      '${escapeHTML(item.instrument_name)}',
-                      '${escapeHTML(item.exchange || "")}'
-                    )
-                  "
-                >
-
-                  <strong>
-                    ${escapeHTML(item.symbol)}
-                  </strong>
-
-                  <small>
-                    ${escapeHTML(item.instrument_name)}
-                    •
-                    ${escapeHTML(item.exchange || "")}
-                    •
-                    ${escapeHTML(item.country || "")}
-                  </small>
-
-                </button>
-
-              `
-            )
-            .join("");
-
-
-      } catch (error) {
-
-        console.error(error);
-
-
-        results.innerHTML = `
-
-          <div class="error-box">
-
-            Market search is temporarily unavailable.
-
-          </div>
-
-        `;
-
-      }
-
-    }
-
-
-    document
-      .getElementById(
-        "marketSearch"
-      )
-      ?.addEventListener(
-        "keydown",
-        event => {
-
-          if (
-            event.key === "Enter"
-          ) {
-
-            searchMarket();
-
-          }
-
-        }
-      );
-
-
-    /* =====================================================
-       MARKET NEWS
-    ====================================================== */
-
-    async function loadMarketNews(
-      symbol
-    ) {
-
-      const container =
-        document.getElementById(
-          "marketNewsList"
-        );
-
-
-      if (!hasGNewsKey()) {
-
-        container.innerHTML =
-          "Add GNews API key.";
-
-        return;
-
-      }
-
-
-      try {
-
-        const query =
-          `"${symbol}" OR stock market`;
-
-
-        const params =
-          new URLSearchParams({
-
-            q:
-              query,
-
-            lang:
-              "en",
-
-            max:
-              "4",
-
-            sortby:
-              "publishedAt",
-
-            from:
-              getFreshNewsDate(),
-
-
-          });
-
-
-        const data =
-          await apiFetch(
-            "https://gnews.io/api/v4/search?"
-            + params.toString()
-          );
-
-
-        const articles =
-          data.articles || [];
-
-
-        if (!articles.length) {
-
-          container.innerHTML =
-            "No recent market headlines.";
-
-          return;
-
-        }
-
-
-        container.innerHTML =
-          articles
-            .map(
-              article => `
-
-                <div class="market-news-item">
-
-                  <a
-                    href="${escapeHTML(article.url)}"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-
-                    ${escapeHTML(
-                      article.title
-                    )}
-
-                  </a>
-
-                </div>
-
-              `
-            )
-            .join("");
-
-
-      } catch (error) {
-
-        console.error(error);
-
-        container.innerHTML =
-          "Market news unavailable.";
-
-      }
-
-    }
-
-
-    /* =====================================================
-       API SETUP MESSAGE
-    ====================================================== */
-
-    function showMarketSetupMessage() {
-
-      document
-        .getElementById(
-          "selectedPrice"
-        )
-        .textContent =
-        "API KEY";
-
-
-      document
-        .getElementById(
-          "selectedChange"
-        )
-        .textContent =
-        "Add Twelve Data key";
-
-
-      document
-        .getElementById(
-          "marketNewsList"
-        )
-        .innerHTML = `
-
-          <div class="error-box">
-
-            Your WORLDLYN Market Terminal is ready,
-            but it needs a Twelve Data API key.
-
-          </div>
-
-        `;
-
-    }
-
-
-    /* =====================================================
-       AUTO REFRESH
-    ====================================================== */
-
-    setInterval(
-      loadAllNews,
-      CONFIG.NEWS_REFRESH
+  }
+);
+
+/* =========================================================
+   NAV ACTIVE STATE
+========================================================= */
+
+const navLinks =
+  document.querySelectorAll(".nav-inner a");
+
+navLinks.forEach(link => {
+  link.addEventListener("click", function() {
+    navLinks.forEach(item =>
+      item.classList.remove("active")
     );
 
+    this.classList.add("active");
+  });
+});
 
-    setInterval(
-      function() {
+/* =========================================================
+   INITIAL LOAD
+========================================================= */
 
-        loadWatchlist();
+window.addEventListener("load", () => {
+  loadAllNews();
+  loadWatchlist();
 
-        loadSelectedMarket();
-
-      },
-      CONFIG.MARKET_REFRESH
-    );
-
-
-    /* =====================================================
-       VISIBILITY REFRESH
-    ====================================================== */
-
-    document.addEventListener(
-      "visibilitychange",
-      function() {
-
-        if (
-          document.visibilityState ===
-          "visible"
-        ) {
-
-          loadAllNews();
-
-          loadWatchlist();
-
-          loadSelectedMarket();
-
-        }
-
-      }
-    );
-
-
-    /* =====================================================
-       NAV ACTIVE STATE
-    ====================================================== */
-
-    const navLinks =
-      document.querySelectorAll(
-        ".nav-inner a"
-      );
-
-
-    navLinks.forEach(
-      link => {
-
-        link.addEventListener(
-          "click",
-          function() {
-
-            navLinks.forEach(
-              item =>
-                item.classList.remove(
-                  "active"
-                )
-            );
-
-
-            this.classList.add(
-              "active"
-            );
-
-          }
-        );
-
-      }
-    );
-
-
-    /* =====================================================
-       INITIAL LOAD
-    ====================================================== */
-
-    window.addEventListener(
-      "load",
-      function() {
-
-        loadAllNews();
-
-        loadWatchlist();
-
-        selectMarket(
-          "NIFTY",
-          "NIFTY 50",
-          "NSE"
-        );
-
-      }
-    );
-
-  </script>
+  selectMarket(
+    "NIFTY",
+    "NIFTY 50",
+    "NSE"
+  );
+});
+</script>
 
 
 </body>
